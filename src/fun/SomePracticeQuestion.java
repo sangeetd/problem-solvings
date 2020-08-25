@@ -3244,7 +3244,63 @@ public class SomePracticeQuestion {
         return isSubTree(main.getLeft(), sub) || isSubTree(main.getRight(), sub);
         
     }
+    
+    private static boolean isTreeSymmetricRecurionHelper(TreeNode<Integer> n1, TreeNode<Integer> n2){
+        
+        if(n1 == null && n2 == null ){
+            return true;
+        }
+        
+        if(n1 == null || n2 == null){
+            return false;
+        }
+        
+        return (n1.getData() == n2.getData() 
+                && isTreeSymmetricRecurionHelper(n1.getLeft(), n2.getRight())
+                && isTreeSymmetricRecurionHelper(n1.getRight(), n2.getLeft()));
+        
+    }
+    
+    public static boolean isTreeSymmetric_Recursion(TreeNode<Integer> root){
+        return isTreeSymmetricRecurionHelper(root, root);
+    }
 
+    public static boolean isTreeSymmetric_Iteraative(TreeNode<Integer> root){
+        
+        Queue<TreeNode> q = new LinkedList<>();
+        q.add(root);
+        q.add(root);
+        
+        while(!q.isEmpty()){
+            
+            TreeNode n1 = q.poll();
+            TreeNode n2 = q.poll();
+            
+            if(n1 == null && n2 == null){
+                return true;
+            }
+            
+            if(n1 == null || n2 == null){
+                return false;
+            }
+            
+            if(n1.getData() != n2.getData()){
+                return false;
+            }
+            
+            q.add(n1.getLeft());
+            q.add(n2.getRight());
+            
+            q.add(n1.getRight());
+            q.add(n2.getLeft());
+            
+            
+        }
+        
+        return false;
+        
+    }
+    
     public static void removeMiddleElementFromStack(Stack<Integer> s, int stackSize, int curr) {
 
         /*
@@ -6075,6 +6131,31 @@ public class SomePracticeQuestion {
 //        //main - 10-20-30 sub - 10-20
 //        //20 should not have any further child in main  
 //        System.out.println("is Subtree "+isSubTree(main1, sub1));        
+//..............................................................................
+//        System.out.println("101. Symmetric Tree");
+//        //https://leetcode.com/problems/symmetric-tree/
+//        //https://leetcode.com/problems/symmetric-tree/solution/
+//        TreeNode<Integer> root = new TreeNode<>(1);
+//        root.setLeft(new TreeNode(2));
+//        root.getLeft().setLeft(new TreeNode(3));
+//        root.getLeft().setRight(new TreeNode(4));
+//        root.setRight(new TreeNode(2));
+//        root.getRight().setLeft(new TreeNode(4));
+//        root.getRight().setRight(new TreeNode(3));
+//        
+//        System.out.println("is tree symmetric? recursive "+isTreeSymmetric_Recursion(root));
+//        System.out.println("is tree symmetric? iterative "+isTreeSymmetric_Iteraative(root));
+//        
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(null);
+//        root1.getLeft().setRight(new TreeNode(3));
+//        root1.setRight(new TreeNode(2));
+//        root1.getRight().setLeft(null);
+//        root1.getRight().setRight(new TreeNode(3));
+//        
+//        System.out.println("is tree symmetric? recursive "+isTreeSymmetric_Recursion(root1));
+//        System.out.println("is tree symmetric? iterative "+isTreeSymmetric_Iteraative(root1));       
 //..............................................................................
 //        System.out.println("Remove middle element from the stack");
 //        //you can not use any other datastructure to do this
