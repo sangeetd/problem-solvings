@@ -3247,6 +3247,8 @@ public class SomePracticeQuestion {
     
     private static boolean isTreeSymmetricRecurionHelper(TreeNode<Integer> n1, TreeNode<Integer> n2){
         
+        //.................O(N)
+        
         if(n1 == null && n2 == null ){
             return true;
         }
@@ -3266,6 +3268,8 @@ public class SomePracticeQuestion {
     }
 
     public static boolean isTreeSymmetric_Iteraative(TreeNode<Integer> root){
+        
+        //.................O(N)
         
         Queue<TreeNode> q = new LinkedList<>();
         q.add(root);
