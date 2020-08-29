@@ -2321,20 +2321,20 @@ public class SomePracticeQuestion {
         //least occuring words come on top but if 2 or more words have same word count
         //then such words are arranged in alphabetical order
         PriorityQueue<String> minHeap = new PriorityQueue<>(
-            (s1, s2) -> {
-            return (wordsCount.get(s1).equals(wordsCount.get(s2))) ? s2.compareTo(s1) : (int)(wordsCount.get(s1) - wordsCount.get(s2));
-        }
+                (s1, s2) -> {
+                    return (wordsCount.get(s1).equals(wordsCount.get(s2))) ? s2.compareTo(s1) : (int) (wordsCount.get(s1) - wordsCount.get(s2));
+                }
         );
-        
+
         wordsCount.entrySet().stream().forEach(e -> {
-            
+
             minHeap.add(e.getKey());
-            if(minHeap.size() > k){
+            if (minHeap.size() > k) {
                 minHeap.poll();
             }
-            
+
         });
-        
+
         //till now we have managed to find to K occuring word
         //but in this minHeap also peek() word will be least occuring in K most occuring
         //and last word of heap will  have max ocuurence of all the K most occuring word
@@ -2342,15 +2342,14 @@ public class SomePracticeQuestion {
         //python -> 2, 
         //java -> 3, 
         //hello -> 5
-        
         //we will be polling out from top and adding to the result
         //in last result list will have word order in asc order (1, 2, 3, 5)
         //but we need to pass K most occuring word so just reverse it
         List<String> result = new ArrayList<>();
-        while(!minHeap.isEmpty()){
+        while (!minHeap.isEmpty()) {
             result.add(minHeap.poll());
         }
-        
+
         Collections.reverse(result);
         //printing k most frequently occuring words
         result.stream().forEach(e -> System.out.println(e));
@@ -3151,160 +3150,192 @@ public class SomePracticeQuestion {
         return lcaSolver(root, p, q);
 
     }
-    
-    private static int depth(TreeNode<Integer> node){
-        
-        if(node == null){
+
+    private static int depth(TreeNode<Integer> node) {
+
+        if (node == null) {
             return 0;
         }
-        
+
         return Math.max(depth(node.getLeft()), depth(node.getRight())) + 1;
-        
+
     }
-    
+
     public static TreeNode<Integer> lcaDeepestLeaves(TreeNode root) {
-        
-        if(root == null){
+
+        if (root == null) {
             return null;
         }
-        
+
         int leftDepth = depth(root.getLeft());
         int rightDepth = depth(root.getRight());
-        
+
         //if a certain root its left subtree depth matches with riight subtree depth
         //then that root is lca for its deepest leaf node
-        if(leftDepth == rightDepth){
+        if (leftDepth == rightDepth) {
             return root;
         }
-        
+
         //if leftDepth is higher then lca for a deepest leaf node is inside somewhere
         //in the left subtree
         //else it is in the right subtree
         return leftDepth > rightDepth ? lcaDeepestLeaves(root.getLeft()) : lcaDeepestLeaves(root.getRight());
-        
+
     }
-    
-    
+
     //this static class is req for the below algo 
     //for isBinaryTreeHeightBalnced()
-    static class Height{
+    static class Height {
+
         int height = 0;
     }
-    public static boolean isBinaryTreeHeightBalanced(TreeNode node, Height height){
-        
-        if(node == null){
+
+    public static boolean isBinaryTreeHeightBalanced(TreeNode node, Height height) {
+
+        if (node == null) {
             height.height = 0;
             return true;
         }
-        
+
         Height leftHeight = new Height();
         Height rightHeight = new Height();
-        
+
         boolean l = isBinaryTreeHeightBalanced(node.getLeft(), leftHeight);
         boolean r = isBinaryTreeHeightBalanced(node.getRight(), rightHeight);
-        
+
         height.height = Math.max(leftHeight.height, rightHeight.height) + 1;
-        
-        if(Math.abs(leftHeight.height - rightHeight.height) > 1){
+
+        if (Math.abs(leftHeight.height - rightHeight.height) > 1) {
             return false;
         }
-        
-        return l && r; 
-        
+
+        return l && r;
+
     }
-    
-    public static boolean isSubTree(TreeNode<Integer> main, TreeNode<Integer> sub){
-        
+
+    public static boolean isSubTree(TreeNode<Integer> main, TreeNode<Integer> sub) {
+
         //empty trees are also subtrees
-        if(main == null && sub == null){
+        if (main == null && sub == null) {
             return true;
         }
-        
+
         //if one tree is null and other one is not
         //there is no way we can say one is subtree of another
-        if(main  == null || sub == null){
+        if (main == null || sub == null) {
             return false;
         }
-        
+
         //if sub tree's first node matches with the main tree's first node
         //then we need to proove sub.left also matches main.left and sub.right matches main.right
         //and so on till sub trees end
         //if they will match it will return true
         //if sub.left doesn't match with main.left OR sub.right doesn't match with main.right
         //we will not move further in this if block...
-        if(main.getData() == sub.getData() && 
-                isSubTree(main.getLeft(), sub.getLeft()) &&
-                isSubTree(main.getRight(), sub.getRight())){
+        if (main.getData() == sub.getData()
+                && isSubTree(main.getLeft(), sub.getLeft())
+                && isSubTree(main.getRight(), sub.getRight())) {
             return true;
         }
-        
+
         //if above if-block is not able to find sub inside main
         //then there could be chances sub can be found in main tree's left subtree
         //OR sub can be found in main tree's right subtree.
         return isSubTree(main.getLeft(), sub) || isSubTree(main.getRight(), sub);
-        
+
     }
-    
-    private static boolean isTreeSymmetricRecurionHelper(TreeNode<Integer> n1, TreeNode<Integer> n2){
-        
+
+    private static boolean isTreeSymmetricRecurionHelper(TreeNode<Integer> n1, TreeNode<Integer> n2) {
+
         //.................O(N)
-        
-        if(n1 == null && n2 == null ){
+        if (n1 == null && n2 == null) {
             return true;
         }
-        
-        if(n1 == null || n2 == null){
+
+        if (n1 == null || n2 == null) {
             return false;
         }
-        
-        return (n1.getData() == n2.getData() 
+
+        return (n1.getData() == n2.getData()
                 && isTreeSymmetricRecurionHelper(n1.getLeft(), n2.getRight())
                 && isTreeSymmetricRecurionHelper(n1.getRight(), n2.getLeft()));
-        
+
     }
-    
-    public static boolean isTreeSymmetric_Recursion(TreeNode<Integer> root){
+
+    public static boolean isTreeSymmetric_Recursion(TreeNode<Integer> root) {
         return isTreeSymmetricRecurionHelper(root, root);
     }
 
-    public static boolean isTreeSymmetric_Iteraative(TreeNode<Integer> root){
-        
+    public static boolean isTreeSymmetric_Iteraative(TreeNode<Integer> root) {
+
         //.................O(N)
-        
         Queue<TreeNode> q = new LinkedList<>();
         q.add(root);
         q.add(root);
-        
-        while(!q.isEmpty()){
-            
+
+        while (!q.isEmpty()) {
+
             TreeNode n1 = q.poll();
             TreeNode n2 = q.poll();
-            
-            if(n1 == null && n2 == null){
+
+            if (n1 == null && n2 == null) {
                 return true;
             }
-            
-            if(n1 == null || n2 == null){
+
+            if (n1 == null || n2 == null) {
                 return false;
             }
-            
-            if(n1.getData() != n2.getData()){
+
+            if (n1.getData() != n2.getData()) {
                 return false;
             }
-            
+
             q.add(n1.getLeft());
             q.add(n2.getRight());
-            
+
             q.add(n1.getRight());
             q.add(n2.getLeft());
-            
-            
+
         }
-        
+
         return false;
-        
+
     }
-    
+
+    public static boolean canFinish(int numCourses, int[][] prerequisites) {
+        int[][] matrix = new int[numCourses][numCourses]; // i -> j
+        int[] indegree = new int[numCourses];
+
+        for (int i = 0; i < prerequisites.length; i++) {
+            int ready = prerequisites[i][0];
+            int pre = prerequisites[i][1];
+            if (matrix[pre][ready] == 0) {
+                indegree[ready]++; //duplicate case
+            }
+            matrix[pre][ready] = 1;
+        }
+
+        int count = 0;
+        Queue<Integer> queue = new LinkedList();
+        for (int i = 0; i < indegree.length; i++) {
+            if (indegree[i] == 0) {
+                queue.offer(i);
+            }
+        }
+        while (!queue.isEmpty()) {
+            int course = queue.poll();
+            count++;
+            for (int i = 0; i < numCourses; i++) {
+                if (matrix[course][i] != 0) {
+                    if (--indegree[i] == 0) {
+                        queue.offer(i);
+                    }
+                }
+            }
+        }
+        return count == numCourses;
+    }
+
     public static void removeMiddleElementFromStack(Stack<Integer> s, int stackSize, int curr) {
 
         /*
@@ -3352,30 +3383,29 @@ public class SomePracticeQuestion {
         return c;
 
     }
-    
-    public static void inPlace90AntiClockRotateMatrix(int[][] mat){
+
+    public static void inPlace90AntiClockRotateMatrix(int[][] mat) {
         int N = mat.length;
-        for(int x=0; x<N/2; x++){
-            for(int y=x; y<N-1-x; y++){
-                
+        for (int x = 0; x < N / 2; x++) {
+            for (int y = x; y < N - 1 - x; y++) {
+
                 int temp = mat[x][y];
-                mat[x][y] = mat[y][N-1-x];
-                mat[y][N-1-x] = mat[N-1-x][N-1-y];
-                mat[N-1-x][N-1-y] = mat[N-1-y][x];
-                mat[N-1-y][x] = temp;
-                
+                mat[x][y] = mat[y][N - 1 - x];
+                mat[y][N - 1 - x] = mat[N - 1 - x][N - 1 - y];
+                mat[N - 1 - x][N - 1 - y] = mat[N - 1 - y][x];
+                mat[N - 1 - y][x] = temp;
+
             }
         }
-        
+
         //printing
-        for(int x=0; x<N; x++){
+        for (int x = 0; x < N; x++) {
             System.out.println();
-            for(int y=0; y<N; y++){
-                System.out.print(mat[x][y]+"\t");
+            for (int y = 0; y < N; y++) {
+                System.out.print(mat[x][y] + "\t");
             }
         }
-        
-        
+
     }
 
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
@@ -6185,6 +6215,14 @@ public class SomePracticeQuestion {
 //        
 //        System.out.println("is tree symmetric? recursive "+isTreeSymmetric_Recursion(root1));
 //        System.out.println("is tree symmetric? iterative "+isTreeSymmetric_Iteraative(root1));       
+//..............................................................................
+//        System.out.println("207. Course Schedule | Figure out strategy to find the order of execution of processes");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-185-for-sde1/?ref=rp
+//        //https://leetcode.com/problems/course-schedule/
+//        int[][] coursesPre = {{1, 0}};
+//        System.out.println("can courses be completed? "+canFinish(2, coursesPre));
+//        int[][] coursesPre2 = {{1, 0}, {0, 1}};
+//        System.out.println("can courses be completed? "+canFinish(2, coursesPre2));
 //..............................................................................
 //        System.out.println("Remove middle element from the stack");
 //        //you can not use any other datastructure to do this
