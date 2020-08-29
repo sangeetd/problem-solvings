@@ -3352,6 +3352,31 @@ public class SomePracticeQuestion {
         return c;
 
     }
+    
+    public static void inPlace90AntiClockRotateMatrix(int[][] mat){
+        int N = mat.length;
+        for(int x=0; x<N/2; x++){
+            for(int y=x; y<N-1-x; y++){
+                
+                int temp = mat[x][y];
+                mat[x][y] = mat[y][N-1-x];
+                mat[y][N-1-x] = mat[N-1-x][N-1-y];
+                mat[N-1-x][N-1-y] = mat[N-1-y][x];
+                mat[N-1-y][x] = temp;
+                
+            }
+        }
+        
+        //printing
+        for(int x=0; x<N; x++){
+            System.out.println();
+            for(int y=0; y<N; y++){
+                System.out.print(mat[x][y]+"\t");
+            }
+        }
+        
+        
+    }
 
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
 
@@ -6199,6 +6224,16 @@ public class SomePracticeQuestion {
 //        N = 9;
 //        M = 17;
 //        System.out.println(theMinimumCost_HackerEarth(N, M, 0));
+//..............................................................................
+        System.out.println("Inplace rotate square matrix by 90 degrees");
+        //https://www.geeksforgeeks.org/inplace-rotate-square-matrix-by-90-degrees/
+        int mat[][] = { 
+            { 1, 2, 3, 4 }, 
+            { 5, 6, 7, 8 }, 
+            { 9, 10, 11, 12 }, 
+            { 13, 14, 15, 16 } 
+        }; 
+        inPlace90AntiClockRotateMatrix(mat);       
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
