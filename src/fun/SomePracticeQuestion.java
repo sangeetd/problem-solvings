@@ -6186,41 +6186,41 @@ public class SomePracticeQuestion {
 //        root2.getLeft().setLeft(new TreeNode(3));
 //        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root2, new Height()));
 //..............................................................................
-        System.out.println("Diameter of tree | DP on tree");
-        //https://www.geeksforgeeks.org/diameter-of-a-binary-tree/
-        /*
-        Def: 
-        The diameter of a tree (sometimes called the width) is the
-        number of nodes on the longest path between two leaf nodes. 
-        */
-        //below root1 is diagramatic example 1 in the gfg link
-        TreeNode<Integer> root1 = new TreeNode<>(1);
-        root1.setLeft(new TreeNode<>(2));
-        root1.getLeft().setLeft(new TreeNode<>(4));
-        root1.getLeft().setRight(new TreeNode<>(5));
-        root1.getLeft().getRight().setLeft(new TreeNode<>(6));
-        root1.getLeft().getRight().setRight(new TreeNode<>(7));
-        root1.setRight(new TreeNode<>(3));
-        root1.getRight().setRight(new TreeNode<>(8));
-        root1.getRight().getRight().setRight(new TreeNode<>(9));
-        root1.getRight().getRight().getRight().setLeft(new TreeNode<>(10));
-        root1.getRight().getRight().getRight().getLeft().setRight(new TreeNode<>(12));
-        root1.getRight().getRight().getRight().setRight(new TreeNode<>(11));
-        
-        BinaryTree<Integer> bt = new BinaryTree<>(root1);
-        bt.treeBFS();
-        System.out.println("Diameter of above tree b/w node 7(leaf) to 12(leaf)"+diameterOfTree(root1, new Height()));
-        
-        TreeNode<Integer> root2 = new TreeNode<>(1);
-        root2.setLeft(new TreeNode<>(2));
-        root2.getLeft().setLeft(new TreeNode<>(4));
-        root2.getLeft().setRight(new TreeNode<>(5));
-        root2.getLeft().getRight().setRight(new TreeNode<>(6));
-        root2.getLeft().getRight().getRight().setRight(new TreeNode<>(7));
-        root2.getLeft().getRight().getRight().getRight().setLeft(new TreeNode<>(8));
-        bt = new BinaryTree<>(root2);
-        bt.treeBFS();
-        System.out.println("Diameter of above tree b/w node 4(leaf) to 8(leaf)"+diameterOfTree(root2, new Height()));
+//        System.out.println("Diameter of tree | DP on tree");
+//        //https://www.geeksforgeeks.org/diameter-of-a-binary-tree/
+//        /*
+//        Def: 
+//        The diameter of a tree (sometimes called the width) is the
+//        number of nodes on the longest path between two leaf nodes. 
+//        */
+//        //below root1 is diagramatic example 1 in the gfg link
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.getLeft().setRight(new TreeNode<>(5));
+//        root1.getLeft().getRight().setLeft(new TreeNode<>(6));
+//        root1.getLeft().getRight().setRight(new TreeNode<>(7));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setRight(new TreeNode<>(8));
+//        root1.getRight().getRight().setRight(new TreeNode<>(9));
+//        root1.getRight().getRight().getRight().setLeft(new TreeNode<>(10));
+//        root1.getRight().getRight().getRight().getLeft().setRight(new TreeNode<>(12));
+//        root1.getRight().getRight().getRight().setRight(new TreeNode<>(11));
+//        
+//        BinaryTree<Integer> bt = new BinaryTree<>(root1);
+//        bt.treeBFS();
+//        System.out.println("Diameter of above tree b/w node 7(leaf) to 12(leaf)"+diameterOfTree(root1, new Height()));
+//        
+//        TreeNode<Integer> root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode<>(2));
+//        root2.getLeft().setLeft(new TreeNode<>(4));
+//        root2.getLeft().setRight(new TreeNode<>(5));
+//        root2.getLeft().getRight().setRight(new TreeNode<>(6));
+//        root2.getLeft().getRight().getRight().setRight(new TreeNode<>(7));
+//        root2.getLeft().getRight().getRight().getRight().setLeft(new TreeNode<>(8));
+//        bt = new BinaryTree<>(root2);
+//        bt.treeBFS();
+//        System.out.println("Diameter of above tree b/w node 4(leaf) to 8(leaf)"+diameterOfTree(root2, new Height()));
 //..............................................................................
 //        System.out.println(" Find if the given tree is the subtree of the big tree.");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-186-for-sde1/?ref=rp
