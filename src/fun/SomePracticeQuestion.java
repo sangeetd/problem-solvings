@@ -3445,6 +3445,83 @@ public class SomePracticeQuestion {
         return helper(N, K - 1, dict);
     }
 
+    public static String intToRoman(int num) {
+
+        Map<Integer, String> map = new HashMap<>();
+        map.put(0, "");
+        map.put(1, "I");
+        map.put(2, "II");
+        map.put(3, "III");
+        map.put(4, "IV");
+        map.put(5, "V");
+        map.put(6, "VI");
+        map.put(7, "VII");
+        map.put(8, "VIII");
+        map.put(9, "IX");
+        map.put(10, "X");
+        map.put(20, "XX");
+        map.put(30, "XXX");
+        map.put(40, "XL");
+        map.put(50, "L");
+        map.put(60, "LX");
+        map.put(70, "LXX");
+        map.put(80, "LXXX");
+        map.put(90, "XC");
+        map.put(100, "C");
+        map.put(200, "CC");
+        map.put(300, "CCC");
+        map.put(400, "CD");
+        map.put(500, "D");
+        map.put(600, "DC");
+        map.put(700, "DCC");
+        map.put(800, "DCCC");
+        map.put(900, "CM");
+        map.put(1000, "M");
+        map.put(2000, "MM");
+        map.put(3000, "MMM");
+
+        int mul = 0;
+        StringBuilder sb = new StringBuilder();
+        while (num != 0) {
+
+            // System.out.println(num +" -- " +(Math.pow(10, mul) * (num%10))+" -- "+map.get((int)(Math.pow(10, mul++) * (num%10))));
+            sb.insert(0, map.get((int) (Math.pow(10, mul++) * (num % 10))));
+
+            num /= 10;
+
+        }
+
+        return sb.toString();
+
+    }
+
+    public static int romanToInt(String s) {
+        
+        Map<Character, Integer> roman = new HashMap<>();
+        roman.put('I', 1);
+        roman.put('V', 5);
+        roman.put('X', 10);
+        roman.put('L', 50);
+        roman.put('C', 100);
+        roman.put('D', 500);
+        roman.put('M', 1000);
+        
+        int result = 0;
+        
+        for(int i = 0; i<s.length(); i++){
+            
+            if( (i-1 >= 0) && (roman.get(s.charAt(i-1)) < roman.get(s.charAt(i))) ){
+                result += roman.get(s.charAt(i)) - 2 * roman.get(s.charAt(i-1));
+            }else{
+                result += roman.get(s.charAt(i));
+            }
+                
+        }  
+        
+        return result;
+        
+    }
+    
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
 
         //least end point when we reach to 0 index of string
@@ -6367,6 +6444,20 @@ public class SomePracticeQuestion {
 //        N = 4;
 //        K = 6;
 //        System.out.println(kthGrammar(N, K));
+//..............................................................................
+//        System.out.println("12. Integer to Roman");
+//        //https://leetcode.com/problems/integer-to-roman/
+//        System.out.println("roman : "+intToRoman(3));
+//        System.out.println("roman : "+intToRoman(432));
+//        System.out.println("roman : "+intToRoman(501));
+//        System.out.println("roman : "+intToRoman(3999));
+//..............................................................................
+//        System.out.println("13. Roman to Integer");
+//        //https://leetcode.com/problems/roman-to-integer/
+//        System.out.println("int : " + romanToInt("MMMCMXCIX"));
+//        System.out.println("int : " + romanToInt("VIII"));
+//        System.out.println("int : " + romanToInt("DI"));
+//        System.out.println("int : " + romanToInt("MCMXCIV"));
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
