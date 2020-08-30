@@ -22,6 +22,7 @@ import javafx.util.Pair;
 public class BinaryTree<T> {
 
     private TreeNode<T> root;
+    private int height = 0;
 
     public BinaryTree() {
         this.root = null;
@@ -373,6 +374,26 @@ public class BinaryTree<T> {
 
         kSumPathAndDeleteOtherNode(root, k, 0, null);
 
+    }
+    
+    public int treeHeightWithNode(TreeNode node){
+        
+        if(node == null){
+            return 0;
+        }
+        
+        return Math.max(treeHeightWithNode(node.getLeft()), treeHeightWithNode(node.getRight())) + 1;
+        
+    }
+    
+    public int treeHeight(){
+        if (getRoot() == null) {
+            System.out.println("Tree is empty");
+            return 0;
+        }
+        
+        return treeHeightWithNode(getRoot());
+        
     }
 
     private int inorderRootElementIndex(T[] inorder, T data, int l, int r) {
