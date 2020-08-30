@@ -115,7 +115,7 @@ public class GraphTest {
         }*/
         
         
-        try {
+        /*try {
             GraphStructure g = new GraphStructure(5, GraphStructure.GRAPH_UNDIRECTED);
             
             
@@ -149,6 +149,24 @@ public class GraphTest {
             GraphStructure g3= g.primsForMCST();
             System.out.println("Minimum cost spanning tree obtained from graph g prims");
             g3.printAdjList();
+            
+        } catch (Exception ex) {
+            Logger.getLogger(GraphTest.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+        
+        try {
+            GraphStructure g = new GraphStructure(6, GraphStructure.GRAPH_DIRECTED);
+            
+            
+            g.addVertexConnections(5, 0, 1, 1);
+            g.addVertexConnections(5, 2, 1, 1);
+            g.addVertexConnections(2, 3, 1, 1);
+            g.addVertexConnections(3, 1, 1, 1);
+            g.addVertexConnections(4, 0, 1, 1);
+            g.addVertexConnections(4, 1, 1, 1);
+  
+            g.printAdjList();
+            
             
         } catch (Exception ex) {
             Logger.getLogger(GraphTest.class.getName()).log(Level.SEVERE, null, ex);
