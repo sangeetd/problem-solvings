@@ -3212,29 +3212,29 @@ public class SomePracticeQuestion {
         return l && r;
 
     }
-    
-    public static int diameterOfTree(TreeNode node, Height height){
-        
-        if(node == null){
+
+    public static int diameterOfTree(TreeNode node, Height height) {
+
+        if (node == null) {
             //this will set the height of the node as we passed the height ref in fun() call
             //itself
             height.height = 0;
             //this return statement will give out the diameter of the same node
             return 0;
         }
-        
+
         Height leftHeight = new Height();
         Height rightHeight = new Height();
-        
+
         int lD = diameterOfTree(node.getLeft(), leftHeight);
         int rD = diameterOfTree(node.getRight(), rightHeight);
-        
+
         //choosing the max height from the leftSubtree or rightSubTree  and adding
         // 1 for the current node itself 
         height.height = Math.max(leftHeight.height, rightHeight.height) + 1;
-        
-        return Math.max(leftHeight.height+rightHeight.height+1, Math.max(lD, rD));
-        
+
+        return Math.max(leftHeight.height + rightHeight.height + 1, Math.max(lD, rD));
+
     }
 
     public static boolean isSubTree(TreeNode<Integer> main, TreeNode<Integer> sub) {
@@ -3430,6 +3430,19 @@ public class SomePracticeQuestion {
             }
         }
 
+    }
+
+    private static int helper(int N, int K, int[][] dict) {
+        if (N == 1) {
+            return 0;
+        }
+        int num = helper(N - 1, K / 2, dict);
+        return dict[num][K % 2];
+    }
+
+    public static int kthGrammar(int N, int K) {
+        int[][] dict = {{0, 1}, {1, 0}};
+        return helper(N, K - 1, dict);
     }
 
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
@@ -6335,6 +6348,25 @@ public class SomePracticeQuestion {
 //            { 13, 14, 15, 16 } 
 //        }; 
 //        inPlace90AntiClockRotateMatrix(mat);       
+//..............................................................................
+//        System.out.println("779. K-th Symbol in Grammar");
+//        //https://leetcode.com/problems/k-th-symbol-in-grammar/
+//        /*
+//         Explanation:
+//         row 1: 0
+//         row 2: 01
+//         row 3: 0110
+//         row 4: 01101001
+//        
+//         */
+//        int N = 1, K = 1;
+//        System.out.println(kthGrammar(N, K));
+//        N = 2;
+//        K = 2;
+//        System.out.println(kthGrammar(N, K));
+//        N = 4;
+//        K = 6;
+//        System.out.println(kthGrammar(N, K));
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
