@@ -3236,6 +3236,26 @@ public class SomePracticeQuestion {
         return Math.max(leftHeight.height + rightHeight.height + 1, Math.max(lD, rD));
 
     }
+    
+    static class Result{
+        int result = Integer.MIN_VALUE;
+    }
+    public static int maxPathSumOfTree(TreeNode node, Result result) {
+
+        if (node == null) {
+            //this return statement will give out the diameter of the same node
+            return 0;
+        }
+
+        int lPathSum = maxPathSumOfTree(node.getLeft(), result);
+        int rPathSum = maxPathSumOfTree(node.getRight(), result);
+
+        int temp = Math.max(Math.max(lPathSum, rPathSum) + (Integer)node.getData(), (Integer)node.getData()); 
+        int ans = Math.max(temp, lPathSum + rPathSum + (Integer)node.getData());
+        result.result = Math.max(temp, ans);
+        return temp;
+
+    }
 
     public static boolean isSubTree(TreeNode<Integer> main, TreeNode<Integer> sub) {
 
@@ -6311,6 +6331,20 @@ public class SomePracticeQuestion {
 //        bt = new BinaryTree<>(root2);
 //        bt.treeBFS();
 //        System.out.println("Diameter of above tree b/w node 4(leaf) to 8(leaf)"+diameterOfTree(root2, new Height()));
+//..............................................................................
+//        System.out.println("Max path sum of tree | DP on tree");
+//        //https://www.geeksforgeeks.org/find-maximum-path-sum-in-a-binary-tree/
+//        TreeNode<Integer> root = new TreeNode<>(10);
+//        root.setLeft(new TreeNode(2));
+//        root.getLeft().setLeft(new TreeNode<>(20));
+//        root.getLeft().setRight(new TreeNode<>(1));
+//        root.setRight(new TreeNode(10));
+//        root.getRight().setRight(new TreeNode(-25));
+//        root.getRight().getRight().setLeft(new TreeNode<>(3));
+//        root.getRight().getRight().setRight(new TreeNode<>(4));
+//        Result res = new Result();
+//        maxPathSumOfTree(root, res);
+//        System.out.println("max path sum of tree "+res.result);
 //..............................................................................
 //        System.out.println(" Find if the given tree is the subtree of the big tree.");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-186-for-sde1/?ref=rp
