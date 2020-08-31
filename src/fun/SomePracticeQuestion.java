@@ -3243,13 +3243,18 @@ public class SomePracticeQuestion {
     public static int maxPathSumOfTree(TreeNode node, Result result) {
 
         if (node == null) {
-            //this return statement will give out the diameter of the same node
+            //this return statement will give out the sum of the null node
             return 0;
         }
 
+        //get the sum for left subtree and right subtree
         int lPathSum = maxPathSumOfTree(node.getLeft(), result);
         int rPathSum = maxPathSumOfTree(node.getRight(), result);
 
+        //a. either leftPathSum or rightPathSum is greater and the current node will include that
+        //b. if leftPathSum and rightPathSum is -ve and our current node is +ve then by default 
+        //our current node is greater than all
+        //choose max(a, b)
         int temp = Math.max(Math.max(lPathSum, rPathSum) + (Integer)node.getData(), (Integer)node.getData()); 
         int ans = Math.max(temp, lPathSum + rPathSum + (Integer)node.getData());
         result.result = Math.max(temp, ans);
