@@ -3240,7 +3240,7 @@ public class SomePracticeQuestion {
     static class Result{
         int result = Integer.MIN_VALUE;
     }
-    public static int maxPathSumOfTree(TreeNode node, Result result) {
+    public static int maxPathSumOfTreeAnyNodeToAnyNode(TreeNode node, Result result) {
 
         if (node == null) {
             //this return statement will give out the sum of the null node
@@ -3248,8 +3248,8 @@ public class SomePracticeQuestion {
         }
 
         //get the sum for left subtree and right subtree
-        int lPathSum = maxPathSumOfTree(node.getLeft(), result);
-        int rPathSum = maxPathSumOfTree(node.getRight(), result);
+        int lPathSum = maxPathSumOfTreeAnyNodeToAnyNode(node.getLeft(), result);
+        int rPathSum = maxPathSumOfTreeAnyNodeToAnyNode(node.getRight(), result);
 
         //a. either leftPathSum or rightPathSum is greater and the current node will include that
         //b. if leftPathSum and rightPathSum is -ve and our current node is +ve then by default 
@@ -3259,6 +3259,31 @@ public class SomePracticeQuestion {
         int ans = Math.max(temp, lPathSum + rPathSum + (Integer)node.getData());
         result.result = Math.max(temp, ans);
         return temp;
+
+    }
+    
+    public static int maxPathSumOfTreeLeafNodeToLeafNode(TreeNode node, Result result) {
+
+        if (node == null) {
+            //this return statement will give out the sum of the null node
+            return 0;
+        }
+
+        //get the sum for left subtree and right subtree
+        int lPathSum = maxPathSumOfTreeLeafNodeToLeafNode(node.getLeft(), result);
+        int rPathSum = maxPathSumOfTreeLeafNodeToLeafNode(node.getRight(), result);
+
+        //a. either leftPathSum or rightPathSum is greater and the current node will include that
+        //b. if leftPathSum and rightPathSum is -ve and our current node is +ve then by default 
+        //our current node is greater than all
+        //choose max(a, b)
+        int temp = Math.max(lPathSum, rPathSum) + (Integer)node.getData(); 
+//        if(node.getLeft() == null && node.getRight() == null){
+//            temp = Math.max(temp, (Integer)node.getData());
+//        }
+        int ans = Math.max(temp, lPathSum + rPathSum + (Integer)node.getData());
+        result.result = Math.max(temp, ans);
+        return ans;
 
     }
 
@@ -6337,7 +6362,7 @@ public class SomePracticeQuestion {
 //        bt.treeBFS();
 //        System.out.println("Diameter of above tree b/w node 4(leaf) to 8(leaf)"+diameterOfTree(root2, new Height()));
 //..............................................................................
-//        System.out.println("Max path sum of tree | DP on tree");
+//        System.out.println("Max path sum of tree any node to any node | DP on tree");
 //        //https://www.geeksforgeeks.org/find-maximum-path-sum-in-a-binary-tree/
 //        TreeNode<Integer> root = new TreeNode<>(10);
 //        root.setLeft(new TreeNode(2));
@@ -6348,8 +6373,27 @@ public class SomePracticeQuestion {
 //        root.getRight().getRight().setLeft(new TreeNode<>(3));
 //        root.getRight().getRight().setRight(new TreeNode<>(4));
 //        Result res = new Result();
-//        maxPathSumOfTree(root, res);
+//        maxPathSumOfTreeAnyNodeToAnyNode(root, res);
 //        System.out.println("max path sum of tree "+res.result);
+//..............................................................................
+        System.out.println("Max path sum of tree leaf node to leaf node| DP on tree");
+        TreeNode<Integer> root = new TreeNode<>(-15);
+        root.setLeft(new TreeNode<>(5));
+        root.getLeft().setLeft(new TreeNode<>(-8));
+        root.getLeft().getLeft().setLeft(new TreeNode<>(2));
+        root.getLeft().getLeft().setRight(new TreeNode<>(6));
+        root.getLeft().setRight(new TreeNode<>(1));
+        root.setRight(new TreeNode<>(6));
+        root.getRight().setLeft(new TreeNode<>(3));
+        root.getRight().setRight(new TreeNode<>(9));
+        root.getRight().getRight().setRight(new TreeNode<>(0));
+        root.getRight().getRight().getRight().setLeft(new TreeNode<>(4));
+        root.getRight().getRight().getRight().setRight(new TreeNode<>(-1));
+        root.getRight().getRight().getRight().getRight().setLeft(new TreeNode<>(10));
+        
+        Result res = new Result();
+        maxPathSumOfTreeLeafNodeToLeafNode(root, res);
+        System.out.println("max path sum of tree "+res.result);
 //..............................................................................
 //        System.out.println(" Find if the given tree is the subtree of the big tree.");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-186-for-sde1/?ref=rp
