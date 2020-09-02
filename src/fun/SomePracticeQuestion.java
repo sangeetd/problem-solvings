@@ -3236,10 +3236,12 @@ public class SomePracticeQuestion {
         return Math.max(leftHeight.height + rightHeight.height + 1, Math.max(lD, rD));
 
     }
-    
-    static class Result{
+
+    static class Result {
+
         int result = Integer.MIN_VALUE;
     }
+
     public static int maxPathSumOfTreeAnyNodeToAnyNode(TreeNode node, Result result) {
 
         if (node == null) {
@@ -3255,13 +3257,13 @@ public class SomePracticeQuestion {
         //b. if leftPathSum and rightPathSum is -ve and our current node is +ve then by default 
         //our current node is greater than all
         //choose max(a, b)
-        int temp = Math.max(Math.max(lPathSum, rPathSum) + (Integer)node.getData(), (Integer)node.getData()); 
-        int ans = Math.max(temp, lPathSum + rPathSum + (Integer)node.getData());
+        int temp = Math.max(Math.max(lPathSum, rPathSum) + (Integer) node.getData(), (Integer) node.getData());
+        int ans = Math.max(temp, lPathSum + rPathSum + (Integer) node.getData());
         result.result = Math.max(temp, ans);
         return temp;
 
     }
-    
+
     public static int maxPathSumOfTreeLeafNodeToLeafNode(TreeNode node, Result result) {
 
         if (node == null) {
@@ -3277,11 +3279,11 @@ public class SomePracticeQuestion {
         //b. if leftPathSum and rightPathSum is -ve and our current node is +ve then by default 
         //our current node is greater than all
         //choose max(a, b)
-        int temp = Math.max(lPathSum, rPathSum) + (Integer)node.getData(); 
+        int temp = Math.max(lPathSum, rPathSum) + (Integer) node.getData();
 //        if(node.getLeft() == null && node.getRight() == null){
 //            temp = Math.max(temp, (Integer)node.getData());
 //        }
-        int ans = Math.max(temp, lPathSum + rPathSum + (Integer)node.getData());
+        int ans = Math.max(temp, lPathSum + rPathSum + (Integer) node.getData());
         result.result = Math.max(temp, ans);
         return ans;
 
@@ -3377,11 +3379,9 @@ public class SomePracticeQuestion {
     }
 
     public static boolean canFinish(int numCourses, int[][] prerequisites) {
-        
-        
+
         //this is based on Kahn's algorithm
         //topological sort BFS 
-        
         int[][] matrix = new int[numCourses][numCourses]; // i -> j
         int[] indegree = new int[numCourses];
 
@@ -3434,14 +3434,15 @@ public class SomePracticeQuestion {
         }
 
     }
-    
+
     static Stack<Integer> stackReverse = new Stack<>();
-    private static void insertInStack(int ele){
-        
+
+    private static void insertInStack(int ele) {
+
         //if stack is empty push that element
-        if(stackReverse.isEmpty()){
+        if (stackReverse.isEmpty()) {
             stackReverse.push(ele);
-        }else{
+        } else {
             //if stack is not empty
             //pop all the elements again until stack is empty
             //push the ele in empty stack
@@ -3450,12 +3451,12 @@ public class SomePracticeQuestion {
             //then push in all the poppped element
             stackReverse.push(x_);
         }
-        
+
     }
-    
-    public static void reverseStackRecursion(){
-        
-        if(stackReverse.size() > 0){
+
+    public static void reverseStackRecursion() {
+
+        if (stackReverse.size() > 0) {
             //pop out all element from stack
             //and in each recursive call x holds popped element
             int x = stackReverse.pop();
@@ -3464,7 +3465,7 @@ public class SomePracticeQuestion {
             //push all element back
             insertInStack(x);
         }
-        
+
     }
 
     public static int theMinimumCost_HackerEarth(int N, int M, int cost) {
@@ -3532,74 +3533,73 @@ public class SomePracticeQuestion {
         return helper(N, K - 1, dict);
     }
 
-    public static int kthGrammar_2(int N, int K){
-        
+    public static int kthGrammar_2(int N, int K) {
+
         /*
         
-        easier explanations:...
+         easier explanations:...
         
-                                        K -> 
-        len of grammer 2^N-1        N=1 0
-        len of grammer 2^N-1        N=2 01
-        len of grammer 2^N-1        N=3 0110
-        len of grammer 2^N-1        N=4 01101001
+         K -> 
+         len of grammer 2^N-1        N=1 0
+         len of grammer 2^N-1        N=2 01
+         len of grammer 2^N-1        N=3 0110
+         len of grammer 2^N-1        N=4 01101001
         
-        for given N and K find the bit in the grammar
-        observe N=4 len = 2^N-1 = 8
-        in this, first half 0110 is exactly same as N=3 
-        and other half 1001 is exactly reverse of all K in N=3 (0110) N=4 other_half(1001)
-        so if K=1 to mid of len at given Nth row = K at N-1th row
-        ex: N=4 K=1 = N=3 K=1 == 0 upto K = mid = 4
-        else if K > mid of len at given Nth row (K=mid+1 to len(Nth row)) = rev(K-mid) at N-1th row
-        ex: N=4 K=6 = N=3 K=(K-mid=6-4)=2 = 1 and rev(1) = 0
+         for given N and K find the bit in the grammar
+         observe N=4 len = 2^N-1 = 8
+         in this, first half 0110 is exactly same as N=3 
+         and other half 1001 is exactly reverse of all K in N=3 (0110) N=4 other_half(1001)
+         so if K=1 to mid of len at given Nth row = K at N-1th row
+         ex: N=4 K=1 = N=3 K=1 == 0 upto K = mid = 4
+         else if K > mid of len at given Nth row (K=mid+1 to len(Nth row)) = rev(K-mid) at N-1th row
+         ex: N=4 K=6 = N=3 K=(K-mid=6-4)=2 = 1 and rev(1) = 0
         
-        */
-        
-        if(N == 1){
+         */
+        if (N == 1) {
             return 0;
         }
-        
-        int mid = (int)(Math.pow(2, N-1)/2);
-        if(K < mid){
+
+        int mid = (int) (Math.pow(2, N - 1) / 2);
+        if (K <= mid) {
             //first half of Nth row
-            return kthGrammar_2(N-1, K);
-        }else {
+            return kthGrammar_2(N - 1, K);
+        } else {
             //other half of Nth row ans would be rev
-            return kthGrammar_2(N-1, K-mid) == 0 ? 1 : 0;
+            return kthGrammar_2(N - 1, K - mid) == 0 ? 1 : 0;
         }
-        
+
     }
-    
-    public static void connectRopesWithMinCost(int[] ropesLength){
-        
+
+    public static void connectRopesWithMinCost(int[] ropesLength) {
+
         PriorityQueue<Integer> minHeap = new PriorityQueue<>();
-        for(int i: ropesLength){
+        for (int i : ropesLength) {
             minHeap.add(i);
         }
         int cost = 0;
-        
+
         //if heap size goes below 2 i.e, 1 that means we have combined all the ropes to make one
-        while(minHeap.size()>=2){
-            
+        while (minHeap.size() >= 2) {
+
             //first shorter lengthed rope
             int firstRope = minHeap.poll();
-            
+
             //second shorter lengthed rope
             int secondRope = minHeap.poll();
-            
+
             //cost for joining 2 ropes
             cost += firstRope + secondRope;
-            
+
             //now 2 ropes are combined to form one rope of length (firstRope.len + secondRope.len)
             //add it heap again
-            minHeap.add(firstRope+secondRope);
-            
+            minHeap.add(firstRope + secondRope);
+
         }
-        
-        System.out.println("min cost of joining all the ropes together "+cost);
-        
+
+        System.out.println("min cost of joining all the ropes together " + cost);
+
     }
-    
+
     public static String intToRoman(int num) {
 
         Map<Integer, String> map = new HashMap<>();
@@ -3651,7 +3651,7 @@ public class SomePracticeQuestion {
     }
 
     public static int romanToInt(String s) {
-        
+
         Map<Character, Integer> roman = new HashMap<>();
         roman.put('I', 1);
         roman.put('V', 5);
@@ -3660,23 +3660,96 @@ public class SomePracticeQuestion {
         roman.put('C', 100);
         roman.put('D', 500);
         roman.put('M', 1000);
-        
+
         int result = 0;
-        
-        for(int i = 0; i<s.length(); i++){
-            
-            if( (i-1 >= 0) && (roman.get(s.charAt(i-1)) < roman.get(s.charAt(i))) ){
-                result += roman.get(s.charAt(i)) - 2 * roman.get(s.charAt(i-1));
-            }else{
+
+        for (int i = 0; i < s.length(); i++) {
+
+            if ((i - 1 >= 0) && (roman.get(s.charAt(i - 1)) < roman.get(s.charAt(i)))) {
+                result += roman.get(s.charAt(i)) - 2 * roman.get(s.charAt(i - 1));
+            } else {
                 result += roman.get(s.charAt(i));
             }
-                
-        }  
-        
+
+        }
+
         return result;
+
+    }
+
+    public static void slidingWindowMaximum_ON2(int[] nums, int k) {
+
+        //this is O(N^2) approach can give you TLE
+        ArrayList<Integer> result = new ArrayList<>();
+
+        if (k == 1 || nums.length == 1) {
+            System.out.print(nums[0]);
+
+        }
+
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(
+                (a, b) -> b.compareTo(a)
+        );
+        for (int i = 0; i <= nums.length - k; i++) {
+
+            for (int j = i; j < i + k; j++) {
+                // System.out.println(nums[j]);
+                maxHeap.add(nums[j]);
+
+            }
+
+            result.add(maxHeap.poll());
+            maxHeap.clear();
+
+        }
+
+        result.stream().forEach((l) -> {
+            System.out.print(l + " ");
+        });
+
+        System.out.println();
         
     }
-    
+
+    public static void slidingWindowMaximum_ON(int[] nums, int k) {
+
+        //this is O(N) approach
+        // max_upto array stores the index 
+        // upto which the maximum element is a[i] 
+        // i.e. max(a[i], a[i + 1], ... a[max_upto[i]]) = a[i] 
+        int n = nums.length;
+        int[] max_upto = new int[n];
+        
+        // Update max_upto array similar to 
+        // finding next greater element 
+        Stack<Integer> s = new Stack<>();
+        s.push(0);
+        for (int i = 1; i < n; i++) {
+            while (!s.empty() && nums[s.peek()] < nums[i]) {
+                max_upto[s.peek()] = i - 1;
+                s.pop();
+            }
+            s.push(i);
+        }
+        
+        while (!s.empty()) {
+            max_upto[s.peek()] = n - 1;
+            s.pop();
+        }
+        
+        int j = 0;
+        for (int i = 0; i <= n - k; i++) {
+
+            // j < i is to check whether the 
+            // jth element is outside the window 
+            while (j < i || max_upto[j] < i + k - 1) {
+                j++;
+            }
+            System.out.print(nums[j] + " ");
+        }
+        System.out.println();
+    }
+
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
 
         //least end point when we reach to 0 index of string
@@ -6664,6 +6737,12 @@ public class SomePracticeQuestion {
 //        System.out.println("int : " + romanToInt("VIII"));
 //        System.out.println("int : " + romanToInt("DI"));
 //        System.out.println("int : " + romanToInt("MCMXCIV"));
+//..............................................................................
+        System.out.println("239. Sliding Window Maximum");
+        //https://leetcode.com/problems/sliding-window-maximum/
+        //https://www.geeksforgeeks.org/sliding-window-maximum-maximum-of-all-subarrays-of-size-k-using-stack-in-on-time/
+        slidingWindowMaximum_ON2(new int[]{1,3,-1,-3,5,3,6,7}, 3);
+        slidingWindowMaximum_ON(new int[]{1,3,-1,-3,5,3,6,7}, 3);
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
