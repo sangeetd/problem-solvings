@@ -5764,16 +5764,18 @@ public class SomePracticeQuestion {
 //        root.treeBFS();
 //        System.out.println();
 //.............................................................................. 
-        //lookagain
-//        BinaryTree<String> tree = new BinaryTree<>();
-//        
-//        tree = tree.buildTreeFromInorderPreorder(new String[] {"D", "B", "E", "A", "F", "C"}, 
-//        new String[] {"A", "B", "D", "E", "C", "F"});
-//        tree.treeBFS();
-//        
-////        tree = tree.buildTreeFromInorderPreorder(new String[] {"H", "D", "I", "B", "J", "E", "K", "A", "F", "C", "G"}, 
-////        new String[] {"A", "B", "D", "H", "I", "E", "J", "K", "C", "F", "G"});
-////        tree.treeBFS();
+        System.out.println("Creating binary tree from given inorder and preorder array");
+        //https://www.geeksforgeeks.org/construct-tree-from-given-inorder-and-preorder-traversal/
+        BinaryTree<String> tree = new BinaryTree<>();
+        
+        tree = tree.buildTreeFromInorderPreorder(new String[] {"D", "B", "E", "A", "F", "C"}, 
+        new String[] {"A", "B", "D", "E", "C", "F"});
+        tree.treeBFS();
+        
+        tree = tree.buildTreeFromInorderPreorder(new String[] {"H", "D", "I", "B", "J", "E", "K", "A", "F", "C", "G"}, 
+        new String[] {"A", "B", "D", "H", "I", "E", "J", "K", "C", "F", "G"});
+        System.out.println();
+        tree.treeBFS();
 //..............................................................................
 //        System.out.println("Boggle-Solver with direction option "
 //                + "limited to up, down, right and left");

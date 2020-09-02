@@ -397,63 +397,35 @@ public class BinaryTree<T> {
     }
 
     private int inorderRootElementIndex(T[] inorder, T data, int l, int r) {
-        int inorderRootIndex = -1;
-        for (int i = l; i <= r; i++) {
+        int i;
+        for (i = l; i <= r; i++) {
 
             if (data == inorder[i]) {
-                inorderRootIndex = i;
-                break;
+                return i;
             }
 
         }
 
-        return inorderRootIndex;
+        return i;
     }
-
-//    private void buildTree(T[] inorder, T[] preorder, int l, int r, TreeNode<T> root, int kPreorderIndex) {
-//
-//        if (r < 0 || l < 0) {
-//            System.out.println("ggg");
-//            return;
-//        }
-//
-//        if (l > inorder.length - 1 || kPreorderIndex > inorder.length - 1) {
-//            return;
-//        }
-//
-//        T rootElementPreorder = preorder[kPreorderIndex++];
-//        int inorderRootIndex = inorderRootElementIndex(inorder, rootElementPreorder, l, r);
-//        root.setLeft(new TreeNode(rootElementPreorder));
-//        System.out.println("....l" + l + " r " + inorderRootIndex + " K " + rootElementPreorder);
-//        buildTree(inorder, preorder, l, inorderRootIndex, root.getLeft(), kPreorderIndex);
-//        System.out.println(".=.=l" + (inorderRootIndex) + " r " + r + " K " + rootElementPreorder);
-//        root.setRight(new TreeNode(rootElementPreorder));
-//        buildTree(inorder, preorder, inorderRootIndex, r, root.getRight(), inorderRootIndex);
-//
-//    }
-    private TreeNode<T> buildTree(T[] inorder, T[] preorder, int l, int r, int preIndex) {
+    
+    //required for recursive stability
+    static int preIndex = 0;
+    private TreeNode<T> buildTree(T[] inorder, T[] preorder, int l, int r) {
 
         if (l > r) {
-            System.out.println("ggg");
             return null;
         }
         
-        if(preIndex > preorder.length-1){
-            return null;
-        }
-
         TreeNode<T> node = new TreeNode<T>(preorder[preIndex++]);
 
         if (l == r) {
-            System.out.println("-----l" + l + " r " + r + " K " + preIndex+" d "+node.getData());
             return node;
         }
 
         int inorderRootIndex = inorderRootElementIndex(inorder, node.getData(), l, r);
-        System.out.println("....l" + l + " r " + inorderRootIndex + " K " + preIndex+" d "+node.getData());
-        node.setLeft(buildTree(inorder, preorder, l, inorderRootIndex - 1, preIndex));
-        System.out.println("||||l" + l + " r " + inorderRootIndex + " K " + preIndex+" d "+node.getData());       
-        node.setRight(buildTree(inorder, preorder, inorderRootIndex + 1, r, preIndex));
+        node.setLeft(buildTree(inorder, preorder, l, inorderRootIndex - 1));      
+        node.setRight(buildTree(inorder, preorder, inorderRootIndex + 1, r));
         
         return node;
 
@@ -466,19 +438,11 @@ public class BinaryTree<T> {
         }
 
         int n = inorder.length;
-        int preIndex = 0;
-        TreeNode<T> root = buildTree(inorder, preorder, 0, n - 1, preIndex);
-
-//        int n = inorder.length;
-//        int kPreorderIndex = 0;
-//        T rootElementPreorder = preorder[kPreorderIndex++];
-//        int inorderRootIndex = inorderRootElementIndex(inorder, rootElementPreorder, 0, n);
-//        
-//        TreeNode<T> root = new TreeNode<>(rootElementPreorder);
-//        System.out.println("--l" + (0)+" r "+inorderRootIndex+" K "+rootElementPreorder);
-//        buildTree(inorder, preorder, 0, inorderRootIndex, root, kPreorderIndex);
-//        System.out.println("!!!! l" + (inorderRootIndex+1)+" r "+n+" K "+preorder[inorderRootIndex+1]);
-//        buildTree(inorder, preorder, inorderRootIndex+1, n, root, inorderRootIndex+1);
+        TreeNode<T> root = buildTree(inorder, preorder, 0, n - 1);
+        
+        //just reseting the static variable after the work is done
+        preIndex = 0;
+        
         return new BinaryTree<T>(root);
 
     }
