@@ -3708,7 +3708,7 @@ public class SomePracticeQuestion {
         });
 
         System.out.println();
-        
+
     }
 
     public static void slidingWindowMaximum_ON(int[] nums, int k) {
@@ -3719,7 +3719,7 @@ public class SomePracticeQuestion {
         // i.e. max(a[i], a[i + 1], ... a[max_upto[i]]) = a[i] 
         int n = nums.length;
         int[] max_upto = new int[n];
-        
+
         // Update max_upto array similar to 
         // finding next greater element 
         Stack<Integer> s = new Stack<>();
@@ -3731,12 +3731,12 @@ public class SomePracticeQuestion {
             }
             s.push(i);
         }
-        
+
         while (!s.empty()) {
             max_upto[s.peek()] = n - 1;
             s.pop();
         }
-        
+
         int j = 0;
         for (int i = 0; i <= n - k; i++) {
 
@@ -3748,6 +3748,36 @@ public class SomePracticeQuestion {
             System.out.print(nums[j] + " ");
         }
         System.out.println();
+    }
+
+    private static void allTreePathRootToLeafWithWithGivenSum_Recursion(TreeNode<Integer> node, int K,
+            List<Integer> curr, ArrayList<List<Integer>> result) {
+
+        if (node == null) {
+            return;
+        }
+
+        curr.add(node.getData());
+        if (K - node.getData() == 0 && node.getLeft() == null && node.getRight() == null) {
+            result.add(curr);
+            return;
+        }
+        
+        allTreePathRootToLeafWithWithGivenSum_Recursion(node.getLeft(), K - node.getData(),
+                new ArrayList<>(curr), result);
+
+        allTreePathRootToLeafWithWithGivenSum_Recursion(node.getRight(), K - node.getData(),
+                new ArrayList<>(curr), result);
+
+    }
+
+    public static void allTreePathRootToLeafWithWithGivenSum(TreeNode<Integer> node, int K) {
+
+        ArrayList<List<Integer>> result = new ArrayList<>();
+        allTreePathRootToLeafWithWithGivenSum_Recursion(node, K, new ArrayList<>(), result);
+
+        System.out.println(result);
+
     }
 
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
@@ -5764,18 +5794,18 @@ public class SomePracticeQuestion {
 //        root.treeBFS();
 //        System.out.println();
 //.............................................................................. 
-        System.out.println("Creating binary tree from given inorder and preorder array");
-        //https://www.geeksforgeeks.org/construct-tree-from-given-inorder-and-preorder-traversal/
-        BinaryTree<String> tree = new BinaryTree<>();
-        
-        tree = tree.buildTreeFromInorderPreorder(new String[] {"D", "B", "E", "A", "F", "C"}, 
-        new String[] {"A", "B", "D", "E", "C", "F"});
-        tree.treeBFS();
-        
-        tree = tree.buildTreeFromInorderPreorder(new String[] {"H", "D", "I", "B", "J", "E", "K", "A", "F", "C", "G"}, 
-        new String[] {"A", "B", "D", "H", "I", "E", "J", "K", "C", "F", "G"});
-        System.out.println();
-        tree.treeBFS();
+//        System.out.println("Creating binary tree from given inorder and preorder array");
+//        //https://www.geeksforgeeks.org/construct-tree-from-given-inorder-and-preorder-traversal/
+//        BinaryTree<String> tree = new BinaryTree<>();
+//        
+//        tree = tree.buildTreeFromInorderPreorder(new String[] {"D", "B", "E", "A", "F", "C"}, 
+//        new String[] {"A", "B", "D", "E", "C", "F"});
+//        tree.treeBFS();
+//        
+//        tree = tree.buildTreeFromInorderPreorder(new String[] {"H", "D", "I", "B", "J", "E", "K", "A", "F", "C", "G"}, 
+//        new String[] {"A", "B", "D", "H", "I", "E", "J", "K", "C", "F", "G"});
+//        System.out.println();
+//        tree.treeBFS();
 //..............................................................................
 //        System.out.println("Boggle-Solver with direction option "
 //                + "limited to up, down, right and left");
@@ -6740,11 +6770,29 @@ public class SomePracticeQuestion {
 //        System.out.println("int : " + romanToInt("DI"));
 //        System.out.println("int : " + romanToInt("MCMXCIV"));
 //..............................................................................
-        System.out.println("239. Sliding Window Maximum");
-        //https://leetcode.com/problems/sliding-window-maximum/
-        //https://www.geeksforgeeks.org/sliding-window-maximum-maximum-of-all-subarrays-of-size-k-using-stack-in-on-time/
-        slidingWindowMaximum_ON2(new int[]{1,3,-1,-3,5,3,6,7}, 3);
-        slidingWindowMaximum_ON(new int[]{1,3,-1,-3,5,3,6,7}, 3);
+//        System.out.println("239. Sliding Window Maximum");
+//        //https://leetcode.com/problems/sliding-window-maximum/
+//        //https://www.geeksforgeeks.org/sliding-window-maximum-maximum-of-all-subarrays-of-size-k-using-stack-in-on-time/
+//        slidingWindowMaximum_ON2(new int[]{1,3,-1,-3,5,3,6,7}, 3);
+//        slidingWindowMaximum_ON(new int[]{1,3,-1,-3,5,3,6,7}, 3);
+//..............................................................................
+//        System.out.println("Root to leaf path sum ");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-off-campus-for-sde1/?ref=rp
+//        //https://practice.geeksforgeeks.org/problems/root-to-leaf-path-sum/1
+//        TreeNode<Integer> root = new TreeNode<>(1);
+//        root.setLeft(new TreeNode<>(2));
+//        root.setRight(new TreeNode<>(3));
+//        allTreePathRootToLeafWithWithGivenSum(root, 2);
+//
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.setRight(new TreeNode<>(3));
+//        allTreePathRootToLeafWithWithGivenSum(root1, 4);
+//        
+//        TreeNode<Integer> root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode<>(3));
+//        root2.setRight(new TreeNode<>(3));
+//        allTreePathRootToLeafWithWithGivenSum(root2, 4);
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
