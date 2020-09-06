@@ -6,10 +6,12 @@
 package fun;
 
 import com.sun.xml.internal.bind.v2.runtime.Coordinator;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -3762,7 +3764,7 @@ public class SomePracticeQuestion {
             result.add(curr);
             return;
         }
-        
+
         allTreePathRootToLeafWithWithGivenSum_Recursion(node.getLeft(), K - node.getData(),
                 new ArrayList<>(curr), result);
 
@@ -3777,6 +3779,156 @@ public class SomePracticeQuestion {
         allTreePathRootToLeafWithWithGivenSum_Recursion(node, K, new ArrayList<>(), result);
 
         System.out.println(result);
+
+    }
+
+    private static void goDeepInTreeUptoKDistance(TreeNode<Integer> root, int K, Set<Integer> result) {
+
+        if (root == null) {
+            return;
+        }
+        if (K == 0) {
+            result.add(root.getData());
+            return;
+        }
+        goDeepInTreeUptoKDistance(root.getLeft(), K - 1, result);
+        goDeepInTreeUptoKDistance(root.getRight(), K - 1, result);
+
+    }
+
+    private static int binaryTreeNodeAtKDistanceFromTarget_Recursion(TreeNode<Integer> root,
+            int target, int K, Set<Integer> result) {
+
+        if (root == null) {
+            return -1;
+        }
+
+        if (root.getData() == target) {
+            goDeepInTreeUptoKDistance(root, K, result);
+            return 0;
+
+        }
+
+        int distLeft = binaryTreeNodeAtKDistanceFromTarget_Recursion(root.getLeft(),
+                target, K, result);
+
+        if (distLeft != -1) {
+
+            //if K == 1
+            if (distLeft + 1 == K) {
+
+                result.add(root.getData());
+
+            } else {
+                goDeepInTreeUptoKDistance(root.getRight(), K - distLeft - 2, result);
+            }
+            return distLeft + 1;
+        }
+
+        int distRight = binaryTreeNodeAtKDistanceFromTarget_Recursion(root.getLeft(),
+                target, K, result);
+
+        if (distRight != -1) {
+
+            //if K == 1
+            if (distRight + 1 == K) {
+
+                result.add(root.getData());
+
+            } else {
+                goDeepInTreeUptoKDistance(root.getLeft(), K - distRight - 2, result);
+            }
+            return distRight + 1;
+        }
+
+        return -1;
+
+    }
+
+    public static void binaryTreeNodeAtKDistanceFromTarget(TreeNode<Integer> root, int target, int K) {
+
+        Set<Integer> result = new HashSet<>();
+        binaryTreeNodeAtKDistanceFromTarget_Recursion(root, target, K, result);
+
+        System.out.println(result);
+
+    }
+
+    public static void findXInSortedMatrix(int[][] mat, int X) {
+
+        /*
+        
+         Complexity Analysis:
+         Time Complexity: O(n).
+         Only one traversal is needed, i.e, i from 0 to n and j from n-1 to 0 with at most 2*n steps.
+         The above approach will also work for m x n matrix (not only for n x n). Complexity would be O(m + n).
+         Space Complexity: O(1).
+         No extra space is required.
+        
+         */
+        int m = mat.length;
+        int i = 0;
+        int n = mat[i].length;
+        int j = n - 1;
+        while (i < m && j >= 0) {
+
+            if (mat[i][j] == X) {
+                System.out.println("Found " + i + ":" + j);
+                return;
+            } else if (X < mat[i][j]) {
+                j--;
+            } else {
+                i++;
+            }
+
+        }
+
+        System.out.println("Not Found");
+
+    }
+
+    public static void binaryTreeFlattening(TreeNode root) {
+
+        /*
+        
+         ArrayDeque in Java provides a way to apply resizable-array in addition to the implementation of 
+         the Deque interface. It is also known as Array Double Ended Queue or Array Deck. 
+         This is a special kind of array that grows and allows users to add or remove an element 
+         from both sides of the queue. Few important features of ArrayDeque are as follows:
+
+         Array deques have no capacity restrictions and they grow as necessary to support usage.
+         They are not thread-safe which means that in the absence of external synchronization, ArrayDeque does not 
+         support concurrent access by multiple threads.
+         Null elements are prohibited in the ArrayDeque.
+         ArrayDeque class is likely to be faster than Stack when used as a stack.
+         ArrayDeque class is likely to be faster than LinkedList when used as a queue
+        
+         */
+        if (root == null) {
+            return;
+        }
+
+        Deque<TreeNode> q = new ArrayDeque<>();
+        q.addFirst(root);
+        while (!q.isEmpty()) {
+            TreeNode curr = q.removeFirst(); //pop first from the queue
+
+            if (curr.right != null) {
+                q.addFirst(curr.right); //push at first in queue
+            }
+            if (curr.left != null) {
+                q.addFirst(curr.left); //push at first in queue
+            }
+            System.out.println(q);
+            if (!q.isEmpty()) {
+                curr.right = q.peek();
+                curr.left = null;
+            }
+        }
+
+        BinaryTree<Integer> bt = new BinaryTree<>(root);
+        bt.treeBFS();
+        System.out.println();
 
     }
 
@@ -6793,6 +6945,43 @@ public class SomePracticeQuestion {
 //        root2.setLeft(new TreeNode<>(3));
 //        root2.setRight(new TreeNode<>(3));
 //        allTreePathRootToLeafWithWithGivenSum(root2, 4);
+//..............................................................................
+//        System.out.println("Nodes at given distance in binary tree");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-off-campus-for-sde1/?ref=rp
+//        //https://practice.geeksforgeeks.org/problems/nodes-at-given-distance-in-binary-tree/1
+//        //https://www.geeksforgeeks.org/print-nodes-distance-k-given-node-binary-tree/
+//        TreeNode<Integer> root2 = new TreeNode<>(20);
+//        root2.setLeft(new TreeNode<>(8));
+//        root2.getLeft().setLeft(new TreeNode<>(4));
+//        root2.getLeft().setRight(new TreeNode<>(12));
+//        root2.getLeft().getRight().setLeft(new TreeNode<>(10));
+//        root2.getLeft().getRight().setRight(new TreeNode<>(14));
+//        root2.setRight(new TreeNode<>(22));
+//        binaryTreeNodeAtKDistanceFromTarget(root2, 8, 2);
+//        binaryTreeNodeAtKDistanceFromTarget(root2, 8, 1);
+//        binaryTreeNodeAtKDistanceFromTarget(root2, 13, 2);
+//..............................................................................
+        System.out.println("Search in a row wise and column wise sorted matrix");
+        //https://www.geeksforgeeks.org/amazon-interview-experience-off-campus-for-sde1/?ref=rp
+        //https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/
+        int mat[][] = {{10, 20, 30, 40},
+        {15, 25, 35, 45},
+        {27, 29, 37, 48},
+        {32, 33, 39, 50}};
+
+        findXInSortedMatrix(mat, 29);
+        findXInSortedMatrix(mat, 100);
+//..............................................................................
+        System.out.println("114. Flatten Binary Tree to Linked List");
+        //https://leetcode.com/problems/flatten-binary-tree-to-linked-list/
+        //https://leetcode.com/problems/flatten-binary-tree-to-linked-list/discuss/825970/Standard-Java-Solution
+        TreeNode<Integer> root2 = new TreeNode<>(1);
+        root2.setLeft(new TreeNode<>(2));
+        root2.getLeft().setLeft(new TreeNode<>(3));
+        root2.getLeft().setRight(new TreeNode<>(4));
+        root2.setRight(new TreeNode<>(5));
+        root2.getRight().setRight(new TreeNode<>(6));
+        binaryTreeFlattening(root2);
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
