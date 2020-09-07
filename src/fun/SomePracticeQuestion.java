@@ -166,6 +166,33 @@ public class SomePracticeQuestion {
 
     }
 
+    public static int simpleBinarySearch(int[] a, int key) {
+
+        int f = 0;
+        int l = a.length - 1;
+
+        while (f < l) {
+
+            //this mid calculation works normal
+            //int mid = (f+l)/2;
+            //this mid calculation can handle normal as well as large length array 10^9
+            //without creating issues
+            int mid = f + ((l - f) / 2);
+
+            if (a[mid] == key) {
+                return mid;
+            } else if (key < a[mid]) {
+                l = mid - 1;
+            } else {
+                f = mid + 1;
+            }
+
+        }
+
+        return -1;
+
+    }
+
     public static boolean isStringPallindrome(String str) {
 
 //        //...........brute force.............
@@ -1062,7 +1089,7 @@ public class SomePracticeQuestion {
                     sb.append(st.pop());
                 }
                 st.push(ch);
-                //System.out.println(st.toString());
+//                System.out.println(st.toString());
             }
 
         }
@@ -2354,7 +2381,7 @@ public class SomePracticeQuestion {
 
         Collections.reverse(result);
         //printing k most frequently occuring words
-        result.stream().forEach(e -> System.out.println(e));
+        result.stream().forEach(System.out::println);
 
     }
 
@@ -3149,6 +3176,12 @@ public class SomePracticeQuestion {
 
     public static TreeNode lowestCommonAncestor(TreeNode<Integer> root, TreeNode<Integer> p, TreeNode<Integer> q) {
 
+        /*
+        
+        this method works for BST and non bst
+        
+        */
+        
         return lcaSolver(root, p, q);
 
     }
@@ -3182,6 +3215,56 @@ public class SomePracticeQuestion {
         //in the left subtree
         //else it is in the right subtree
         return leftDepth > rightDepth ? lcaDeepestLeaves(root.getLeft()) : lcaDeepestLeaves(root.getRight());
+
+    }
+
+    public static TreeNode<Integer> lowestCommonAncestorInBinarySearchTree_Recursion(TreeNode<Integer> node, int n1, int n2) {
+
+        /*
+        
+        this method only works for BST
+        
+        */
+        
+        
+        //recursion maintains function call stack.
+        if (node == null) {
+            return null;
+        }
+
+        if (node.getData() > n1 && node.getData() > n2) {
+            return lowestCommonAncestorInBinarySearchTree_Recursion(node.getLeft(), n1, n2);
+        }
+
+        if (node.getData() < n1 && node.getData() < n2) {
+            return lowestCommonAncestorInBinarySearchTree_Recursion(node.getRight(), n1, n2);
+        }
+
+        return node;
+    }
+
+    public static TreeNode<Integer> lowestCommonAncestorInBinarySearchTree_Iterative(TreeNode<Integer> node, int n1, int n2) {
+
+        /*
+        
+        this method only works for BST
+        
+        */
+        
+        //efficient than recursion
+        while (node != null) {
+
+            if (node.getData() > n1 && node.getData() > n2) {
+                node = node.getLeft();
+            } else if (node.getData() < n1 && node.getData() < n2) {
+                node = node.getRight();
+            } else {
+                break;
+            }
+
+        }
+
+        return node;
 
     }
 
@@ -3919,8 +4002,9 @@ public class SomePracticeQuestion {
             if (curr.left != null) {
                 q.addFirst(curr.left); //push at first in queue
             }
-            System.out.println(q);
+//            System.out.println(q);
             if (!q.isEmpty()) {
+//                System.out.println(q.peek()+"--");
                 curr.right = q.peek();
                 curr.left = null;
             }
@@ -5548,7 +5632,11 @@ public class SomePracticeQuestion {
 //...........................................................................
 //        System.out.println("recursion stack check");
 //        recursionCheck(5);
-//............................................................................
+//..............................................................................
+//        System.out.println("Simple Binary search");
+//        //mid calculation inn effective way
+//        System.out.println("key found at: "+simpleBinarySearch(new int[]{1,2,4,5,6,7,8,9,10}, 2));
+//..............................................................................
 //        System.out.println("Given a string, write a program to find longest length palindrome "
 //                + "from that given string");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-153-sde1/?ref=rp
@@ -5751,6 +5839,7 @@ public class SomePracticeQuestion {
 //        //https://www.geeksforgeeks.org/stack-set-2-infix-to-postfix/
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-off-campus-for-sde-1-2/?ref=leftbar-rightbar
 //        expressionInfixToPostfix("a+b*(c^d-e)^(f+g*h)-i");
+//        expressionInfixToPostfix("(a+b)^c");
 //..............................................................................
 //        System.out.println("Given an array, find the number of sub-arrays having even sum");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-off-campus-for-sde-1-2/?ref=leftbar-rightbar
@@ -6624,7 +6713,7 @@ public class SomePracticeQuestion {
 //        BinaryTree<Integer> bt = new BinaryTree<>(treePrune(root1));
 //        bt.treeBFS();
 //..............................................................................
-//        System.out.println("235. Lowest Common Ancestor of a Binary Search Tree");
+//        System.out.println("235. Lowest Common Ancestor of a Binary Tree");
 //        //https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/
 //        //https://www.geeksforgeeks.org/lowest-common-ancestor-binary-tree-set-1/
 //        TreeNode<Integer> root1 = new TreeNode<>(6);
@@ -6661,6 +6750,38 @@ public class SomePracticeQuestion {
 //        System.out.println("Lowest common ancesctor for the deepest leaf node "+ans.getData());
 //        BinaryTree<Integer> bt = new BinaryTree<>(ans);
 //        bt.treeBFS();
+//..............................................................................
+//        System.out.println("lowest common ancestor in Binary search tree");
+//        //https://www.geeksforgeeks.org/lowest-common-ancestor-in-a-binary-search-tree/
+//        TreeNode<Integer> root = new TreeNode(20); 
+//        root.setLeft(new TreeNode<>(8)); 
+//        root.setRight(new TreeNode<>(22)); 
+//        root.getLeft().setLeft(new TreeNode<>(4)); 
+//        root.getLeft().setRight(new TreeNode<>(12)); 
+//        root.getLeft().getRight().setLeft(new TreeNode<>(10)); 
+//        root.getLeft().getRight().setRight(new TreeNode<>(14));
+//        //this works for binary tree and bst both......
+//        TreeNode ans = lowestCommonAncestor(root, new TreeNode<>(8), new TreeNode<>(14));
+//        System.out.println("Lowest common ancesctor for 8 and 14 is "+ans.getData()); 
+//        //............
+//        System.out.println("LCA in BST for 8, 14 using recursion "+lowestCommonAncestorInBinarySearchTree_Recursion(root, 8, 14).getData());
+//        System.out.println("LCA in BST for 8, 22  using recursion "+lowestCommonAncestorInBinarySearchTree_Recursion(root, 8, 22).getData());
+//        System.out.println("LCA in BST for 8, 14  using iteration "+lowestCommonAncestorInBinarySearchTree_Iterative(root, 8, 14).getData());
+//        System.out.println("LCA in BST for 8, 22  using iteration "+lowestCommonAncestorInBinarySearchTree_Iterative(root, 8, 22).getData());
+//        ans = lowestCommonAncestor(root, new TreeNode<>(8), new TreeNode<>(22));
+//        System.out.println("Lowest common ancesctor for 8 and 22 is "+ans.getData()); //this works for binary tree
+//        
+//        //non bst tree
+//        TreeNode<Integer> root1 = new TreeNode(2); 
+//        root1.setLeft(new TreeNode<>(1)); 
+//        root1.setRight(new TreeNode<>(1)); 
+//        //this works for binary tree and bst both......
+//        ans = lowestCommonAncestor(root1, new TreeNode<>(1), new TreeNode<>(1));
+//        System.out.println("Lowest common ancesctor for 1 and 1 is "+ans.getData());
+//        //.......................
+//        //this below method call fails for non bst tree.............
+//        System.out.println("LCA in non-BST for 1, 1  using recursion "+lowestCommonAncestorInBinarySearchTree_Recursion(root1, 1, 1).getData());
+//        System.out.println("LCA in non-BST for 1, 1  using iteration "+lowestCommonAncestorInBinarySearchTree_Iterative(root1, 1, 1).getData());
 //..............................................................................
 //        System.out.println("How to determine if a binary tree is height-balanced?");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-186-for-sde1/?ref=rp
@@ -6961,27 +7082,27 @@ public class SomePracticeQuestion {
 //        binaryTreeNodeAtKDistanceFromTarget(root2, 8, 1);
 //        binaryTreeNodeAtKDistanceFromTarget(root2, 13, 2);
 //..............................................................................
-        System.out.println("Search in a row wise and column wise sorted matrix");
-        //https://www.geeksforgeeks.org/amazon-interview-experience-off-campus-for-sde1/?ref=rp
-        //https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/
-        int mat[][] = {{10, 20, 30, 40},
-        {15, 25, 35, 45},
-        {27, 29, 37, 48},
-        {32, 33, 39, 50}};
-
-        findXInSortedMatrix(mat, 29);
-        findXInSortedMatrix(mat, 100);
+//        System.out.println("Search in a row wise and column wise sorted matrix");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-off-campus-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/
+//        int mat[][] = {{10, 20, 30, 40},
+//        {15, 25, 35, 45},
+//        {27, 29, 37, 48},
+//        {32, 33, 39, 50}};
+//
+//        findXInSortedMatrix(mat, 29);
+//        findXInSortedMatrix(mat, 100);
 //..............................................................................
-        System.out.println("114. Flatten Binary Tree to Linked List");
-        //https://leetcode.com/problems/flatten-binary-tree-to-linked-list/
-        //https://leetcode.com/problems/flatten-binary-tree-to-linked-list/discuss/825970/Standard-Java-Solution
-        TreeNode<Integer> root2 = new TreeNode<>(1);
-        root2.setLeft(new TreeNode<>(2));
-        root2.getLeft().setLeft(new TreeNode<>(3));
-        root2.getLeft().setRight(new TreeNode<>(4));
-        root2.setRight(new TreeNode<>(5));
-        root2.getRight().setRight(new TreeNode<>(6));
-        binaryTreeFlattening(root2);
+//        System.out.println("114. Flatten Binary Tree to Linked List");
+//        //https://leetcode.com/problems/flatten-binary-tree-to-linked-list/
+//        //https://leetcode.com/problems/flatten-binary-tree-to-linked-list/discuss/825970/Standard-Java-Solution
+//        TreeNode<Integer> root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode<>(2));
+//        root2.getLeft().setLeft(new TreeNode<>(3));
+//        root2.getLeft().setRight(new TreeNode<>(4));
+//        root2.setRight(new TreeNode<>(5));
+//        root2.getRight().setRight(new TreeNode<>(6));
+//        binaryTreeFlattening(root2);
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
