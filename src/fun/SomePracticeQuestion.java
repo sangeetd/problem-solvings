@@ -3178,10 +3178,9 @@ public class SomePracticeQuestion {
 
         /*
         
-        this method works for BST and non bst
+         this method works for BST and non bst
         
-        */
-        
+         */
         return lcaSolver(root, p, q);
 
     }
@@ -3222,11 +3221,9 @@ public class SomePracticeQuestion {
 
         /*
         
-        this method only works for BST
+         this method only works for BST
         
-        */
-        
-        
+         */
         //recursion maintains function call stack.
         if (node == null) {
             return null;
@@ -3247,10 +3244,9 @@ public class SomePracticeQuestion {
 
         /*
         
-        this method only works for BST
+         this method only works for BST
         
-        */
-        
+         */
         //efficient than recursion
         while (node != null) {
 
@@ -3592,6 +3588,17 @@ public class SomePracticeQuestion {
                 mat[N - 1 - x][N - 1 - y] = mat[N - 1 - y][x];
                 mat[N - 1 - y][x] = temp;
 
+                //enable this if you want to only rorate outer edges of 
+                //matrix
+//                if(x != 0 && x != N - 1 && y != 0 && y != N - 1){
+//                    continue;
+//                }
+                //90degree clockwwise code...
+//                int temp = mat[y][N - 1 - x];
+//                mat[y][N - 1 - x] = mat[x][y];
+//                mat[x][y] = mat[N - 1 - y][x];
+//                mat[N - 1 - y][x] = mat[N - 1 - x][N - 1 - y];
+//                mat[N - 1 - x][N - 1 - y] = temp;
             }
         }
 
@@ -4013,6 +4020,99 @@ public class SomePracticeQuestion {
         BinaryTree<Integer> bt = new BinaryTree<>(root);
         bt.treeBFS();
         System.out.println();
+
+    }
+
+    public static String breakPalindrome(String pallindrome) {
+
+        /*
+        
+         Given a palindromic string palindrome, replace exactly one character by any lowercase English letter 
+         so that the string becomes the lexicographically smallest possible string that isn't a palindrome.
+
+         After doing so, return the final string.  If there is no way to do so, return the empty string.
+        
+         Example 1:
+
+         Input: palindrome = "abccba"
+         Output: "aaccba"
+         Example 2:
+
+         Input: palindrome = "a"
+         Output: ""
+        
+         */
+        if (pallindrome == null || pallindrome.length() == 0 || pallindrome.length() == 1) {
+            return "";
+        }
+
+        char[] ch = pallindrome.toCharArray();
+
+        int firstNonA = -1;
+        for (int i = 0; i < ch.length; i++) {
+            if (ch[i] != 'a') {
+                firstNonA = i;
+                char org = ch[i];
+                ch[i] = (char) (ch[i] + 1);
+                String check = String.valueOf(ch);
+                if (check.equals(new StringBuilder(check).reverse().toString())) {
+                    firstNonA = -1;
+                    ch[i] = org;
+                    continue;
+                }
+                break;
+            }
+        }
+
+        if (firstNonA != -1) {
+            ch[firstNonA] = 'a';
+        } else {
+            ch[ch.length - 1] = 'b';
+        }
+
+        return String.valueOf(ch);
+
+    }
+
+    public static String replaceWords(List<String> dictionary, String sentence) {
+
+        /*
+        
+         n English, we have a concept called root, which can be followed by some other 
+         word to form another longer word - let's call this word successor. For example, 
+         when the root "an" is followed by the successor word "other", we can form a new word "another".
+         Given a dictionary consisting of many roots and a sentence consisting of 
+         words separated by spaces, replace all the successors in the sentence with the root 
+         forming it. If a successor can be replaced by more than one root, replace it with the root 
+         that has the shortest length.
+         Return the sentence after the replacement.
+        
+         Input: dictionary = ["cat","bat","rat"], sentence = "the cattle was rattled by the battery"
+         Output: "the cat was rat by the bat"
+        
+         */
+        Set<String> set = dictionary.stream().collect(Collectors.toSet());
+
+        StringBuilder sb = new StringBuilder();
+        boolean isDone = false;
+        for (String w : sentence.split(" ")) {
+            isDone = false;
+            for (int i = 1; i < w.length(); i++) {
+                String prefix = w.substring(0, i);
+                if (set.contains(prefix)) {
+                    sb.append(prefix + " ");
+                    isDone = true;
+                    break;
+                }
+            }
+
+            if (!isDone) {
+                sb.append(w + " ");
+            }
+
+        }
+
+        return sb.toString().trim();
 
     }
 
@@ -6994,13 +7094,13 @@ public class SomePracticeQuestion {
 //..............................................................................
 //        System.out.println("Inplace rotate square matrix by 90 degrees");
 //        //https://www.geeksforgeeks.org/inplace-rotate-square-matrix-by-90-degrees/
-//        int mat[][] = { 
-//            { 1, 2, 3, 4 }, 
-//            { 5, 6, 7, 8 }, 
-//            { 9, 10, 11, 12 }, 
-//            { 13, 14, 15, 16 } 
-//        }; 
-//        inPlace90AntiClockRotateMatrix(mat);       
+//        int mat[][] = {
+//            {1, 2, 3, 4},
+//            {5, 6, 7, 8},
+//            {9, 10, 11, 12},
+//            {13, 14, 15, 16}
+//        };
+//        inPlace90AntiClockRotateMatrix(mat);
 //..............................................................................
 //        System.out.println("779. K-th Symbol in Grammar");
 //        //https://leetcode.com/problems/k-th-symbol-in-grammar/
@@ -7103,6 +7203,18 @@ public class SomePracticeQuestion {
 //        root2.setRight(new TreeNode<>(5));
 //        root2.getRight().setRight(new TreeNode<>(6));
 //        binaryTreeFlattening(root2);
+//..............................................................................
+//        System.out.println("1328. Break a Palindrome");
+//        //https://leetcode.com/problems/break-a-palindrome/
+//        System.out.println(breakPalindrome("aba"));
+//        System.out.println(breakPalindrome("abccba"));
+//        System.out.println(breakPalindrome("aaa"));
+//        System.out.println(breakPalindrome("bbb"));
+//        System.out.println(breakPalindrome("b"));
+//..............................................................................
+//        System.out.println("648. Replace Words");
+//        //https://leetcode.com/problems/replace-words/
+//        System.out.println(replaceWords(Arrays.asList("cat","bat","rat"), "the cattle was rattled by the battery"));
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
