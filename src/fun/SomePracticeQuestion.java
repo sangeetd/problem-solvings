@@ -3362,6 +3362,7 @@ public class SomePracticeQuestion {
             return 0;
         }
         if (node.left == null && node.right == null) {
+            res.result = Math.max(res.result, (Integer)node.getData());
             return (Integer) node.getData();
         }
 
@@ -6992,36 +6993,48 @@ public class SomePracticeQuestion {
 //        maxPathSumOfTreeAnyNodeToAnyNode(root, res);
 //        System.out.println("max path sum of tree "+res.result);
 //..............................................................................
-        System.out.println("Max path sum of tree leaf node to leaf node| DP on tree");
-        TreeNode<Integer> root = new TreeNode<>(-15);
-        root.setLeft(new TreeNode<>(5));
-        root.getLeft().setLeft(new TreeNode<>(-8));
-        root.getLeft().getLeft().setLeft(new TreeNode<>(2));
-        root.getLeft().getLeft().setRight(new TreeNode<>(6));
-        root.getLeft().setRight(new TreeNode<>(1));
-        root.setRight(new TreeNode<>(6));
-        root.getRight().setLeft(new TreeNode<>(3));
-        root.getRight().setRight(new TreeNode<>(9));
-        root.getRight().getRight().setRight(new TreeNode<>(0));
-        root.getRight().getRight().getRight().setLeft(new TreeNode<>(4));
-        root.getRight().getRight().getRight().setRight(new TreeNode<>(-1));
-        root.getRight().getRight().getRight().getRight().setLeft(new TreeNode<>(10));
-
-        Result res = new Result();
-        maxPathSumOfTreeLeafNodeToLeafNode(root, res);
-        System.out.println("max path sum of tree " + res.result);
-
-        TreeNode<Integer> root1 = new TreeNode<>(10);
-        root1.setLeft(new TreeNode(2));
-        root1.getLeft().setLeft(new TreeNode<>(20));
-        root1.getLeft().setRight(new TreeNode<>(1));
-        root1.setRight(new TreeNode(10));
-        root1.getRight().setRight(new TreeNode(-25));
-        root1.getRight().getRight().setLeft(new TreeNode<>(3));
-        root1.getRight().getRight().setRight(new TreeNode<>(4));
-        res = new Result();
-        maxPathSumOfTreeLeafNodeToLeafNode(root1, res);
-        System.out.println("max path sum of tree " + res.result);
+//        System.out.println("Max path sum of tree leaf node to leaf node| DP on tree");
+//        TreeNode<Integer> root = new TreeNode<>(-15);
+//        root.setLeft(new TreeNode<>(5));
+//        root.getLeft().setLeft(new TreeNode<>(-8));
+//        root.getLeft().getLeft().setLeft(new TreeNode<>(2));
+//        root.getLeft().getLeft().setRight(new TreeNode<>(6));
+//        root.getLeft().setRight(new TreeNode<>(1));
+//        root.setRight(new TreeNode<>(6));
+//        root.getRight().setLeft(new TreeNode<>(3));
+//        root.getRight().setRight(new TreeNode<>(9));
+//        root.getRight().getRight().setRight(new TreeNode<>(0));
+//        root.getRight().getRight().getRight().setLeft(new TreeNode<>(4));
+//        root.getRight().getRight().getRight().setRight(new TreeNode<>(-1));
+//        root.getRight().getRight().getRight().getRight().setLeft(new TreeNode<>(10));
+//
+//        Result res = new Result();
+//        maxPathSumOfTreeLeafNodeToLeafNode(root, res);
+//        System.out.println("max path sum of tree " + res.result);
+//
+//        TreeNode<Integer> root1 = new TreeNode<>(10);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode<>(20));
+//        root1.getLeft().setRight(new TreeNode<>(1));
+//        root1.setRight(new TreeNode(10));
+//        root1.getRight().setRight(new TreeNode(-25));
+//        root1.getRight().getRight().setLeft(new TreeNode<>(3));
+//        root1.getRight().getRight().setRight(new TreeNode<>(4));
+//        res = new Result();
+//        maxPathSumOfTreeLeafNodeToLeafNode(root1, res);
+//        System.out.println("max path sum of tree " + res.result);
+//        
+//        root1 = new TreeNode<>(-10);
+//        res = new Result();
+//        maxPathSumOfTreeLeafNodeToLeafNode(root1, res);
+//        System.out.println("max path sum of tree " + res.result);
+//        
+//        root1 = new TreeNode<>(-1);
+//        root1.setLeft(new TreeNode<>(1000));
+//        root1.setRight(new TreeNode<>(3));
+//        res = new Result();
+//        maxPathSumOfTreeLeafNodeToLeafNode(root1, res);
+//        System.out.println("max path sum of tree " + res.result);
 //..............................................................................
 //        System.out.println(" Find if the given tree is the subtree of the big tree.");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-186-for-sde1/?ref=rp
