@@ -63,7 +63,7 @@ public class BinarySearchTree<T> extends BinaryTree implements Comparator<T> {
             Integer o11 = (Integer) o1;
             Integer o22 = (Integer) o2;
 
-            return o11.intValue() - o22.intValue();
+            return o11.compareTo(o22);
 
         }
 
