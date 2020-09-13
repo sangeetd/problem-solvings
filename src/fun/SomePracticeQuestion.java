@@ -3478,6 +3478,29 @@ public class SomePracticeQuestion {
         return false;
 
     }
+    
+    static TreeNode<Integer> prevForIsTreeBST;
+    public static boolean isTreeBST(TreeNode<Integer> node){
+        
+        if(node == null){
+            return true;
+        }
+        
+        boolean leftIsBST = isTreeBST(node.getLeft());
+        if(leftIsBST == false){
+            return false;
+        }
+        
+        if(prevForIsTreeBST != null && node.getData() < prevForIsTreeBST.getData()){
+            return false;
+        }
+        
+        prevForIsTreeBST = node;
+        
+        return isTreeBST(node.getRight());
+        
+    }
+    
 
     public static boolean canFinish(int numCourses, int[][] prerequisites) {
 
@@ -6994,6 +7017,7 @@ public class SomePracticeQuestion {
 //        System.out.println("max path sum of tree "+res.result);
 //..............................................................................
 //        System.out.println("Max path sum of tree leaf node to leaf node| DP on tree");
+//        //https://www.geeksforgeeks.org/find-maximum-path-sum-two-leaves-binary-tree/
 //        TreeNode<Integer> root = new TreeNode<>(-15);
 //        root.setLeft(new TreeNode<>(5));
 //        root.getLeft().setLeft(new TreeNode<>(-8));
@@ -7092,6 +7116,17 @@ public class SomePracticeQuestion {
 //        
 //        System.out.println("is tree symmetric? recursive "+isTreeSymmetric_Recursion(root1));
 //        System.out.println("is tree symmetric? iterative "+isTreeSymmetric_Iteraative(root1));       
+//..............................................................................
+//        System.out.println("Is Tree binary search tree");
+//        TreeNode<Integer> root1 = new TreeNode<>(10);
+//        root1.setLeft(new TreeNode(5));
+//        root1.setRight(new TreeNode<>(15));
+//        System.out.println("is tree bst? "+isTreeBST(root1));
+//        
+//        root1 = new TreeNode<>(-10);
+//        root1.setLeft(new TreeNode(5));
+//        root1.setRight(new TreeNode<>(15));
+//        System.out.println("is tree bst? "+isTreeBST(root1));
 //..............................................................................
 //        System.out.println("207. Course Schedule | Figure out strategy to find the order of execution of processes");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-185-for-sde1/?ref=rp
