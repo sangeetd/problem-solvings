@@ -1358,7 +1358,7 @@ public class SomePracticeQuestion {
         return max;
     }
 
-    public static void maxElementInKWindow(int[] a, int k) {
+    public static void maxElementInKWindow_ON2(int[] a, int k) {
 
         int n = a.length;
 
@@ -1367,7 +1367,51 @@ public class SomePracticeQuestion {
             System.out.print(findMax(a, i, i + k - 1) + "  ");
 
         }
+        
+        System.out.println();
 
+    }
+    
+    public static void maxElementInKWindow_ON(int[] a, int k){
+        
+        /*
+        
+        to solve this question in O(N) we will use Dqueue
+        
+        https://www.geeksforgeeks.org/sliding-window-maximum-maximum-of-all-subarrays-of-size-k/
+        
+        */
+        int n = a.length;
+        Deque<Integer> dq = new LinkedList<>();
+        int i=0;
+        for(; i<k; i++){
+            
+            while(!dq.isEmpty() && a[i] >= a[dq.peekLast()]){
+                dq.removeLast();
+            }
+            
+            dq.addLast(i);
+            
+        }
+        
+        for(; i<n; i++){
+            
+            System.out.print(a[dq.peek()]+" ");
+            
+            while(!dq.isEmpty() && dq.peek() <= i-k){
+                dq.removeFirst();
+            }
+            
+            while(!dq.isEmpty() && a[i] >= a[dq.peekLast()]){
+                dq.removeLast();
+            }
+            
+            dq.addLast(i);
+            
+        }
+        
+        System.out.print(a[dq.peek()]+ " ");
+        System.out.println();
     }
 
     public static void bitonicArray(int[] a) {
@@ -4158,6 +4202,127 @@ public class SomePracticeQuestion {
         return sb.toString().trim();
 
     }
+    
+    public static void continousSubArrayWhoseSumIsK(int[] a, int K){
+        
+        /*
+        
+        ...............O(N^2)....................
+        brute force approach will be to try all the possible sub arrays that form
+        the given sum
+        this can be achieved using 2 nested fo loops
+        
+        loop: i=0 -> i<n -> i++
+            sum = a[i]
+            loop: j = i+1 -> i<n -> j++
+                if: sum == K
+                    int end = j - 1
+                    print: "subarray indexes" + i +" to "+ end
+                    return
+                
+                if: sum > K
+                    break
+                
+                sum += a[j]
+        
+        the aabove algo is of O(N^2)
+        reason for finding end variable is because we adding into the sum variable a[j]
+        in the last of loop 2, so if aadding a[j] makes sum == K that can only be checked 
+        in next iteration of j where j got already incremented so balancing the last element added was at j-1 index 
+       
+        */
+        
+        //................O(N)...........................................
+        int n = a.length;
+        int start = 0;
+        int sum = a[0];
+        for(int i=1; i<=n; i++){
+            
+            while(sum > K && start < i-1){
+                sum -= a[start];
+                start++;
+            }
+            
+            if(sum == K){
+                int end  = i-1;
+                System.out.println("subarray index "+start+" to "+end);
+                return;
+            }
+            
+            if(i<n){
+                sum += a[i];
+            }
+            
+        }
+        
+        System.out.println("no subarray found");
+        
+    }
+    
+    public static void continousSubArrayWhoseSumIsK_HandlesNegtiveNum(int[] a, int K){
+        
+        //10, 2, -2, -20, 10 | K = -10
+        
+        int n = a.length;
+        int start = 0;
+        int end  = -1;  
+        int sum = 0;
+        Map<Integer, Integer> m = new HashMap<>();
+        for(int i=0; i<n; i++){
+            sum += a[i];
+            if(sum - K == 0){
+                start = 0;
+                end = i;
+                break;
+            }
+            
+            if(m.containsKey(sum - K)){
+                start = m.get(sum - K) + 1;
+                end = 1;
+                break;
+            }
+            
+            m.put(sum, i);
+            
+        }
+        
+        // if end is -1 : means we have reached end without the sum 
+        if (end == -1) { 
+            System.out.println("No subarray with given sum exists"); 
+        } else { 
+            System.out.println("Sum found between indexes " 
+                            + start + " to " + end); 
+        } 
+    }
+    
+    public static void findOddOccurringNumber_UsingHashing(int[] a){
+        
+        //...................O(N)..............................
+        Map<Integer, Integer> map = new HashMap<>();
+        for(int x: a){
+            map.put(x, map.getOrDefault(x, 0) + 1);
+        }
+        
+        for(Map.Entry<Integer, Integer> e: map.entrySet()) {
+            if(e.getValue() % 2 == 1){
+                System.out.println("odd occuerence hashing: "+e.getKey());
+                return;
+            }
+        }
+        
+        System.out.println("odd occuerence hashing: "+0);
+    }
+    
+    public static void findOddOccurringNumber_UsingXOR(int[] a){
+        //..............O(N)..................................
+        int xor = 0;
+        for(int x: a){
+            xor = xor ^ x;
+        }
+        
+        //odd occurred element will be in the xor
+        System.out.println("odd occuerence xor: "+xor);
+    }
 
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
 
@@ -6141,9 +6306,12 @@ public class SomePracticeQuestion {
 //..............................................................................
 //        System.out.println("3) Given an array and a fixed window size X, "
 //                + "you have to find out the minimum value "
-//                + "from every window. De-queue was not alloweds");
+//                + "from every window. with and without Deque");
 //        //geeksforgeeks.org/amazon-interview-set-41-campus/
-//        maxElementInKWindow(new int[]{1, 2, 3, 1, 4, 5, 2, 3, 6}, 3);
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-291-on-campus-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/sliding-window-maximum-maximum-of-all-subarrays-of-size-k/
+//        maxElementInKWindow_ON2(new int[]{1, 2, 3, 1, 4, 5, 2, 3, 6}, 3);
+//        maxElementInKWindow_ON(new int[]{1, 2, 3, 1, 4, 5, 2, 3, 6}, 3);
 //..............................................................................
 //        System.out.println("You have an array whose elements firstly strictly "
 //                + "increase and then strictly decrease. "
@@ -7308,6 +7476,56 @@ public class SomePracticeQuestion {
 //        System.out.println("648. Replace Words");
 //        //https://leetcode.com/problems/replace-words/
 //        System.out.println(replaceWords(Arrays.asList("cat","bat","rat"), "the cattle was rattled by the battery"));
+//..............................................................................
+//        System.out.println(" Largest length of subarray with given sum | handles positive integers");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-291-on-campus-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/find-subarray-with-given-sum/
+//        int arr[] = { 15, 2, 4, 8, 9, 5, 10, 23 }; 
+//        int sum = 23; 
+//        continousSubArrayWhoseSumIsK(arr, sum);
+//        
+//        int ar[] = { 1, 1, 1, 1, 1 }; 
+//        sum = 5; 
+//        continousSubArrayWhoseSumIsK(ar, sum);
+//        continousSubArrayWhoseSumIsK(ar, 32);
+//..............................................................................
+//        System.out.println(" Largest length of subarray with given sum | handles negative integers");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-291-on-campus-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/find-subarray-with-given-sum-in-array-of-integers/
+//        int[] arr = {10, 2, -2, -20, 10}; 
+//        int n = arr.length; 
+//        int sum = -10; 
+//        continousSubArrayWhoseSumIsK_HandlesNegtiveNum(arr, sum); 
+//..............................................................................
+//        System.out.println("Queue Implementation using 2 stacks");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-291-on-campus-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/queue-using-stacks/
+//        QueueImplmentationUsingTwoStacks sq = new QueueImplmentationUsingTwoStacks();
+//        sq.enQueue(1);
+//        sq.enQueue(2);
+//        sq.enQueue(3);
+//        sq.print();
+//        System.out.println("deQueued "+sq.deQueue());
+//        sq.enQueue(4);
+//        sq.enQueue(5);
+//        sq.print();
+//        System.out.println("deQueued "+sq.deQueue());
+//        System.out.println("peek "+sq.peek());
+//        sq.print();
+//..............................................................................
+//        System.out.println("Given an array with all "
+//                + "even elements present even number of "
+//                + "times except one which is present odd number "
+//                + "of times. Find that element.");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-291-on-campus-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/find-the-number-occurring-odd-number-of-times/
+//        int arr[] = {1, 2, 3, 2, 3, 1, 3}; 
+//        findOddOccurringNumber_UsingHashing(arr);
+//        findOddOccurringNumber_UsingXOR(arr);
+//        
+//        int ar[] = {1, 2, 3, 2, 3, 1}; 
+//        findOddOccurringNumber_UsingHashing(ar);
+//        findOddOccurringNumber_UsingXOR(ar);
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
