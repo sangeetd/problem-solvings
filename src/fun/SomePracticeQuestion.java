@@ -1367,50 +1367,50 @@ public class SomePracticeQuestion {
             System.out.print(findMax(a, i, i + k - 1) + "  ");
 
         }
-        
+
         System.out.println();
 
     }
-    
-    public static void maxElementInKWindow_ON(int[] a, int k){
-        
+
+    public static void maxElementInKWindow_ON(int[] a, int k) {
+
         /*
         
-        to solve this question in O(N) we will use Dqueue
+         to solve this question in O(N) we will use Dqueue
         
-        https://www.geeksforgeeks.org/sliding-window-maximum-maximum-of-all-subarrays-of-size-k/
+         https://www.geeksforgeeks.org/sliding-window-maximum-maximum-of-all-subarrays-of-size-k/
         
-        */
+         */
         int n = a.length;
         Deque<Integer> dq = new LinkedList<>();
-        int i=0;
-        for(; i<k; i++){
-            
-            while(!dq.isEmpty() && a[i] >= a[dq.peekLast()]){
+        int i = 0;
+        for (; i < k; i++) {
+
+            while (!dq.isEmpty() && a[i] >= a[dq.peekLast()]) {
                 dq.removeLast();
             }
-            
+
             dq.addLast(i);
-            
+
         }
-        
-        for(; i<n; i++){
-            
-            System.out.print(a[dq.peek()]+" ");
-            
-            while(!dq.isEmpty() && dq.peek() <= i-k){
+
+        for (; i < n; i++) {
+
+            System.out.print(a[dq.peek()] + " ");
+
+            while (!dq.isEmpty() && dq.peek() <= i - k) {
                 dq.removeFirst();
             }
-            
-            while(!dq.isEmpty() && a[i] >= a[dq.peekLast()]){
+
+            while (!dq.isEmpty() && a[i] >= a[dq.peekLast()]) {
                 dq.removeLast();
             }
-            
+
             dq.addLast(i);
-            
+
         }
-        
-        System.out.print(a[dq.peek()]+ " ");
+
+        System.out.print(a[dq.peek()] + " ");
         System.out.println();
     }
 
@@ -3406,7 +3406,7 @@ public class SomePracticeQuestion {
             return 0;
         }
         if (node.left == null && node.right == null) {
-            res.result = Math.max(res.result, (Integer)node.getData());
+            res.result = Math.max(res.result, (Integer) node.getData());
             return (Integer) node.getData();
         }
 
@@ -3522,29 +3522,29 @@ public class SomePracticeQuestion {
         return false;
 
     }
-    
+
     static TreeNode<Integer> prevForIsTreeBST;
-    public static boolean isTreeBST(TreeNode<Integer> node){
-        
-        if(node == null){
+
+    public static boolean isTreeBST(TreeNode<Integer> node) {
+
+        if (node == null) {
             return true;
         }
-        
+
         boolean leftIsBST = isTreeBST(node.getLeft());
-        if(leftIsBST == false){
+        if (leftIsBST == false) {
             return false;
         }
-        
-        if(prevForIsTreeBST != null && node.getData() < prevForIsTreeBST.getData()){
+
+        if (prevForIsTreeBST != null && node.getData() < prevForIsTreeBST.getData()) {
             return false;
         }
-        
+
         prevForIsTreeBST = node;
-        
+
         return isTreeBST(node.getRight());
-        
+
     }
-    
 
     public static boolean canFinish(int numCourses, int[][] prerequisites) {
 
@@ -4202,128 +4202,238 @@ public class SomePracticeQuestion {
         return sb.toString().trim();
 
     }
-    
-    public static void continousSubArrayWhoseSumIsK(int[] a, int K){
-        
+
+    public static void continousSubArrayWhoseSumIsK(int[] a, int K) {
+
         /*
         
-        ...............O(N^2)....................
-        brute force approach will be to try all the possible sub arrays that form
-        the given sum
-        this can be achieved using 2 nested fo loops
+         ...............O(N^2)....................
+         brute force approach will be to try all the possible sub arrays that form
+         the given sum
+         this can be achieved using 2 nested fo loops
         
-        loop: i=0 -> i<n -> i++
-            sum = a[i]
-            loop: j = i+1 -> i<n -> j++
-                if: sum == K
-                    int end = j - 1
-                    print: "subarray indexes" + i +" to "+ end
-                    return
+         loop: i=0 -> i<n -> i++
+         sum = a[i]
+         loop: j = i+1 -> i<n -> j++
+         if: sum == K
+         int end = j - 1
+         print: "subarray indexes" + i +" to "+ end
+         return
                 
-                if: sum > K
-                    break
+         if: sum > K
+         break
                 
-                sum += a[j]
+         sum += a[j]
         
-        the aabove algo is of O(N^2)
-        reason for finding end variable is because we adding into the sum variable a[j]
-        in the last of loop 2, so if aadding a[j] makes sum == K that can only be checked 
-        in next iteration of j where j got already incremented so balancing the last element added was at j-1 index 
+         the aabove algo is of O(N^2)
+         reason for finding end variable is because we adding into the sum variable a[j]
+         in the last of loop 2, so if aadding a[j] makes sum == K that can only be checked 
+         in next iteration of j where j got already incremented so balancing the last element added was at j-1 index 
        
-        */
-        
+         */
         //................O(N)...........................................
         int n = a.length;
         int start = 0;
         int sum = a[0];
-        for(int i=1; i<=n; i++){
-            
-            while(sum > K && start < i-1){
+        for (int i = 1; i <= n; i++) {
+
+            while (sum > K && start < i - 1) {
                 sum -= a[start];
                 start++;
             }
-            
-            if(sum == K){
-                int end  = i-1;
-                System.out.println("subarray index "+start+" to "+end);
+
+            if (sum == K) {
+                int end = i - 1;
+                System.out.println("subarray index " + start + " to " + end);
                 return;
             }
-            
-            if(i<n){
+
+            if (i < n) {
                 sum += a[i];
             }
-            
+
         }
-        
+
         System.out.println("no subarray found");
-        
+
     }
-    
-    public static void continousSubArrayWhoseSumIsK_HandlesNegtiveNum(int[] a, int K){
-        
+
+    public static void continousSubArrayWhoseSumIsK_HandlesNegtiveNum(int[] a, int K) {
+
         //10, 2, -2, -20, 10 | K = -10
-        
         int n = a.length;
         int start = 0;
-        int end  = -1;  
+        int end = -1;
         int sum = 0;
         Map<Integer, Integer> m = new HashMap<>();
-        for(int i=0; i<n; i++){
+        for (int i = 0; i < n; i++) {
             sum += a[i];
-            if(sum - K == 0){
+            if (sum - K == 0) {
                 start = 0;
                 end = i;
                 break;
             }
-            
-            if(m.containsKey(sum - K)){
+
+            if (m.containsKey(sum - K)) {
                 start = m.get(sum - K) + 1;
                 end = 1;
                 break;
             }
-            
+
             m.put(sum, i);
-            
+
         }
-        
+
         // if end is -1 : means we have reached end without the sum 
-        if (end == -1) { 
-            System.out.println("No subarray with given sum exists"); 
-        } else { 
-            System.out.println("Sum found between indexes " 
-                            + start + " to " + end); 
-        } 
+        if (end == -1) {
+            System.out.println("No subarray with given sum exists");
+        } else {
+            System.out.println("Sum found between indexes "
+                    + start + " to " + end);
+        }
     }
-    
-    public static void findOddOccurringNumber_UsingHashing(int[] a){
-        
+
+    public static void findOddOccurringNumber_UsingHashing(int[] a) {
+
         //...................O(N)..............................
         Map<Integer, Integer> map = new HashMap<>();
-        for(int x: a){
+        for (int x : a) {
             map.put(x, map.getOrDefault(x, 0) + 1);
         }
-        
-        for(Map.Entry<Integer, Integer> e: map.entrySet()) {
-            if(e.getValue() % 2 == 1){
-                System.out.println("odd occuerence hashing: "+e.getKey());
+
+        for (Map.Entry<Integer, Integer> e : map.entrySet()) {
+            if (e.getValue() % 2 == 1) {
+                System.out.println("odd occuerence hashing: " + e.getKey());
                 return;
             }
         }
-        
-        System.out.println("odd occuerence hashing: "+0);
-    }
-    
-    public static void findOddOccurringNumber_UsingXOR(int[] a){
-        //..............O(N)..................................
-        int xor = 0;
-        for(int x: a){
-            xor = xor ^ x;
-        }
-        
-        //odd occurred element will be in the xor
-        System.out.println("odd occuerence xor: "+xor);
+
+        System.out.println("odd occuerence hashing: " + 0);
     }
 
+    public static void findOddOccurringNumber_UsingXOR(int[] a) {
+        //..............O(N)..................................
+        int xor = 0;
+        for (int x : a) {
+            xor = xor ^ x;
+        }
+
+        //odd occurred element will be in the xor
+        System.out.println("odd occuerence xor: " + xor);
+    }
+
+    public static boolean isRectangle(int[][] a) {
+
+        int row = a.length;
+        int col = a[0].length;
+        Map<Integer, Set<Integer>> cap = new HashMap<>();
+        for (int x = 0; x < row; x++) {
+            for (int y = 0; y < col; y++) {
+                for (int k = y + 1; k < col; k++) {
+
+                    if (a[x][y] == 1 && a[x][k] == 1) {
+//                        System.out.println("(" + x + "," + y + ")-(" + x + "," + k + ")");
+
+                        if (cap.containsKey(y) && cap.get(y).contains(k)) {
+                            return true;
+                        }
+
+                        if (cap.containsKey(k) && cap.get(k).contains(y)) {
+                            return true;
+                        }
+
+                        if (!cap.containsKey(y)) {
+                            Set<Integer> s = new HashSet<>();
+                            s.add(k);
+                            cap.put(y, s);
+                        } else {
+                            cap.get(y).add(k);
+                        }
+
+                        if (!cap.containsKey(k)) {
+                            Set<Integer> s = new HashSet<>();
+                            s.add(y);
+                            cap.put(k, s);
+                        } else {
+                            cap.get(k).add(y);
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+        return false;
+
+    }
+    
+    public static void removeDuplicate_Iterative(Node<Integer> head){
+        
+        /*
+        
+        removes duplicate irrespective of linked list is sorted or unsorted
+        It kind of maintains insertion order while removing consecutive duplicates
+        
+        iterative keeps the discontinous occurence of node in the list and 
+        removes all dupliacate elements that occured consecutively 
+        
+        */
+        
+        Node<Integer> cur = head;
+        Node<Integer> temp = head.getNext();
+        
+        while(temp != null){
+            
+            if(cur.getData() != temp.getData()){
+                cur.setNext(temp);
+                cur = temp;
+            }
+            
+            temp = temp.getNext();
+            
+        }
+        
+        //if duplicates are in the end segments of the list
+        cur.setNext(temp);
+        System.out.println("remove duplicate using iterative");
+        LinkedListUtil<Integer> ll = new LinkedListUtil<>(head);
+        ll.print();
+    }
+    
+    public static void removeDuplicate_Hashing(Node<Integer> head){
+        
+        /*
+        
+        removes duplicate irrespective of linked list is sorted or unsorted
+        
+        hashing keeps the first occuring node in the list and 
+        removes all other dupliacate elements that occured anywhere in the list later on 
+        
+        */
+        
+        HashSet<Integer> set = new HashSet<>();
+        Node<Integer> cur = head;
+        Node<Integer> prev = head;
+        while(cur != null){
+            
+            if(set.contains(cur.getData())){
+                prev.setNext(cur.getNext());
+            }else {
+                set.add(cur.getData());
+                prev = cur;
+            }
+            
+            cur = cur.getNext();
+            
+        }
+        
+        System.out.println("remove duplicate using hashing");
+        LinkedListUtil<Integer> ll = new LinkedListUtil<>(head);
+        ll.print();
+        
+    }
+    
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
 
         //least end point when we reach to 0 index of string
@@ -7526,6 +7636,78 @@ public class SomePracticeQuestion {
 //        int ar[] = {1, 2, 3, 2, 3, 1}; 
 //        findOddOccurringNumber_UsingHashing(ar);
 //        findOddOccurringNumber_UsingXOR(ar);
+//..............................................................................
+//        System.out.println("Find if there is a rectangle in binary matrix with corners as 1");
+//        //https://www.interviewbit.com/problems/find-rectangle-in-binary-matrix/
+//        //https://www.geeksforgeeks.org/find-rectangle-binary-matrix-corners-1/
+//        int mat[][] = {{1, 0, 0, 1, 0},
+//        {0, 0, 1, 0, 1},
+//        {0, 0, 0, 1, 0},
+//        {1, 0, 1, 0, 1}};
+//        if (isRectangle(mat)) {
+//            System.out.println("Yes");
+//        } else {
+//            System.out.println("No");
+//        }
+//
+//        int mat2[][] = {{0, 1, 1},
+//        {0, 1, 1},
+//        {0, 1, 0}};
+//        if (isRectangle(mat2)) {
+//            System.out.println("Yes");
+//        } else {
+//            System.out.println("No");
+//        }
+//        
+//        int mat3[][] = {{0, 1, 1},
+//        {0, 0, 1},
+//        {0, 1, 0}};
+//        if (isRectangle(mat3)) {
+//            System.out.println("Yes");
+//        } else {
+//            System.out.println("No");
+//        }
+//..............................................................................
+        System.out.println("Remove duplicates from linkedlist using iterative and hashing ways");
+        Node<Integer> n1 =  new Node<>(1);
+        n1.setNext(new Node<>(1));
+        n1.getNext().setNext(new Node<>(2));
+        
+        Node<Integer> n2 =  new Node<>(1);
+        n2.setNext(new Node<>(1));
+        n2.getNext().setNext(new Node<>(2));
+        
+        removeDuplicate_Iterative(n1);
+        removeDuplicate_Hashing(n2);
+        
+        n1 = new Node<>(5);
+        n1.setNext(new Node<>(1));
+        n1.getNext().setNext(new Node<>(1));
+        n1.getNext().getNext().setNext(new Node<>(1));
+        n1.getNext().getNext().getNext().setNext(new Node<>(6));
+        n1.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+        n1.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+        n1.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+        
+        n2 = new Node<>(5);
+        n2.setNext(new Node<>(1));
+        n2.getNext().setNext(new Node<>(1));
+        n2.getNext().getNext().setNext(new Node<>(1));
+        n2.getNext().getNext().getNext().setNext(new Node<>(6));
+        n2.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+        n2.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+        n2.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+        
+        removeDuplicate_Iterative(n1);
+        removeDuplicate_Hashing(n2);
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
