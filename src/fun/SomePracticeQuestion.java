@@ -3321,7 +3321,7 @@ public class SomePracticeQuestion {
             height.height = 0;
             return true;
         }
-
+        
         Height leftHeight = new Height();
         Height rightHeight = new Height();
 
@@ -4368,7 +4368,7 @@ public class SomePracticeQuestion {
 
     }
     
-    public static void removeDuplicate_Iterative(Node<Integer> head){
+    public static void removeDuplicateFromLinkedList_Iterative(Node<Integer> head){
         
         /*
         
@@ -4384,7 +4384,6 @@ public class SomePracticeQuestion {
         Node<Integer> temp = head.getNext();
         
         while(temp != null){
-            
             if(cur.getData() != temp.getData()){
                 cur.setNext(temp);
                 cur = temp;
@@ -4401,7 +4400,7 @@ public class SomePracticeQuestion {
         ll.print();
     }
     
-    public static void removeDuplicate_Hashing(Node<Integer> head){
+    public static void removeDuplicateFromLinkedList_Hashing(Node<Integer> head){
         
         /*
         
@@ -4431,6 +4430,124 @@ public class SomePracticeQuestion {
         System.out.println("remove duplicate using hashing");
         LinkedListUtil<Integer> ll = new LinkedListUtil<>(head);
         ll.print();
+        
+    }
+    
+    public static TreeNode<Integer> removeNodeFromBSTNotInRange(TreeNode<Integer> node, int min, int max){
+        
+        if(node == null){
+            return null;
+        }
+        
+        node.setLeft(removeNodeFromBSTNotInRange(node.getLeft(), min, max));
+        node.setRight(removeNodeFromBSTNotInRange(node.getRight(), min, max));
+        
+        if(node.getData() < min){
+            return node.getRight();
+        }else if(node.getData() > max){
+            return node.getLeft();
+        }
+        
+        return node;
+        
+    }
+    
+    public static void detectLoopInLinkedList_Hashing(Node<Integer> node){
+        
+        /*
+        
+        time: ......................O(N)..............................
+        space: ....................O(N)...............................
+        
+        */
+        
+        HashSet<Node<Integer>> set = new HashSet<>();
+        Node temp = node;
+        while(temp != null){
+            
+            //if temp node's next is a linked ref to some internal previous node of the same 
+            //linked list then this cond forms cycle
+            if(set.contains(temp)){
+                System.out.println("Cycle found at "+temp.getData());
+                return;
+            }
+            
+            set.add(temp);
+            
+            temp = temp.getNext();
+            
+        }
+        
+        //no cycle found
+        System.out.println("No cycle found");
+        
+    }
+    
+    public static void detectLoopInLinkedList_Iterative(Node<Integer> node){
+        
+        /*
+        
+        time: ......................O(N)..............................
+        space: ....................O(1)...............................
+        
+        Also the floyd's warshall algo adaptation to find the the cycle using the concept of 
+        slow and fast pointers
+        
+        */
+        
+        Node slow = node;
+        Node fast = node.getNext().getNext();
+        while(slow != null && fast != null && fast.getNext() != null){
+            
+            //debugg
+//            System.out.println("Slow: "+slow.getData()+" fast: "+fast.getData());
+            
+            if(slow == fast){
+                System.out.println("Cycle found at "+slow.getData());
+                return;
+            }
+            
+            slow = slow.getNext();
+            fast = fast.getNext().getNext();
+            
+        }
+        
+        //no cycle found
+        System.out.println("No cycle found");
+        
+    }
+    
+    
+    public static void detectAndRemovingLoopInLinkedList(Node<Integer> node){
+        
+        /*
+        
+        time: ......................O(N)..............................
+        space: ....................O(N)...............................
+        
+        Using hashing
+        
+        */
+        
+        HashSet<Node<Integer>> set = new HashSet<>();
+        Node<Integer> prev = null;
+        Node<Integer> temp = node;
+        while(temp != null){
+            
+            if(set.contains(temp)){
+                prev.setNext(null);
+                break;
+            }
+            
+            set.add(temp);
+            prev = temp;
+            
+            temp = temp.getNext();
+            
+        }
+        
+        
+        new LinkedListUtil<Integer>(node).print();
         
     }
     
@@ -7204,31 +7321,31 @@ public class SomePracticeQuestion {
 //        System.out.println("LCA in non-BST for 1, 1  using recursion "+lowestCommonAncestorInBinarySearchTree_Recursion(root1, 1, 1).getData());
 //        System.out.println("LCA in non-BST for 1, 1  using iteration "+lowestCommonAncestorInBinarySearchTree_Iterative(root1, 1, 1).getData());
 //..............................................................................
-//        System.out.println("How to determine if a binary tree is height-balanced?");
-//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-186-for-sde1/?ref=rp
-//        //https://practice.geeksforgeeks.org/problems/check-for-balanced-tree/1
-//        //https://www.geeksforgeeks.org/how-to-determine-if-a-binary-tree-is-balanced/
-//        TreeNode<Integer> root = new TreeNode<>(1);
-//        root.setLeft(new TreeNode(2));
-//        root.setRight(new TreeNode(3));
-//        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root, new Height()));
-//        
-//        TreeNode<Integer> root1 = new TreeNode<>(6);
-//        root1.setLeft(new TreeNode(2));
-//        root1.getLeft().setLeft(new TreeNode(0));
-//        root1.getLeft().setRight(new TreeNode(4));
-//        root1.getLeft().getRight().setLeft(new TreeNode(3));
-//        root1.getLeft().getRight().setRight(new TreeNode(5));
-//        root1.setRight(new TreeNode(8));
-//        root1.getRight().setLeft(new TreeNode(7));
-//        root1.getRight().setRight(new TreeNode(9));
-//        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root1, new Height()));
-//        
-//        //Skwed binary tree
-//        TreeNode<Integer> root2 = new TreeNode<>(1);
-//        root2.setLeft(new TreeNode(2));
-//        root2.getLeft().setLeft(new TreeNode(3));
-//        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root2, new Height()));
+        System.out.println("How to determine if a binary tree is height-balanced?");
+        //https://www.geeksforgeeks.org/amazon-interview-experience-set-186-for-sde1/?ref=rp
+        //https://practice.geeksforgeeks.org/problems/check-for-balanced-tree/1
+        //https://www.geeksforgeeks.org/how-to-determine-if-a-binary-tree-is-balanced/
+        TreeNode<Integer> root = new TreeNode<>(1);
+        root.setLeft(new TreeNode(2));
+        root.setRight(new TreeNode(3));
+        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root, new Height()));
+        
+        TreeNode<Integer> root1 = new TreeNode<>(6);
+        root1.setLeft(new TreeNode(2));
+        root1.getLeft().setLeft(new TreeNode(0));
+        root1.getLeft().setRight(new TreeNode(4));
+        root1.getLeft().getRight().setLeft(new TreeNode(3));
+        root1.getLeft().getRight().setRight(new TreeNode(5));
+        root1.setRight(new TreeNode(8));
+        root1.getRight().setLeft(new TreeNode(7));
+        root1.getRight().setRight(new TreeNode(9));
+        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root1, new Height()));
+        
+        //Skwed binary tree
+        TreeNode<Integer> root2 = new TreeNode<>(1);
+        root2.setLeft(new TreeNode(2));
+        root2.getLeft().setLeft(new TreeNode(3));
+        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root2, new Height()));
 //..............................................................................
 //        System.out.println("Diameter of tree | DP on tree");
 //        //https://www.geeksforgeeks.org/diameter-of-a-binary-tree/
@@ -7668,46 +7785,113 @@ public class SomePracticeQuestion {
 //            System.out.println("No");
 //        }
 //..............................................................................
-        System.out.println("Remove duplicates from linkedlist using iterative and hashing ways");
-        Node<Integer> n1 =  new Node<>(1);
-        n1.setNext(new Node<>(1));
-        n1.getNext().setNext(new Node<>(2));
-        
-        Node<Integer> n2 =  new Node<>(1);
-        n2.setNext(new Node<>(1));
-        n2.getNext().setNext(new Node<>(2));
-        
-        removeDuplicate_Iterative(n1);
-        removeDuplicate_Hashing(n2);
-        
-        n1 = new Node<>(5);
-        n1.setNext(new Node<>(1));
-        n1.getNext().setNext(new Node<>(1));
-        n1.getNext().getNext().setNext(new Node<>(1));
-        n1.getNext().getNext().getNext().setNext(new Node<>(6));
-        n1.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
-        n1.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
-        n1.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
-        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
-        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
-        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
-        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
-        
-        n2 = new Node<>(5);
-        n2.setNext(new Node<>(1));
-        n2.getNext().setNext(new Node<>(1));
-        n2.getNext().getNext().setNext(new Node<>(1));
-        n2.getNext().getNext().getNext().setNext(new Node<>(6));
-        n2.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
-        n2.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
-        n2.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
-        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
-        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
-        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
-        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
-        
-        removeDuplicate_Iterative(n1);
-        removeDuplicate_Hashing(n2);
+//        System.out.println("Remove duplicates from linkedlist using iterative and hashing ways");
+//        //https://leetcode.com/problems/remove-duplicates-from-sorted-list/submissions/
+//        //https://www.geeksforgeeks.org/remove-duplicates-from-an-unsorted-linked-list/
+//        Node<Integer> n1 =  new Node<>(1);
+//        n1.setNext(new Node<>(1));
+//        n1.getNext().setNext(new Node<>(2));
+//        
+//        Node<Integer> n2 =  new Node<>(1);
+//        n2.setNext(new Node<>(1));
+//        n2.getNext().setNext(new Node<>(2));
+//        
+//        removeDuplicateFromLinkedList_Iterative(n1);
+//        removeDuplicateFromLinkedList_Hashing(n2);
+//        
+//        n1 = new Node<>(5);
+//        n1.setNext(new Node<>(1));
+//        n1.getNext().setNext(new Node<>(1));
+//        n1.getNext().getNext().setNext(new Node<>(1));
+//        n1.getNext().getNext().getNext().setNext(new Node<>(6));
+//        n1.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        n1.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        n1.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+//        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+//        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+//        n1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        
+//        n2 = new Node<>(5);
+//        n2.setNext(new Node<>(1));
+//        n2.getNext().setNext(new Node<>(1));
+//        n2.getNext().getNext().setNext(new Node<>(1));
+//        n2.getNext().getNext().getNext().setNext(new Node<>(6));
+//        n2.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        n2.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        n2.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+//        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+//        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+//        n2.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        
+//        removeDuplicateFromLinkedList_Iterative(n1);
+//        removeDuplicateFromLinkedList_Hashing(n2);
+//..............................................................................
+//        System.out.println("Remove nodes from BST that are not in the given range");
+//        //youtube  coding simplified
+//        TreeNode<Integer> root = new TreeNode<>(25);
+//        root.setLeft(new TreeNode<>(12));
+//        root.getLeft().setLeft(new TreeNode<>(10));
+//        root.getLeft().setRight(new TreeNode<>(17));
+//        root.getLeft().getRight().setLeft(new TreeNode<>(15));
+//        root.setRight(new TreeNode<>(37));
+//        root.getRight().setLeft(new TreeNode<>(32));
+//        root.getRight().setRight(new TreeNode<>(40));
+//        new BinaryTree<Integer>(root).treeBFS();
+//        System.out.println();
+//        TreeNode<Integer> rootMod = removeNodeFromBSTNotInRange(root, 12, 35);
+//        new BinaryTree<Integer>(rootMod).treeBFS();
+//        System.out.println();
+//        
+//        root = new TreeNode<>(25);
+//        root.setLeft(new TreeNode<>(12));
+//        root.getLeft().setLeft(new TreeNode<>(10));
+//        root.getLeft().setRight(new TreeNode<>(17));
+//        root.getLeft().getRight().setLeft(new TreeNode<>(15));
+//        root.setRight(new TreeNode<>(37));
+//        root.getRight().setLeft(new TreeNode<>(32));
+//        root.getRight().setRight(new TreeNode<>(40));
+//        new BinaryTree<Integer>(root).treeBFS();
+//        System.out.println();
+//        //out of range case
+//        rootMod = removeNodeFromBSTNotInRange(root, 41, 100);
+//        //tree  got empty :)
+//        new BinaryTree<Integer>(rootMod).treeBFS();
+//        System.out.println();
+//..............................................................................
+//        System.out.println("Detect a loop in the linked list");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-213-off-campus-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/detect-loop-in-a-linked-list/
+//        //for iterative approach explanation : https://www.geeksforgeeks.org/how-does-floyds-slow-and-fast-pointers-approach-work/
+//        //10 -> 15 -> [20] -> 25 -> 30 -> [20]
+//        Node<Integer> node = new Node<>(10);
+//        node.setNext(new Node<>(15));
+//        node.getNext().setNext(new Node<>(20));
+//        node.getNext().getNext().setNext(new Node<>(25));
+//        node.getNext().getNext().getNext().setNext(new Node<>(30));
+//        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
+//        detectLoopInLinkedList_Hashing(node);
+//        detectLoopInLinkedList_Iterative(node);
+//        
+//        node = new Node<>(10);
+//        node.setNext(new Node<>(15));
+//        node.getNext().setNext(new Node<>(20));
+//        node.getNext().getNext().setNext(new Node<>(25));
+//        node.getNext().getNext().getNext().setNext(new Node<>(30));
+//        detectLoopInLinkedList_Hashing(node);
+//        detectLoopInLinkedList_Iterative(node);      
+//..............................................................................
+        System.out.println("Detect and removing the loop in the linked list");
+        //https://www.geeksforgeeks.org/detect-and-remove-loop-in-a-linked-list/
+        //10 -> 15 -> [20] -> 25 -> 30 -> [20]
+        Node<Integer> node = new Node<>(10);
+        node.setNext(new Node<>(15));
+        node.getNext().setNext(new Node<>(20));
+        node.getNext().getNext().setNext(new Node<>(25));
+        node.getNext().getNext().getNext().setNext(new Node<>(30));
+        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
+        detectAndRemovingLoopInLinkedList(node);
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";

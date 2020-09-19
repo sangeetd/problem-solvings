@@ -13,17 +13,17 @@ import java.util.Queue;
  *
  * @author RAVI
  */
-public class BinarySearchTree<T> extends BinaryTree implements Comparator<T> {
+public class BinarySearchTree<T> extends BinaryTree<T> implements Comparator<T> {
 
     public BinarySearchTree() {
     }
 
     public BinarySearchTree(Object data) {
-        super(data);
+        super((T)data);
     }
 
     public BinarySearchTree(Object data, TreeNode left, TreeNode right) {
-        super(data, left, right);
+        super((T)data, left, right);
     }
 
     @Override

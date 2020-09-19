@@ -288,7 +288,7 @@ public class LinkedListUtil<T> {
         Node<T> temp = head;
         while (temp != null) {
 
-            System.out.print(temp.getData());
+            System.out.print(temp.getData()+" ");
 
             temp = temp.getNext();
 
