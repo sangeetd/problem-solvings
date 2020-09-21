@@ -3321,7 +3321,7 @@ public class SomePracticeQuestion {
             height.height = 0;
             return true;
         }
-        
+
         Height leftHeight = new Height();
         Height rightHeight = new Height();
 
@@ -4367,190 +4367,454 @@ public class SomePracticeQuestion {
         return false;
 
     }
-    
-    public static void removeDuplicateFromLinkedList_Iterative(Node<Integer> head){
-        
+
+    public static void removeDuplicateFromLinkedList_Iterative(Node<Integer> head) {
+
         /*
         
-        removes duplicate irrespective of linked list is sorted or unsorted
-        It kind of maintains insertion order while removing consecutive duplicates
+         removes duplicate irrespective of linked list is sorted or unsorted
+         It kind of maintains insertion order while removing consecutive duplicates
         
-        iterative keeps the discontinous occurence of node in the list and 
-        removes all dupliacate elements that occured consecutively 
+         iterative keeps the discontinous occurence of node in the list and 
+         removes all dupliacate elements that occured consecutively 
         
-        */
-        
+         */
         Node<Integer> cur = head;
         Node<Integer> temp = head.getNext();
-        
-        while(temp != null){
-            if(cur.getData() != temp.getData()){
+
+        while (temp != null) {
+            if (cur.getData() != temp.getData()) {
                 cur.setNext(temp);
                 cur = temp;
             }
-            
+
             temp = temp.getNext();
-            
+
         }
-        
+
         //if duplicates are in the end segments of the list
         cur.setNext(temp);
         System.out.println("remove duplicate using iterative");
         LinkedListUtil<Integer> ll = new LinkedListUtil<>(head);
         ll.print();
     }
-    
-    public static void removeDuplicateFromLinkedList_Hashing(Node<Integer> head){
-        
+
+    public static void removeDuplicateFromLinkedList_Hashing(Node<Integer> head) {
+
         /*
         
-        removes duplicate irrespective of linked list is sorted or unsorted
+         removes duplicate irrespective of linked list is sorted or unsorted
         
-        hashing keeps the first occuring node in the list and 
-        removes all other dupliacate elements that occured anywhere in the list later on 
+         hashing keeps the first occuring node in the list and 
+         removes all other dupliacate elements that occured anywhere in the list later on 
         
-        */
-        
+         */
         HashSet<Integer> set = new HashSet<>();
         Node<Integer> cur = head;
         Node<Integer> prev = head;
-        while(cur != null){
-            
-            if(set.contains(cur.getData())){
+        while (cur != null) {
+
+            if (set.contains(cur.getData())) {
                 prev.setNext(cur.getNext());
-            }else {
+            } else {
                 set.add(cur.getData());
                 prev = cur;
             }
-            
+
             cur = cur.getNext();
-            
+
         }
-        
+
         System.out.println("remove duplicate using hashing");
         LinkedListUtil<Integer> ll = new LinkedListUtil<>(head);
         ll.print();
-        
+
     }
-    
-    public static TreeNode<Integer> removeNodeFromBSTNotInRange(TreeNode<Integer> node, int min, int max){
-        
-        if(node == null){
+
+    public static TreeNode<Integer> removeNodeFromBSTNotInRange(TreeNode<Integer> node, int min, int max) {
+
+        if (node == null) {
             return null;
         }
-        
+
         node.setLeft(removeNodeFromBSTNotInRange(node.getLeft(), min, max));
         node.setRight(removeNodeFromBSTNotInRange(node.getRight(), min, max));
-        
-        if(node.getData() < min){
+
+        if (node.getData() < min) {
             return node.getRight();
-        }else if(node.getData() > max){
+        } else if (node.getData() > max) {
             return node.getLeft();
         }
-        
+
         return node;
-        
+
     }
-    
-    public static void detectLoopInLinkedList_Hashing(Node<Integer> node){
-        
+
+    public static void detectLoopInLinkedList_Hashing(Node<Integer> node) {
+
         /*
         
-        time: ......................O(N)..............................
-        space: ....................O(N)...............................
+         time: ......................O(N)..............................
+         space: ....................O(N)...............................
         
-        */
-        
+         */
         HashSet<Node<Integer>> set = new HashSet<>();
         Node temp = node;
-        while(temp != null){
-            
+        while (temp != null) {
+
             //if temp node's next is a linked ref to some internal previous node of the same 
             //linked list then this cond forms cycle
-            if(set.contains(temp)){
-                System.out.println("Cycle found at "+temp.getData());
+            if (set.contains(temp)) {
+                System.out.println("Cycle found at " + temp.getData());
                 return;
             }
-            
+
             set.add(temp);
-            
+
             temp = temp.getNext();
-            
+
         }
-        
+
         //no cycle found
         System.out.println("No cycle found");
-        
+
     }
-    
-    public static void detectLoopInLinkedList_Iterative(Node<Integer> node){
-        
+
+    public static void detectLoopInLinkedList_Iterative(Node<Integer> node) {
+
         /*
         
-        time: ......................O(N)..............................
-        space: ....................O(1)...............................
+         time: ......................O(N)..............................
+         space: ....................O(1)...............................
         
-        Also the floyd's warshall algo adaptation to find the the cycle using the concept of 
-        slow and fast pointers
+         Also the floyd's warshall algo adaptation to find the the cycle using the concept of 
+         slow and fast pointers
         
-        */
-        
+         */
         Node slow = node;
         Node fast = node.getNext().getNext();
-        while(slow != null && fast != null && fast.getNext() != null){
-            
+        while (slow != null && fast != null && fast.getNext() != null) {
+
             //debugg
 //            System.out.println("Slow: "+slow.getData()+" fast: "+fast.getData());
-            
-            if(slow == fast){
-                System.out.println("Cycle found at "+slow.getData());
+            if (slow == fast) {
+                System.out.println("Cycle found at " + slow.getData());
                 return;
             }
-            
+
             slow = slow.getNext();
             fast = fast.getNext().getNext();
-            
+
         }
-        
+
         //no cycle found
         System.out.println("No cycle found");
-        
+
     }
-    
-    
-    public static void detectAndRemovingLoopInLinkedList(Node<Integer> node){
-        
+
+    public static void detectAndRemovingLoopInLinkedList_UsingHashing(Node<Integer> node) {
+
         /*
         
-        time: ......................O(N)..............................
-        space: ....................O(N)...............................
+         time: ......................O(N)..............................
+         space: ....................O(N)...............................
         
-        Using hashing
+         Using hashing
         
-        */
-        
+         */
         HashSet<Node<Integer>> set = new HashSet<>();
         Node<Integer> prev = null;
         Node<Integer> temp = node;
-        while(temp != null){
-            
-            if(set.contains(temp)){
+        while (temp != null) {
+
+            if (set.contains(temp)) {
                 prev.setNext(null);
                 break;
             }
-            
+
             set.add(temp);
             prev = temp;
-            
+
             temp = temp.getNext();
-            
+
         }
-        
-        
+
+        System.out.println("Removing cycle using hashing");
         new LinkedListUtil<Integer>(node).print();
+
+    }
+
+    public static void detectAndRemovingLoopInLinkedList_UsingIteration(Node<Integer> node) {
+
+        /*
         
+         time: ......................O(N)..............................
+         space: ....................O(1)...............................
+        
+         Using floyd warshal's adaptation by maintaing the 2 pointers
+        
+         */
+        // If list is empty or has only one node 
+        // without loop 
+        if (node == null || node.getNext() == null) {
+            return;
+        }
+
+        Node slow = node, fast = node;
+
+        // Move slow and fast 1 and 2 steps 
+        // ahead respectively. 
+        slow = slow.getNext();
+        fast = fast.getNext().getNext();
+
+        // Search for loop using slow and fast pointers 
+        while (fast != null && fast.getNext() != null) {
+            if (slow == fast) {
+                break;
+            }
+
+            slow = slow.getNext();
+            fast = fast.getNext().getNext();
+        }
+
+        /* If loop exists */
+        if (slow == fast) {
+            slow = node;
+            while (slow.getNext() != fast.getNext()) {
+                slow = slow.getNext();
+                fast = fast.getNext();
+            }
+
+            /* since fast->next is the looping point */
+            fast.setNext(null); /* remove loop */
+
+        }
+
+        System.out.println("Removing cycle using iterative");
+        new LinkedListUtil<Integer>(node).print();
+
+    }
+
+    public static void sortAListInRelativeOrderOfBList(int[] a, int[] b) {
+
+        //treemap is sorted in order of keys
+        Map<Integer, Integer> map = new TreeMap<>();
+        int[] result = new int[a.length];
+        int k = 0;
+
+        //O(N) loop N = a.length
+        //getting just the occurence of the element from a list
+        for (int x : a) {
+            map.put(x, map.getOrDefault(x, 0) + 1);
+        }
+
+        //O(M) loop M = b.length
+        //relative order of b list
+        for (int x : b) {
+            //inner loops depends upon the occuernce of each elements
+            //x (common to both a list and b list)
+            for (int i = 0; i < map.get(x); i++) {
+                result[k++] = x;
+            }
+            //once we process the x in b list for its relative order
+            //we will remove it from the map
+            //so that we are left with those elements in map that are not in b list
+            map.remove(x);
+        }
+
+        //those elements not in b list 
+        //append them in result in sorted order
+        //O(log(N-M)) getting out of the treemap
+        for (Map.Entry<Integer, Integer> e : map.entrySet()) {
+            int x = e.getKey();
+            //the left over elements, they can be occurrring more than one then 
+            //in result we have to generate that situations also
+            for (int i = 0; i < e.getValue(); i++) {
+                result[k++] = x;
+            }
+        }
+
+        //output
+        for (int x : result) {
+            System.out.print(x + " ");
+        }
+
+        System.out.println();
+
+    }
+
+    public static boolean childrenSumPropertyOfTree(TreeNode<Integer> node) {
+
+        /* left_data is left child data and right_data is for right  
+         child data*/
+        int leftData = 0, rightData = 0;
+
+        /* If node is NULL or it's a leaf node then 
+         return true */
+        if (node == null || (node.getLeft() == null && node.getRight() == null)) {
+            return true;
+        }
+
+        /* If left child is not present then 0 is used 
+         as data of left child */
+        if (node.getLeft() != null) {
+            leftData = (int) node.getLeft().getData();
+        }
+
+        /* If right child is not present then 0 is used 
+         as data of right child */
+        if (node.getRight() != null) {
+            rightData = (int) node.getRight().getData();
+        }
+
+        /* if the node and both of its children satisfy the 
+         property return 1 else 0*/
+        if (node.getData() == leftData + rightData
+                && childrenSumPropertyOfTree(node.getLeft())
+                && childrenSumPropertyOfTree(node.getRight())) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static int buyAndSellStockMaxProfit(int[] prices) {
+
+        if (prices == null || prices.length == 0) {
+            return 0;
+        }
+
+        int minprice = Integer.MAX_VALUE;
+        int maxprofit = 0;
+        for (int i = 0; i < prices.length; i++) {
+            if (prices[i] < minprice) {
+                minprice = prices[i];
+            } else if (prices[i] - minprice > maxprofit) {
+                maxprofit = prices[i] - minprice;
+            }
+        }
+        return maxprofit;
+
+    }
+
+    static class Interval {
+
+        int buy, sell;
+    }
+
+    public static void stockBuySellTime(int price[], int n) {
+        // Prices must be given for at least two days 
+        if (n == 1) {
+            return;
+        }
+
+        int count = 0;
+
+        // solution array 
+        ArrayList<Interval> sol = new ArrayList<>();
+
+        // Traverse through given price array 
+        int i = 0;
+        while (i < n - 1) {
+            // Find Local Minima. Note that the limit is (n-2) as we are 
+            // comparing present element to the next element. 
+            while ((i < n - 1) && (price[i + 1] <= price[i])) {
+                i++;
+            }
+
+            // If we reached the end, break as no further solution possible 
+            if (i == n - 1) {
+                break;
+            }
+
+            Interval e = new Interval();
+            e.buy = i++;
+            // Store the index of minima 
+
+            // Find Local Maxima.  Note that the limit is (n-1) as we are 
+            // comparing to previous element 
+            while ((i < n) && (price[i] >= price[i - 1])) {
+                i++;
+            }
+
+            // Store the index of maxima 
+            e.sell = i - 1;
+            sol.add(e);
+
+            // Increment number of buy/sell 
+            count++;
+        }
+
+        // print solution 
+        if (count == 0) {
+            System.out.println("There is no day when buying the stock "
+                    + "will make profit");
+        } else {
+            for (int j = 0; j < count; j++) {
+                System.out.println("Buy on day: " + sol.get(j).buy
+                        + "        "
+                        + "Sell on day : " + sol.get(j).sell);
+            }
+        }
+
     }
     
+    public static boolean parenthesisPairChecker(String expr){
+        
+        if(expr == null || expr.equals("")){
+            return false;
+        }
+        
+        Stack<Character> s = new Stack<>();
+        for(char c: expr.toCharArray()){
+            
+            if(c == '(' || c == '{' || c == '['){
+                s.push(c);
+                continue;
+            }
+            
+            if(s.isEmpty()){
+                return false;
+            }
+            
+            switch(c){
+                case ')':
+                    if (s.pop() != '(') return false;
+                    break;
+                case '}':
+                    if (s.pop() != '{') return false;
+                    break;
+                case ']':
+                    if (s.pop() != '[') return false;
+                    break;
+            }
+            
+        }
+        return s.isEmpty();
+    }
+    
+    public static int longestValidParentheses(String s) {
+        
+        int len = 0;
+        
+        Stack<Integer> st = new Stack<>();
+        st.push(-1);
+        for(int i=0; i<s.length(); i++){
+            char ch = s.charAt(i);
+            if(ch == '('){
+                st.push(i);
+            }else {
+                st.pop();
+                if(st.isEmpty()){
+                    st.push(i);
+                }else{
+                    len = Math.max(len, i - st.peek());
+                }
+            }
+        }
+        return len;
+    }
+
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
 
         //least end point when we reach to 0 index of string
@@ -7321,31 +7585,31 @@ public class SomePracticeQuestion {
 //        System.out.println("LCA in non-BST for 1, 1  using recursion "+lowestCommonAncestorInBinarySearchTree_Recursion(root1, 1, 1).getData());
 //        System.out.println("LCA in non-BST for 1, 1  using iteration "+lowestCommonAncestorInBinarySearchTree_Iterative(root1, 1, 1).getData());
 //..............................................................................
-        System.out.println("How to determine if a binary tree is height-balanced?");
-        //https://www.geeksforgeeks.org/amazon-interview-experience-set-186-for-sde1/?ref=rp
-        //https://practice.geeksforgeeks.org/problems/check-for-balanced-tree/1
-        //https://www.geeksforgeeks.org/how-to-determine-if-a-binary-tree-is-balanced/
-        TreeNode<Integer> root = new TreeNode<>(1);
-        root.setLeft(new TreeNode(2));
-        root.setRight(new TreeNode(3));
-        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root, new Height()));
-        
-        TreeNode<Integer> root1 = new TreeNode<>(6);
-        root1.setLeft(new TreeNode(2));
-        root1.getLeft().setLeft(new TreeNode(0));
-        root1.getLeft().setRight(new TreeNode(4));
-        root1.getLeft().getRight().setLeft(new TreeNode(3));
-        root1.getLeft().getRight().setRight(new TreeNode(5));
-        root1.setRight(new TreeNode(8));
-        root1.getRight().setLeft(new TreeNode(7));
-        root1.getRight().setRight(new TreeNode(9));
-        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root1, new Height()));
-        
-        //Skwed binary tree
-        TreeNode<Integer> root2 = new TreeNode<>(1);
-        root2.setLeft(new TreeNode(2));
-        root2.getLeft().setLeft(new TreeNode(3));
-        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root2, new Height()));
+//        System.out.println("How to determine if a binary tree is height-balanced?");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-186-for-sde1/?ref=rp
+//        //https://practice.geeksforgeeks.org/problems/check-for-balanced-tree/1
+//        //https://www.geeksforgeeks.org/how-to-determine-if-a-binary-tree-is-balanced/
+//        TreeNode<Integer> root = new TreeNode<>(1);
+//        root.setLeft(new TreeNode(2));
+//        root.setRight(new TreeNode(3));
+//        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root, new Height()));
+//        
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root1, new Height()));
+//        
+//        //Skwed binary tree
+//        TreeNode<Integer> root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode(2));
+//        root2.getLeft().setLeft(new TreeNode(3));
+//        System.out.println("height is balanced in binary tree? "+isBinaryTreeHeightBalanced(root2, new Height()));
 //..............................................................................
 //        System.out.println("Diameter of tree | DP on tree");
 //        //https://www.geeksforgeeks.org/diameter-of-a-binary-tree/
@@ -7882,16 +8146,84 @@ public class SomePracticeQuestion {
 //        detectLoopInLinkedList_Hashing(node);
 //        detectLoopInLinkedList_Iterative(node);      
 //..............................................................................
-        System.out.println("Detect and removing the loop in the linked list");
-        //https://www.geeksforgeeks.org/detect-and-remove-loop-in-a-linked-list/
-        //10 -> 15 -> [20] -> 25 -> 30 -> [20]
-        Node<Integer> node = new Node<>(10);
-        node.setNext(new Node<>(15));
-        node.getNext().setNext(new Node<>(20));
-        node.getNext().getNext().setNext(new Node<>(25));
-        node.getNext().getNext().getNext().setNext(new Node<>(30));
-        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
-        detectAndRemovingLoopInLinkedList(node);
+//        System.out.println("Detect and removing the loop in the linked list");
+//        //https://www.geeksforgeeks.org/detect-and-remove-loop-in-a-linked-list/
+//        //10 -> 15 -> [20] -> 25 -> 30 -> [20]
+//        Node<Integer> node = new Node<>(10);
+//        node.setNext(new Node<>(15));
+//        node.getNext().setNext(new Node<>(20));
+//        node.getNext().getNext().setNext(new Node<>(25));
+//        node.getNext().getNext().getNext().setNext(new Node<>(30));
+//        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
+//        detectAndRemovingLoopInLinkedList_UsingHashing(node);
+//        
+//        node = new Node<>(10);
+//        node.setNext(new Node<>(15));
+//        node.getNext().setNext(new Node<>(20));
+//        node.getNext().getNext().setNext(new Node<>(25));
+//        node.getNext().getNext().getNext().setNext(new Node<>(30));
+//        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
+//        detectAndRemovingLoopInLinkedList_UsingIteration(node);
+//..............................................................................
+//        System.out.println("Relative Sorting");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-213-off-campus-for-sde1/?ref=rp
+//        //https://practice.geeksforgeeks.org/problems/relative-sorting/0
+//        //https://leetcode.com/problems/relative-sort-array/
+//        int[] a = {2, 1, 2, 5, 7, 1, 9, 3, 6, 8, 8};
+//        int[] b = {2, 1, 8, 3};
+//        sortAListInRelativeOrderOfBList(a, b);
+//        
+//        int[] a2 = {2,21,43,38,0,42,33,7,24,13,12,27,12,24,5,23,29,48,30,31};
+//        int[] b2 = {2,42,38,0,43,21};
+//        sortAListInRelativeOrderOfBList(a2, b2);
+//..............................................................................
+//        System.out.println("Children sum property of tree");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-213-off-campus-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/check-for-children-sum-property-in-a-binary-tree/
+//        TreeNode<Integer> root = new TreeNode<>(10);
+//        root.setLeft(new TreeNode<>(8));
+//        root.getLeft().setLeft(new TreeNode<>(3));
+//        root.getLeft().setRight(new TreeNode<>(5));
+//        root.setRight(new TreeNode<>(2));
+//        root.getRight().setLeft(new TreeNode<>(2));
+//        System.out.println("Has children sum property: "+childrenSumPropertyOfTree(root));
+//        
+//        root = new TreeNode<>(10);
+//        root.setLeft(new TreeNode<>(3));
+//        root.getLeft().setLeft(new TreeNode<>(3));
+//        root.getLeft().setRight(new TreeNode<>(5));
+//        root.setRight(new TreeNode<>(2));
+//        root.getRight().setLeft(new TreeNode<>(2));
+//        System.out.println("Has children sum property: "+childrenSumPropertyOfTree(root));
+//..............................................................................
+//        System.out.println("Buy and sell stocks to get maximum profit");
+//        //https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
+//        //https://www.geeksforgeeks.org/stock-buy-sell/
+//        System.out.println(buyAndSellStockMaxProfit(new int[]{7, 1, 5, 3, 6, 4}));
+//        stockBuySellTime(new int[]{7, 1, 5, 3, 6, 4}, 6);
+//        System.out.println(buyAndSellStockMaxProfit(new int[]{7, 6, 4, 3, 1}));
+//        stockBuySellTime(new int[]{7, 6, 4, 3, 1}, 5);
+//        System.out.println(buyAndSellStockMaxProfit(new int[]{2, 4, 1}));
+//        stockBuySellTime(new int[]{2,4,1}, 3);
+//        System.out.println(buyAndSellStockMaxProfit(new int[]{100, 180, 260, 310, 40, 535, 695}));
+//        stockBuySellTime(new int[]{100, 180, 260, 310, 40, 535, 695 }, 7);
+//..............................................................................
+//        System.out.println("Valid paranthesis pair checker");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-213-off-campus-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/check-for-balanced-parentheses-in-an-expression/
+//        System.out.println("valid paranthesis? "+parenthesisPairChecker("([{}])"));
+//        System.out.println("valid paranthesis? "+parenthesisPairChecker("([)]"));
+//        System.out.println("valid paranthesis? "+parenthesisPairChecker("]})({["));
+//        System.out.println("valid paranthesis? "+parenthesisPairChecker("({["));
+//        System.out.println("valid paranthesis? "+parenthesisPairChecker("]})"));
+//..............................................................................
+        System.out.println("Longest valid pair of prenthesis '(' and ')'");
+        //https://leetcode.com/problems/longest-valid-parentheses/
+        System.out.println("longest valid paranthesis? "+longestValidParentheses("(()"));
+        System.out.println("longest valid paranthesis? "+longestValidParentheses(")()())"));
+        System.out.println("longest valid paranthesis? "+longestValidParentheses(")))"));
+        System.out.println("longest valid paranthesis? "+longestValidParentheses("((("));
+        System.out.println("longest valid paranthesis? "+longestValidParentheses(")))((("));
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
