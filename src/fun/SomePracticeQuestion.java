@@ -204,6 +204,23 @@ public class SomePracticeQuestion {
 //            }
 //            
 //        }
+//        //reverse a string without STL
+//        String s = str;
+//        int start=0;
+//        int end=s.length() - 1;
+//        char[] ch = s.toCharArray();
+//        while(start < end){
+//            
+//            char temp = ch[start];
+//            ch[start] = ch[end];
+//            ch[end] = temp;
+//            
+//            start++;
+//            end--;
+//            
+//        }
+//        
+//        System.out.println(String.valueOf(ch));
 //        //...........brute force.............
         StringBuilder sb = new StringBuilder(str);
         if (str.equals(sb.reverse().toString())) {
@@ -3856,6 +3873,95 @@ public class SomePracticeQuestion {
 
     }
 
+    public static void slidingWindowArrayWithFixedWindowK_BasicAlgo(int[] a, int K) {
+
+        /*
+         time.................O(N)............................
+         */
+        System.out.println("array size: " + a.length);
+        int n = a.length;
+        int start = 0;
+        int end = 0;
+        List<Integer> subArray = new ArrayList<>();
+        while (end < n) {
+
+            subArray.add(a[end]);
+//            System.out.println(start +" : "+end);
+            if (end - start + 1 < K) {
+                end++;
+            } else if (end - start + 1 == K) {
+                //logic changes here as required
+//                System.out.println(" K "+(end - start + 1));
+                System.out.println("Sub array of given size K : " + subArray);
+                //to shift window bracket remove what was first added in sub array i.e element at 0th index
+                subArray.remove(0);
+//                and incr start bracket
+                start++;
+                //and incr end bracket
+                end++;
+
+            }
+
+        }
+
+    }
+
+    public static void slidingWindowStringWithFixedWindowK_BasicAlgo(String s, int K) {
+
+        /*
+         time.................O(N)............................
+         */
+        System.out.println("string size: " + s.length());
+        int n = s.length();
+        int start = 0;
+        int end = 0;
+        List<String> subString = new ArrayList<>();
+        while (end < n) {
+
+//            System.out.println(start +" : "+end);
+            if (end - start + 1 < K) {
+                end++;
+            } else if (end - start + 1 == K) {
+                subString.add(s.substring(start, end + 1));
+                //logic changes here as required
+//                System.out.println(" K "+(end - start + 1));
+                System.out.println("Sub string of given size K : " + subString);
+//                and incr start bracket
+                start++;
+                //and incr end bracket
+                end++;
+
+            }
+
+        }
+
+    }
+
+    public static void slidingWindowMaxSumSubArrayOfWindowSizeK(int[] a, int K) {
+
+        int n = a.length;
+        int start = 0;
+        int end = 0;
+        int maxSum = Integer.MIN_VALUE;
+        int sum = 0;
+        while (end < n) {
+
+            sum += a[end];
+            if (end - start + 1 < K) {
+                end++;
+            } else if (end - start + 1 == K) {
+                maxSum = Math.max(maxSum, sum);
+                sum -= a[start];
+                start++;
+                end++;
+            }
+
+        }
+
+        System.out.println("Max sum of sub array with fixed size K : " + maxSum);
+
+    }
+
     public static void slidingWindowMaximum_ON2(int[] nums, int k) {
 
         //this is O(N^2) approach can give you TLE
@@ -4566,7 +4672,7 @@ public class SomePracticeQuestion {
         // ahead respectively. 
         slow = slow.getNext();
         fast = fast.getNext().getNext();
-
+//        System.out.println(slow.getData() + "#" + fast.getData());
         // Search for loop using slow and fast pointers 
         while (fast != null && fast.getNext() != null) {
             if (slow == fast) {
@@ -4575,14 +4681,17 @@ public class SomePracticeQuestion {
 
             slow = slow.getNext();
             fast = fast.getNext().getNext();
+//            System.out.println(slow.getData() + "~" + fast.getData());
         }
 
         /* If loop exists */
         if (slow == fast) {
             slow = node;
+//            System.out.println(slow.getData()+"|"+fast.getData());
             while (slow.getNext() != fast.getNext()) {
                 slow = slow.getNext();
                 fast = fast.getNext();
+//                System.out.println(slow.getData()+"-"+fast.getData());
             }
 
             /* since fast->next is the looping point */
@@ -4758,61 +4867,163 @@ public class SomePracticeQuestion {
         }
 
     }
-    
-    public static boolean parenthesisPairChecker(String expr){
-        
-        if(expr == null || expr.equals("")){
+
+    public static boolean parenthesisPairChecker(String expr) {
+
+        if (expr == null || expr.equals("")) {
             return false;
         }
-        
+
         Stack<Character> s = new Stack<>();
-        for(char c: expr.toCharArray()){
-            
-            if(c == '(' || c == '{' || c == '['){
+        for (char c : expr.toCharArray()) {
+
+            if (c == '(' || c == '{' || c == '[') {
                 s.push(c);
                 continue;
             }
-            
-            if(s.isEmpty()){
+
+            if (s.isEmpty()) {
                 return false;
             }
-            
-            switch(c){
+
+            switch (c) {
                 case ')':
-                    if (s.pop() != '(') return false;
+                    if (s.pop() != '(') {
+                        return false;
+                    }
                     break;
                 case '}':
-                    if (s.pop() != '{') return false;
+                    if (s.pop() != '{') {
+                        return false;
+                    }
                     break;
                 case ']':
-                    if (s.pop() != '[') return false;
+                    if (s.pop() != '[') {
+                        return false;
+                    }
                     break;
             }
-            
+
         }
         return s.isEmpty();
     }
-    
+
     public static int longestValidParentheses(String s) {
-        
+
         int len = 0;
-        
+
         Stack<Integer> st = new Stack<>();
         st.push(-1);
-        for(int i=0; i<s.length(); i++){
+        for (int i = 0; i < s.length(); i++) {
             char ch = s.charAt(i);
-            if(ch == '('){
+            if (ch == '(') {
                 st.push(i);
-            }else {
+            } else {
                 st.pop();
-                if(st.isEmpty()){
+                if (st.isEmpty()) {
                     st.push(i);
-                }else{
+                } else {
                     len = Math.max(len, i - st.peek());
                 }
             }
         }
         return len;
+    }
+
+    public static boolean checkValidString(String s) {
+
+        /*
+        
+         greedy approach
+         Intuition
+
+         When checking whether the string is valid, we only cared about the "balance": the number of extra, 
+         open left brackets as we parsed through the string. 
+         For example, when checking whether '(()())' is valid, we had a balance of 1, 2, 1, 2, 1, 0 as 
+         we parse through the string: '(' has 1 left bracket, '((' has 2, '(()' has 1, and so on. 
+         This means that after parsing the first i symbols, (which may include asterisks,) we only need to keep 
+         track of what the balance could be.
+
+         For example, if we have string '(***)', then as we parse each symbol, 
+         the set of possible values for the balance is [1] for '('; 
+         [0, 1, 2] for '(*'; [0, 1, 2, 3] for '(**'; [0, 1, 2, 3, 4] for '(***', and [0, 1, 2, 3] for '(***)'.
+
+         Furthermore, we can prove these states always form a contiguous interval. 
+         Thus, we only need to know the left and right bounds of this interval. 
+         That is, we would keep those intermediate states described above as 
+         [lo, hi] = [1, 1], [0, 2], [0, 3], [0, 4], [0, 3].
+        
+         */
+        int lo = 0, hi = 0;
+        for (char c : s.toCharArray()) {
+            lo += c == '(' ? 1 : -1;
+            hi += c != ')' ? 1 : -1;
+            if (hi < 0) {
+                break;
+            }
+            lo = Math.max(lo, 0);
+        }
+        return lo == 0;
+    }
+
+    public static String smallestWindowContainingAllCharOfString(String str) {
+        int n = str.length();
+
+        // Count all distinct characters. 
+        int dist_count = 0;
+
+        boolean[] visited = new boolean[256];
+        Arrays.fill(visited, false);
+        for (int i = 0; i < n; i++) {
+            if (visited[str.charAt(i)] == false) {
+                visited[str.charAt(i)] = true;
+                dist_count++;
+            }
+        }
+
+        // Now follow the algorithm discussed in below 
+        // post. We basically maintain a window of characters 
+        // that contains all characters of given string. 
+        int start = 0, start_index = -1;
+        int min_len = Integer.MAX_VALUE;
+
+        int count = 0;
+        int[] curr_count = new int[256];
+        for (int j = 0; j < n; j++) {
+            // Count occurrence of characters of string 
+            curr_count[str.charAt(j)]++;
+
+            // If any distinct character matched, 
+            // then increment count 
+            if (curr_count[str.charAt(j)] == 1) {
+                count++;
+            }
+
+            // if all the characters are matched 
+            if (count == dist_count) {
+                // Try to minimize the window i.e., check if 
+                // any character is occurring more no. of times 
+                // than its occurrence in pattern, if yes 
+                // then remove it from starting and also remove 
+                // the useless characters. 
+                while (curr_count[str.charAt(start)] > 1) {
+                    if (curr_count[str.charAt(start)] > 1) {
+                        curr_count[str.charAt(start)]--;
+                    }
+                    start++;
+                }
+
+                // Update window size 
+                int len_window = j - start + 1;
+                if (min_len > len_window) {
+                    min_len = len_window;
+                    start_index = start;
+                }
+            }
+        }
+        // Return substring starting from start_index 
+        // and length min_len 
+        return str.substring(start_index, start_index + min_len);
     }
 
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
@@ -7895,6 +8106,28 @@ public class SomePracticeQuestion {
 //        System.out.println("int : " + romanToInt("DI"));
 //        System.out.println("int : " + romanToInt("MCMXCIV"));
 //..............................................................................
+//        System.out.println("Sliding window array with fixed given window size K bsic algo");
+//        slidingWindowArrayWithFixedWindowK_BasicAlgo(new int[]{2, 5, 1, 8, 4, 3}, 3);
+//        slidingWindowArrayWithFixedWindowK_BasicAlgo(new int[]{2, 5, 1, 8, 4, 3, 6}, 3);
+//        slidingWindowArrayWithFixedWindowK_BasicAlgo(new int[]{2, 5, 1}, 3);
+//        slidingWindowArrayWithFixedWindowK_BasicAlgo(new int[]{2}, 3);
+//..............................................................................
+//        System.out.println("Sliding window string with fixed given window size K bsic algo");
+//        slidingWindowStringWithFixedWindowK_BasicAlgo("sangeet", 3);
+//        slidingWindowStringWithFixedWindowK_BasicAlgo("abcdefghi", 3);
+//        slidingWindowStringWithFixedWindowK_BasicAlgo("aabcbcdbca", 4);
+//..............................................................................
+//        System.out.println("Max sum of sub array with given fixed size window K");
+//        //Aditya verma youtube playlist
+//        slidingWindowMaxSumSubArrayOfWindowSizeK(new int[]{1, 2, 3, 4, 5, 6, 7}, 3); //should be 5+6+7
+//        slidingWindowMaxSumSubArrayOfWindowSizeK(new int[]{2, 5, 1, 8, 4, 3}, 2); //should be 8+4
+//..............................................................................
+//        System.out.println("Smallest window that contains all characters of string itself");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-213-off-campus-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/smallest-window-contains-characters-string/
+//        String str = "aabcbcdbca";
+//        System.out.println("Smallest window containing all distinct characters is: " + smallestWindowContainingAllCharOfString(str));
+//..............................................................................
 //        System.out.println("239. Sliding Window Maximum");
 //        //https://leetcode.com/problems/sliding-window-maximum/
 //        //https://www.geeksforgeeks.org/sliding-window-maximum-maximum-of-all-subarrays-of-size-k-using-stack-in-on-time/
@@ -8017,6 +8250,10 @@ public class SomePracticeQuestion {
 //        int ar[] = {1, 2, 3, 2, 3, 1}; 
 //        findOddOccurringNumber_UsingHashing(ar);
 //        findOddOccurringNumber_UsingXOR(ar);
+//        
+//        int a[] = {1, 2, 3}; 
+//        findOddOccurringNumber_UsingHashing(a);
+//        findOddOccurringNumber_UsingXOR(a);
 //..............................................................................
 //        System.out.println("Find if there is a rectangle in binary matrix with corners as 1");
 //        //https://www.interviewbit.com/problems/find-rectangle-in-binary-matrix/
@@ -8146,24 +8383,24 @@ public class SomePracticeQuestion {
 //        detectLoopInLinkedList_Hashing(node);
 //        detectLoopInLinkedList_Iterative(node);      
 //..............................................................................
-//        System.out.println("Detect and removing the loop in the linked list");
-//        //https://www.geeksforgeeks.org/detect-and-remove-loop-in-a-linked-list/
-//        //10 -> 15 -> [20] -> 25 -> 30 -> [20]
-//        Node<Integer> node = new Node<>(10);
-//        node.setNext(new Node<>(15));
-//        node.getNext().setNext(new Node<>(20));
-//        node.getNext().getNext().setNext(new Node<>(25));
-//        node.getNext().getNext().getNext().setNext(new Node<>(30));
-//        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
-//        detectAndRemovingLoopInLinkedList_UsingHashing(node);
-//        
-//        node = new Node<>(10);
-//        node.setNext(new Node<>(15));
-//        node.getNext().setNext(new Node<>(20));
-//        node.getNext().getNext().setNext(new Node<>(25));
-//        node.getNext().getNext().getNext().setNext(new Node<>(30));
-//        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
-//        detectAndRemovingLoopInLinkedList_UsingIteration(node);
+        System.out.println("Detect and removing the loop in the linked list");
+        //https://www.geeksforgeeks.org/detect-and-remove-loop-in-a-linked-list/
+        //10 -> 15 -> [20] -> 25 -> 30 -> [20]
+        Node<Integer> node = new Node<>(10);
+        node.setNext(new Node<>(15));
+        node.getNext().setNext(new Node<>(20));
+        node.getNext().getNext().setNext(new Node<>(25));
+        node.getNext().getNext().getNext().setNext(new Node<>(30));
+        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
+        detectAndRemovingLoopInLinkedList_UsingHashing(node);
+
+        node = new Node<>(1);
+        node.setNext(new Node<>(2));
+        node.getNext().setNext(new Node<>(3));
+        node.getNext().getNext().setNext(new Node<>(4));
+        node.getNext().getNext().getNext().setNext(new Node<>(5));
+        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
+        detectAndRemovingLoopInLinkedList_UsingIteration(node);
 //..............................................................................
 //        System.out.println("Relative Sorting");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-213-off-campus-for-sde1/?ref=rp
@@ -8217,13 +8454,18 @@ public class SomePracticeQuestion {
 //        System.out.println("valid paranthesis? "+parenthesisPairChecker("({["));
 //        System.out.println("valid paranthesis? "+parenthesisPairChecker("]})"));
 //..............................................................................
-        System.out.println("Longest valid pair of prenthesis '(' and ')'");
-        //https://leetcode.com/problems/longest-valid-parentheses/
-        System.out.println("longest valid paranthesis? "+longestValidParentheses("(()"));
-        System.out.println("longest valid paranthesis? "+longestValidParentheses(")()())"));
-        System.out.println("longest valid paranthesis? "+longestValidParentheses(")))"));
-        System.out.println("longest valid paranthesis? "+longestValidParentheses("((("));
-        System.out.println("longest valid paranthesis? "+longestValidParentheses(")))((("));
+//        System.out.println("Longest valid pair of prenthesis '(' and ')'");
+//        //https://leetcode.com/problems/longest-valid-parentheses/
+//        System.out.println("longest valid paranthesis? " + longestValidParentheses("(()"));
+//        System.out.println("longest valid paranthesis? " + longestValidParentheses(")()())"));
+//        System.out.println("longest valid paranthesis? " + longestValidParentheses(")))"));
+//        System.out.println("longest valid paranthesis? " + longestValidParentheses("((("));
+//        System.out.println("longest valid paranthesis? " + longestValidParentheses(")))((("));
+//..............................................................................
+//        System.out.println("Valid Parenthesis String");
+//        //https://leetcode.com/problems/valid-parenthesis-string/
+//        System.out.println("valid paranthesis? " + checkValidString("(*)"));
+//        System.out.println("valid paranthesis? " + checkValidString("(*)*)"));
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
