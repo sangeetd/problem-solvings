@@ -5,9 +5,11 @@
  */
 package fun;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -375,25 +377,25 @@ public class BinaryTree<T> {
         kSumPathAndDeleteOtherNode(root, k, 0, null);
 
     }
-    
-    public int treeHeightWithNode(TreeNode node){
-        
-        if(node == null){
+
+    public int treeHeightWithNode(TreeNode node) {
+
+        if (node == null) {
             return 0;
         }
-        
+
         return Math.max(treeHeightWithNode(node.getLeft()), treeHeightWithNode(node.getRight())) + 1;
-        
+
     }
-    
-    public int treeHeight(){
+
+    public int treeHeight() {
         if (getRoot() == null) {
             System.out.println("Tree is empty");
             return 0;
         }
-        
+
         return treeHeightWithNode(getRoot());
-        
+
     }
 
     private int inorderRootElementIndex(T[] inorder, T data, int l, int r) {
@@ -408,15 +410,16 @@ public class BinaryTree<T> {
 
         return i;
     }
-    
+
     //required for recursive stability
     static int preIndex = 0;
+
     private TreeNode<T> buildTree(T[] inorder, T[] preorder, int l, int r) {
 
         if (l > r) {
             return null;
         }
-        
+
         TreeNode<T> node = new TreeNode<T>(preorder[preIndex++]);
 
         if (l == r) {
@@ -424,9 +427,9 @@ public class BinaryTree<T> {
         }
 
         int inorderRootIndex = inorderRootElementIndex(inorder, node.getData(), l, r);
-        node.setLeft(buildTree(inorder, preorder, l, inorderRootIndex - 1));      
+        node.setLeft(buildTree(inorder, preorder, l, inorderRootIndex - 1));
         node.setRight(buildTree(inorder, preorder, inorderRootIndex + 1, r));
-        
+
         return node;
 
     }
@@ -439,17 +442,18 @@ public class BinaryTree<T> {
 
         int n = inorder.length;
         TreeNode<T> root = buildTree(inorder, preorder, 0, n - 1);
-        
+
         //just reseting the static variable after the work is done
         preIndex = 0;
-        
+
         return new BinaryTree<T>(root);
 
     }
-    
-    public void treeTopView(){
+
+    public void treeTopView() {
         //inner class scope limited to this method only
-        class NodePair{
+        class NodePair {
+
             TreeNode node;
             int horizontalDistance;
 
@@ -457,132 +461,215 @@ public class BinaryTree<T> {
                 this.node = node;
                 this.horizontalDistance = horizontalDistance;
             }
-            
+
         }
-        
+
         Queue<NodePair> q = new LinkedList<>();
         Map<Integer, TreeNode> map = new TreeMap<>();
-        
-        if(root == null){
+
+        if (root == null) {
             System.out.println("Tree is empty");
             return;
         }
-        
+
         q.add(new NodePair(root, 0));
-        
-        while(!q.isEmpty()){
-            
+
+        while (!q.isEmpty()) {
+
             NodePair t = q.poll();
-            
-            if(!map.containsKey(t.horizontalDistance)){
+
+            if (!map.containsKey(t.horizontalDistance)) {
                 map.put(t.horizontalDistance, t.node);
             }
-            
-            if(t.node.getLeft()!=null){
-                q.add(new NodePair(t.node.getLeft(), t.horizontalDistance-1));
+
+            if (t.node.getLeft() != null) {
+                q.add(new NodePair(t.node.getLeft(), t.horizontalDistance - 1));
             }
-            
-            if(t.node.getRight()!=null){
-                q.add(new NodePair(t.node.getRight(), t.horizontalDistance+1));
+
+            if (t.node.getRight() != null) {
+                q.add(new NodePair(t.node.getRight(), t.horizontalDistance + 1));
             }
-            
+
         }
-        
-        for(Map.Entry<Integer, TreeNode> e: map.entrySet()){
-            System.out.print(e.getValue().getData()+" ");
+
+        for (Map.Entry<Integer, TreeNode> e : map.entrySet()) {
+            System.out.print(e.getValue().getData() + " ");
         }
-        
-        
+
+    }
+
+    private void leftViewHelper(TreeNode<T> root, int level, TreeMap<Integer, T> result) {
+
+        if (root == null) {
+            return;
+        }
+
+        if (!result.containsKey(level)) {
+            result.put(level, root.data);
+        }
+
+        leftViewHelper(root.getLeft(), level + 1, result);
+        leftViewHelper(root.getRight(), level + 1, result);
+
+    }
+
+    public List<T> leftView() {
+        // Your code here
+        Map<Integer, T> result = new TreeMap<>();
+        List<T> output = new ArrayList<>();
+        if (root == null) {
+            return output;
+        }
+
+        leftViewHelper(this.root, 0, (TreeMap<Integer, T>) result);
+
+        result.entrySet().stream().forEach((e) -> {
+            output.add(e.getValue());
+        });
+
+        return output;
+
     }
     
-    public void treeInorderIterative(){
+    private void rightViewHelper(TreeNode<T> root, int level, TreeMap<Integer, T> result) {
+
+        if (root == null) {
+            return;
+        }
+
+        if (!result.containsKey(level)) {
+            result.put(level, root.data);
+        }
+
+        rightViewHelper(root.getRight(), level + 1, result);
+        rightViewHelper(root.getLeft(), level + 1, result);
         
-        if(root == null){
+    }
+
+    public List<T> rightView() {
+        // Your code here
+        Map<Integer, T> result = new TreeMap<>();
+        List<T> output = new ArrayList<>();
+        if (root == null) {
+            return output;
+        }
+
+        rightViewHelper(this.root, 0, (TreeMap<Integer, T>) result);
+
+        result.entrySet().stream().forEach((e) -> {
+            output.add(e.getValue());
+        });
+
+        return output;
+
+    }
+
+    public void treeInorderIterative() {
+
+        if (root == null) {
             System.out.println("Tree is empty");
             return;
         }
-        
+
         Stack<Pair<TreeNode<T>, Integer>> st = new Stack<>();
         st.push(new Pair<>(getRoot(), 0));
-        
-        while(!st.isEmpty()){
-            
+
+        while (!st.isEmpty()) {
+
             Pair<TreeNode<T>, Integer> p = st.pop();
             TreeNode<T> t = p.getKey();
             Integer status = p.getValue();
-            
-            if(t == null || status == 3){
+
+            if (t == null || status == 3) {
                 continue;
             }
-            
-            st.push(new Pair<>(t, status+1));
-            
-            if(status == 0) st.push(new Pair<>(t.getLeft(), 0));
-            if(status == 1) System.out.print(t.getData()+" ");
-            if(status == 2) st.push(new Pair<>(t.getRight(), 0));
-            
+
+            st.push(new Pair<>(t, status + 1));
+
+            if (status == 0) {
+                st.push(new Pair<>(t.getLeft(), 0));
+            }
+            if (status == 1) {
+                System.out.print(t.getData() + " ");
+            }
+            if (status == 2) {
+                st.push(new Pair<>(t.getRight(), 0));
+            }
+
         }
-        
+
     }
-    
-    public void treePreorderIterative(){
-        
-        if(root == null){
+
+    public void treePreorderIterative() {
+
+        if (root == null) {
             System.out.println("Tree is empty");
             return;
         }
-        
+
         Stack<Pair<TreeNode<T>, Integer>> st = new Stack<>();
         st.push(new Pair<>(getRoot(), 0));
-        
-        while(!st.isEmpty()){
-            
+
+        while (!st.isEmpty()) {
+
             Pair<TreeNode<T>, Integer> p = st.pop();
             TreeNode<T> t = p.getKey();
             Integer status = p.getValue();
-            
-            if(t == null || status == 3){
+
+            if (t == null || status == 3) {
                 continue;
             }
-            
-            st.push(new Pair<>(t, status+1));
-            
-            if(status == 0) System.out.print(t.getData()+" ");
-            if(status == 1) st.push(new Pair<>(t.getLeft(), 0));
-            if(status == 2) st.push(new Pair<>(t.getRight(), 0));
-            
+
+            st.push(new Pair<>(t, status + 1));
+
+            if (status == 0) {
+                System.out.print(t.getData() + " ");
+            }
+            if (status == 1) {
+                st.push(new Pair<>(t.getLeft(), 0));
+            }
+            if (status == 2) {
+                st.push(new Pair<>(t.getRight(), 0));
+            }
+
         }
-        
+
     }
-    
-    public void treePostorderIterative(){
-        
-        if(root == null){
+
+    public void treePostorderIterative() {
+
+        if (root == null) {
             System.out.println("Tree is empty");
             return;
         }
-        
+
         Stack<Pair<TreeNode<T>, Integer>> st = new Stack<>();
         st.push(new Pair<>(getRoot(), 0));
-        
-        while(!st.isEmpty()){
-            
+
+        while (!st.isEmpty()) {
+
             Pair<TreeNode<T>, Integer> p = st.pop();
             TreeNode<T> t = p.getKey();
             Integer status = p.getValue();
-            
-            if(t == null || status == 3){
+
+            if (t == null || status == 3) {
                 continue;
             }
-            
-            st.push(new Pair<>(t, status+1));
-            
-            if(status == 0) st.push(new Pair<>(t.getLeft(), 0));
-            if(status == 1) st.push(new Pair<>(t.getRight(), 0));
-            if(status == 2) System.out.print(t.getData()+" ");
-            
+
+            st.push(new Pair<>(t, status + 1));
+
+            if (status == 0) {
+                st.push(new Pair<>(t.getLeft(), 0));
+            }
+            if (status == 1) {
+                st.push(new Pair<>(t.getRight(), 0));
+            }
+            if (status == 2) {
+                System.out.print(t.getData() + " ");
+            }
+
         }
-        
+
     }
 
 }

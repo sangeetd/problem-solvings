@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -4971,15 +4972,12 @@ public class SomePracticeQuestion {
 
         // Count all distinct characters. 
         int dist_count = 0;
-
-        boolean[] visited = new boolean[256];
-        Arrays.fill(visited, false);
-        for (int i = 0; i < n; i++) {
-            if (visited[str.charAt(i)] == false) {
-                visited[str.charAt(i)] = true;
-                dist_count++;
-            }
+        Map<Character, Integer> distCountMap = new HashMap<>();
+        for (char c : str.toCharArray()) {
+            distCountMap.put(c, distCountMap.getOrDefault(c, 0) + 1);
         }
+
+        dist_count = distCountMap.size();
 
         // Now follow the algorithm discussed in below 
         // post. We basically maintain a window of characters 
@@ -4988,14 +4986,13 @@ public class SomePracticeQuestion {
         int min_len = Integer.MAX_VALUE;
 
         int count = 0;
-        int[] curr_count = new int[256];
+        Map<Character, Integer> currCountMap = new HashMap<>();
         for (int j = 0; j < n; j++) {
-            // Count occurrence of characters of string 
-            curr_count[str.charAt(j)]++;
+            // Count occurrence of characters of string
+            currCountMap.put(str.charAt(j),
+                    currCountMap.getOrDefault(str.charAt(j), 0) + 1);
 
-            // If any distinct character matched, 
-            // then increment count 
-            if (curr_count[str.charAt(j)] == 1) {
+            if (currCountMap.get(str.charAt(j)) == 1) {
                 count++;
             }
 
@@ -5006,9 +5003,10 @@ public class SomePracticeQuestion {
                 // than its occurrence in pattern, if yes 
                 // then remove it from starting and also remove 
                 // the useless characters. 
-                while (curr_count[str.charAt(start)] > 1) {
-                    if (curr_count[str.charAt(start)] > 1) {
-                        curr_count[str.charAt(start)]--;
+                while (currCountMap.get(str.charAt(start)) > 1) {
+                    if (currCountMap.get(str.charAt(start)) > 1) {
+                        currCountMap.put(str.charAt(start),
+                                currCountMap.get(str.charAt(start)) - 1);
                     }
                     start++;
                 }
@@ -5024,6 +5022,139 @@ public class SomePracticeQuestion {
         // Return substring starting from start_index 
         // and length min_len 
         return str.substring(start_index, start_index + min_len);
+    }
+
+    private static int peekElementHelper(int[] arr, int low, int high, int n) {
+
+        // Find index of middle element 
+        // (low + high)/2 
+        int mid = low + (high - low) / 2;
+
+        // Compare middle element with its 
+        // neighbours (if neighbours exist) 
+        if ((mid == 0 || arr[mid - 1] <= arr[mid])
+                && (mid == n - 1 || arr[mid + 1] <= arr[mid])) {
+            return mid;
+        } // If middle element is not peak 
+        // and its left neighbor is 
+        // greater than it, then left half 
+        // must have a peak element 
+        else if (mid > 0 && arr[mid - 1] > arr[mid]) {
+            return peekElementHelper(arr, low, (mid - 1), n);
+        } // If middle element is not peak 
+        // and its right neighbor 
+        // is greater than it, then right 
+        // half must have a peak 
+        // element 
+        else {
+            return peekElementHelper(arr, (mid + 1), high, n);
+        }
+
+    }
+
+    public static int peakElement_OLogN(int[] arr, int n) {
+        return peekElementHelper(arr, 0, n, n);
+
+    }
+
+    public static void invertABinaryTree(TreeNode<Integer> node) {
+        Queue<TreeNode<Integer>> q = new LinkedList<>();
+        q.add(node);
+
+        while (!q.isEmpty()) {
+
+            TreeNode<Integer> t = q.poll();
+
+            if (t.getLeft() != null) {
+                q.add(t.getLeft());
+            }
+
+            if (t.getRight() != null) {
+                q.add(t.getRight());
+            }
+
+            if (t.getLeft() != null && t.getRight() != null) {
+                int temp = (int) t.getRight().getData();
+                t.getRight().setData(t.getLeft().getData());
+                t.getLeft().setData(temp);
+            } else if (t.getLeft() == null && t.getRight() != null) {
+                t.setLeft(t.getRight());
+                t.setRight(null);
+            } else if (t.getLeft() != null && t.getRight() == null) {
+                t.setRight(t.getLeft());
+                t.setLeft(null);
+            }
+
+        }
+
+        BinaryTree<Integer> bt = new BinaryTree<>(node);
+        bt.treeBFS();
+
+    }
+
+    public static void countNoOfWords(String s) {
+
+        final int IN = 1;
+        final int OUT = 0;
+
+        int state = OUT;
+        int wordCount = 0;
+        int i = 0;
+        while (i < s.length()) {
+
+            if (s.charAt(i) == ' ' || s.charAt(i) == '\t' || s.charAt(i) == '\n') {
+                state = OUT;
+            } else if (state == OUT) {
+                state = IN;
+                wordCount++;
+            }
+
+            i++;
+
+        }
+
+        System.out.println("actual word count " + wordCount);
+
+    }
+
+    public static void rotateAndDelete() {
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Enter test case:");
+        int t = Integer.parseInt(scan.nextLine());
+        
+        List<String> stringList = new ArrayList<>();
+        String answer = "";
+
+        while (t-- > 0) {
+            
+            System.out.println("Enter size of array:");
+            int n = Integer.parseInt(scan.nextLine());
+            System.out.println("Enter array (space seprated):");
+            String[] sList = scan.nextLine().split(" ");
+
+            stringList.clear();
+            stringList.addAll(Arrays.asList(sList));
+
+            int counter = 1;
+
+            while (stringList.size() != 1) {
+
+                Collections.rotate(stringList, 1);
+
+                if (stringList.size() - counter < 0) {
+                    counter = stringList.size();
+                }
+
+                stringList.remove(stringList.size() - counter);
+                counter++;
+
+            }
+            answer += stringList.get(0) + "\n";
+
+        }
+        System.out.println("Output per test case:");
+        System.out.println(answer);
+
     }
 
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
@@ -5522,17 +5653,20 @@ public class SomePracticeQuestion {
 
     public static int minDiffInEqualSubset(int[] a) {
 
-        int range = 0;
+        //ex:  3, 1, 4, 2, 2, 1
+        //with the given array a the max sum that can be 
+        //possible is the sum of array itself
+        int sumArray = 0;
         for (int i = 0; i < a.length; i++) {
-            range += a[i];
+            sumArray += a[i];
         }
 
-        //0 ---- range
+        //0 ---- sumArray
         int n = a.length;
         //base cond
-        boolean[][] memo = new boolean[n + 1][range + 1];
+        boolean[][] memo = new boolean[n + 1][sumArray + 1];
         for (int x = 0; x < n + 1; x++) {
-            for (int y = 0; y < range + 1; y++) {
+            for (int y = 0; y < sumArray + 1; y++) {
                 if (x == 0) {
                     memo[x][y] = false;
                 }
@@ -5544,9 +5678,9 @@ public class SomePracticeQuestion {
         }
 
         //start from ahead of base cond
-        //to analyse sum = y is possible or not
+        //to analyse y = sum = [0 -> sumArray+1] is possible or not
         for (int x = 1; x < n + 1; x++) {
-            for (int y = 1; y < range + 1; y++) {
+            for (int y = 1; y < sumArray + 1; y++) {
                 if (a[x - 1] > y) {
                     memo[x][y] = memo[x - 1][y];
                 } else {
@@ -5555,12 +5689,19 @@ public class SomePracticeQuestion {
             }
         }
 
-        //now consider the last of the memo[][] i.e, x = nth row
-        //that row signifies all the elements in array is taken to form sum 0 -> range+1
+//        //printing
+//        for (int x = 0; x < n + 1; x++) {
+//            for (int y = 0; y < sumArray + 1; y++) {
+//                System.out.print(memo[x][y]+"\t");
+//            }
+//            System.out.println();
+//        }
+        //now consider the last row of the memo[][] i.e, x = nth row
+        //that row signifies all the elements in array is taken to form y = sum = [0 -> sumArray+1]
         int min = Integer.MAX_VALUE;
-        for (int i = (range + 1) / 2; i >= 0; i--) {
+        for (int i = (sumArray + 1) / 2; i >= 0; i--) {
             if (memo[n][i]) {
-                min = Math.abs(range - 2 * i);
+                min = Math.abs(sumArray - 2 * i);
                 break;
             }
         }
@@ -6893,6 +7034,7 @@ public class SomePracticeQuestion {
 //        System.out.println();
 //        System.out.println("the height of tree is node-wise "+root.treeHeight());
 //        System.out.println("the height of tree is node-edge-wise "+(root.treeHeight()-1));
+//        System.out.println("tree left view "+ root.leftView());
 //..............................................................................       
 //        System.out.println("ZigZag Tree Traversal");
 //        //https://www.geeksforgeeks.org/zigzag-tree-traversal/
@@ -8383,24 +8525,24 @@ public class SomePracticeQuestion {
 //        detectLoopInLinkedList_Hashing(node);
 //        detectLoopInLinkedList_Iterative(node);      
 //..............................................................................
-        System.out.println("Detect and removing the loop in the linked list");
-        //https://www.geeksforgeeks.org/detect-and-remove-loop-in-a-linked-list/
-        //10 -> 15 -> [20] -> 25 -> 30 -> [20]
-        Node<Integer> node = new Node<>(10);
-        node.setNext(new Node<>(15));
-        node.getNext().setNext(new Node<>(20));
-        node.getNext().getNext().setNext(new Node<>(25));
-        node.getNext().getNext().getNext().setNext(new Node<>(30));
-        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
-        detectAndRemovingLoopInLinkedList_UsingHashing(node);
-
-        node = new Node<>(1);
-        node.setNext(new Node<>(2));
-        node.getNext().setNext(new Node<>(3));
-        node.getNext().getNext().setNext(new Node<>(4));
-        node.getNext().getNext().getNext().setNext(new Node<>(5));
-        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
-        detectAndRemovingLoopInLinkedList_UsingIteration(node);
+//        System.out.println("Detect and removing the loop in the linked list");
+//        //https://www.geeksforgeeks.org/detect-and-remove-loop-in-a-linked-list/
+//        //10 -> 15 -> [20] -> 25 -> 30 -> [20]
+//        Node<Integer> node = new Node<>(10);
+//        node.setNext(new Node<>(15));
+//        node.getNext().setNext(new Node<>(20));
+//        node.getNext().getNext().setNext(new Node<>(25));
+//        node.getNext().getNext().getNext().setNext(new Node<>(30));
+//        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
+//        detectAndRemovingLoopInLinkedList_UsingHashing(node);
+//
+//        node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext());
+//        detectAndRemovingLoopInLinkedList_UsingIteration(node);
 //..............................................................................
 //        System.out.println("Relative Sorting");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-213-off-campus-for-sde1/?ref=rp
@@ -8466,6 +8608,51 @@ public class SomePracticeQuestion {
 //        //https://leetcode.com/problems/valid-parenthesis-string/
 //        System.out.println("valid paranthesis? " + checkValidString("(*)"));
 //        System.out.println("valid paranthesis? " + checkValidString("(*)*)"));
+//..............................................................................
+//        System.out.println("Peek element in the array O(LogN)");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-150-sde1-1-year-experienced/?ref=rp
+//        //https://practice.geeksforgeeks.org/problems/peak-element/1
+//        //https://www.geeksforgeeks.org/find-a-peak-in-a-given-array/
+//        int[] arr = {1, 3, 20, 4, 1, 0 };
+//        System.out.println("peek element at "+peakElement_OLogN(arr, arr.length));
+//        int[] arrr = {10, 20, 30, 40, 50};
+//        System.out.println("peek element at "+peakElement_OLogN(arrr, arrr.length));
+//        int[] arrrr = {50, 40, 30, 20, 10};
+//        System.out.println("peek element at "+peakElement_OLogN(arrrr, arrrr.length));
+//..............................................................................
+//        System.out.println("Invert a binary tree");
+//        TreeNode<Integer> root = new TreeNode<>(1);
+//        root.setLeft(new TreeNode<>(2));
+//        root.getLeft().setLeft(new TreeNode<>(4));
+//        root.getLeft().setRight(new TreeNode<>(5));
+//        root.setRight(new TreeNode<>(3));
+//        root.getRight().setLeft(new TreeNode<>(6));
+//        root.getRight().setRight(new TreeNode<>(7));
+//        BinaryTree<Integer> bt = new BinaryTree<>(root);
+//        bt.treeBFS();
+//        System.out.println();
+//        invertABinaryTree(root);
+//        
+//        System.out.println();
+//        root = new TreeNode<>(1);
+//        root.setRight(new TreeNode<>(3));
+//        root.getRight().setLeft(new TreeNode<>(6));
+//        root.getRight().setRight(new TreeNode<>(7));
+//        bt = new BinaryTree<>(root);
+//        bt.treeBFS();
+//        System.out.println();
+//        invertABinaryTree(root);
+//..............................................................................
+//        System.out.println("Count the no of words in the stream");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-150-sde1-1-year-experienced/?ref=rp
+//        //https://www.geeksforgeeks.org/count-words-in-a-given-string/
+//        countNoOfWords("One two       three\n four\tfive  ");
+//..............................................................................
+        System.out.println("Rotate and delete");
+        //https://www.geeksforgeeks.org/amazon-interview-experience-set-150-sde1-1-year-experienced/?ref=rp
+        //https://practice.geeksforgeeks.org/problems/rotate-and-delete/0
+        //http://geeksalgorithms.blogspot.com/2017/01/rotate-and-delete.html
+        rotateAndDelete();
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
@@ -8569,8 +8756,9 @@ public class SomePracticeQuestion {
 //..............................................................................
 //        System.out.println("min diff possible using sum of subsets (variation in 01knapsack)");
 //        int arr[] = {3, 1, 4, 2, 2, 1}; 
-//        int n = arr.length; 
 //        System.out.println(minDiffInEqualSubset(arr));
+//        int ar[] = {1, 2, 5}; 
+//        System.out.println(minDiffInEqualSubset(ar));
 //..............................................................................
 //        System.out.println("subset sum to from a given diff (variation in 01knapsack)");
 //        int arr[] = {1, 2, 1, 3}; 
@@ -8614,6 +8802,11 @@ public class SomePracticeQuestion {
 //        String Y = "NewSite:GeeksQuiz.com";
 //        int m = X.length();
 //        int n = Y.length();
+//        System.out.println(longestCommonSubstring(X, Y, m, n));
+//        X = "xyzabcpqrs";
+//        Y = "jklmnoabcefgh";
+//        m = X.length();
+//        n = Y.length();
 //        System.out.println(longestCommonSubstring(X, Y, m, n));
 //..............................................................................        
 //        System.out.println("printing longest common subsequence string");
