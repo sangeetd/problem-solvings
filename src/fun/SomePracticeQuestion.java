@@ -5074,9 +5074,23 @@ public class SomePracticeQuestion {
             }
 
             if (t.getLeft() != null && t.getRight() != null) {
+
+                /*
+                
+                 below code invert only child of immediate node not full level, order wise
+                
+                 */
                 int temp = (int) t.getRight().getData();
                 t.getRight().setData(t.getLeft().getData());
                 t.getLeft().setData(temp);
+
+                /*
+                 full invert level order wise
+                 TreeNode temp = t.getRight();
+                 t.setRight(t.getLeft());
+                 t.setLeft(temp);
+                
+                 */
             } else if (t.getLeft() == null && t.getRight() != null) {
                 t.setLeft(t.getRight());
                 t.setRight(null);
@@ -5121,12 +5135,12 @@ public class SomePracticeQuestion {
         Scanner scan = new Scanner(System.in);
         System.out.println("Enter test case:");
         int t = Integer.parseInt(scan.nextLine());
-        
+
         List<String> stringList = new ArrayList<>();
         String answer = "";
 
         while (t-- > 0) {
-            
+
             System.out.println("Enter size of array:");
             int n = Integer.parseInt(scan.nextLine());
             System.out.println("Enter array (space seprated):");
@@ -5154,6 +5168,332 @@ public class SomePracticeQuestion {
         }
         System.out.println("Output per test case:");
         System.out.println(answer);
+
+    }
+
+    private static void doInOrder(TreeNode node, List<Integer> inOrder) {
+
+        if (node == null) {
+            return;
+        }
+
+        doInOrder(node.getLeft(), inOrder);
+        inOrder.add((int) node.getData());
+        doInOrder(node.getRight(), inOrder);
+
+    }
+
+    public static void bstToGreaterSumTree(TreeNode<Integer> root) {
+
+        /*
+         Given the root of a Binary Search Tree (BST), convert it to a 
+         Greater Tree such that every key of the original 
+         BST is changed to the original key plus sum of all 
+         keys greater than the original key in BST.
+         */
+        List<Integer> inOrder = new ArrayList<>();
+
+        //get inorder of the given BST
+        doInOrder(root, inOrder);
+
+        //get the sum of all the node which is greater than the node itself
+        //and stored as map
+        int sum = 0;
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < inOrder.size(); i++) {
+            sum = 0;
+            for (int j = i; j < inOrder.size(); j++) {
+                sum += inOrder.get(j);
+            }
+
+            map.put(inOrder.get(i), sum);
+        }
+
+        //do a level order traversal on BST 
+        // and for every node find the greater sum from the map
+        //and replace the value for that node
+        Queue<TreeNode> q = new LinkedList<>();
+        q.add(root);
+        while (!q.isEmpty()) {
+
+            TreeNode t = q.poll();
+            t.setData(map.get(t.getData()));
+
+            if (t.getLeft() != null) {
+                q.add(t.getLeft());
+            }
+
+            if (t.getRight() != null) {
+                q.add(t.getRight());
+            }
+
+        }
+
+        System.out.println();
+        //print greater sun tree (which may not be a BST after all conversions)
+        BinaryTree<Integer> bt = new BinaryTree<>(root);
+        bt.treeBFS();
+
+    }
+
+    public static int minDifferenceBetweenTwoPairOfElement_ONLogN(int[] a) {
+
+        /*
+         ............Brute force approach O(N^2).....................
+         // Initialize difference as infinite 
+         int diff = Integer.MAX_VALUE; 
+      
+         // Find the min diff by comparing difference 
+         // of all possible pairs in given array 
+         for (int i=0; i<n-1; i++) {
+         for (int j=i+1; j<n; j++) {
+         if (Math.abs((arr[i] - arr[j]) )< diff){ 
+         diff = Math.abs((arr[i] - arr[j]));
+         }   
+         }
+         }
+         // Return min diff     
+         return diff;
+        
+         */
+        //sort the array
+        //O(LogN)
+        Arrays.sort(a);
+
+        //window based traversing login O(N)
+        int start = 0;
+        int end = 0;
+        int k = 2; //window is fixed to Two pair of element
+        int minDiff = Integer.MAX_VALUE;
+        while (end < a.length) {
+
+            if (end - start + 1 < k) {
+                end++;
+            } else if (end - start + 1 == k) {
+                minDiff = Math.min(minDiff, a[end] - a[start]);
+                start++;
+                end++;
+            }
+
+        }
+
+        return minDiff;
+    }
+
+    public static void flipAndInvertImage(int[][] A) {
+
+        int row = A.length;
+        int col = A[0].length;
+
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < (col + 1) / 2; j++) {
+
+                //horizontal flip
+                int temp = A[i][j] == 0 ? 1 : 0; //inverse first element
+                A[i][j] = A[i][col - j - 1] == 0 ? 1 : 0; //inverse second element
+                A[i][col - j - 1] = temp;
+                //element are inversed and swaped at the same time
+
+            }
+
+        }
+
+        //printing
+        for (int[] r : A) {
+            for (int c : r) {
+                System.out.print(c + "\t");
+            }
+            System.out.println();
+        }
+
+    }
+
+    public static void zigZagLinkedList(Node<Integer> node) {
+
+        //actual Linkedlist
+        System.out.println("input:");
+        LinkedListUtil<Integer> ll = new LinkedListUtil<>(node);
+        ll.print();
+
+        boolean flag = true;
+        int temp = 0;
+        Node<Integer> curr = node;
+        while (curr != null && curr.getNext() != null) {
+
+            if (flag) {
+
+                if ((int) curr.getData() > (int) curr.getNext().getData()) {
+                    temp = curr.getData();
+                    curr.setData((int) curr.getNext().getData());
+                    curr.getNext().setData(temp);
+                }
+
+            } else {
+
+                if ((int) curr.getData() < (int) curr.getNext().getData()) {
+                    temp = curr.getData();
+                    curr.setData((int) curr.getNext().getData());
+                    curr.getNext().setData(temp);
+                }
+
+            }
+
+            curr = curr.getNext();
+            flag = !flag;
+
+        }
+
+        //converted node
+        System.out.println("output:");
+        ll = new LinkedListUtil<>(node);
+        ll.print();
+
+    }
+
+    private static void sumOfOnlyLeftChildOfNodeInTree_Helper(TreeNode<Integer> node,
+            TreeNode<Integer> parent) {
+
+        if (node == null) {
+            return;
+        }
+
+//        System.out.println(sumOfOnlyLeftChildOfNodeInTree+"--"+node.getData()+"--"+(parent == null ? "Null" : parent.getData()));
+        sumOfOnlyLeftChildOfNodeInTree_Helper(node.getLeft(), node);
+        if (parent != null && node == parent.getLeft()) {
+            sumOfOnlyLeftChildOfNodeInTree += node.getData();
+        }
+
+        sumOfOnlyLeftChildOfNodeInTree_Helper(node.getRight(), node);
+
+    }
+    private static int sumOfOnlyLeftChildOfNodeInTree = 0;
+
+    public static void sumOfOnlyLeftChildOfNodeInTree(TreeNode<Integer> node) {
+        sumOfOnlyLeftChildOfNodeInTree_Helper(node, null);
+        System.out.println("Sum of all the left childs of any node in the tree: " + sumOfOnlyLeftChildOfNodeInTree);
+        //resetting static variabe
+        sumOfOnlyLeftChildOfNodeInTree = 0;
+    }
+
+    private static void sumOfLeftLeafNodesOfTree_Helper(TreeNode<Integer> root, TreeNode<Integer> parent) {
+
+        if (root == null) {
+            return;
+        }
+
+        sumOfLeftLeafNodesOfTree_Helper(root.getLeft(), root);
+
+        if (root.getLeft() == null && root.getRight() == null
+                && parent != null && parent.getLeft() == root) {
+            sumOfOnlyLeftChildOfNodeInTree += root.getData();
+        }
+
+        sumOfLeftLeafNodesOfTree_Helper(root.right, root);
+
+    }
+
+    public static void sumOfLeftLeafNodesOfTree(TreeNode<Integer> root) {
+        sumOfLeftLeafNodesOfTree_Helper(root, null);
+        System.out.println("Sum of left-leaf nodes in the tree: " + sumOfOnlyLeftChildOfNodeInTree);
+        //resetting static variabe
+        sumOfOnlyLeftChildOfNodeInTree = 0;
+
+    }
+
+    public static boolean wordBreak(Set<String> dictionary, String word) {
+        int size = word.length();
+
+        // base case 
+        if (size == 0) {
+            return true;
+        }
+
+        //else check for all words 
+        for (int i = 1; i <= size; i++) {
+            // Now we will first divide the word into two parts , 
+            // the prefix will have a length of i and check if it is  
+            // present in dictionary ,if yes then we will check for  
+            // suffix of length size-i recursively. if both prefix and  
+            // suffix are present the word is found in dictionary. 
+
+            if (dictionary.contains(word.substring(0, i))
+                    && wordBreak(dictionary, word.substring(i, size))) {
+                return true;
+            }
+        }
+
+        // if all cases failed then return false 
+        return false;
+    }
+
+    public static int commonPrefix_Helper(String str, String suffix, int len1, int len2) {
+
+        if (len1 >= str.length() || len2 >= suffix.length()) {
+            return 0;
+        }
+
+        if (str.charAt(len1) == suffix.charAt(len2)) {
+            return commonPrefix_Helper(str, suffix, len1 + 1, len2 + 1) + 1;
+        } else {
+            return 0;
+        }
+
+    }
+
+    public static List<Integer> commonPrefix(List<String> inputs) {
+
+        //Hackerrank test for Akash inst.
+        /*
+    
+         Given a string, split the string into two substrings at every possible point. 
+         The rightmost substring is a suffix The beginning of the string is the prefix 
+         Determine the lengths of the common prefix between each suffix and the original 
+         string. Sum and return the lengths of the common prefixes. Return an array where 
+         each element i is the sum for string i
+        
+         ex String s = "abcabcd"
+        
+         //every suffix in the below suffix column is to be compared with actual String s
+         //such that suffix and s should have common perfix in them
+         //take this suffix = 'abcd' s = 'abcabcd' common prefix = 'abc' length = 3
+         //add all those lengths in which we can find common prefix
+        
+         //Remove to leave suffix |   Suffix |    Common Prefix |     Length
+         //''                         'abcabcd'	'abcabcd'       	7
+         //'a'                        'bcabcd'	''                      0
+         //'ab'                       'cabcd'	''                      0
+         //'abc'                      'abcd'	'abc'                   3
+         //'abca'                     'bcd'	''                      0
+         //'abcab'                    'cd'	''                      0
+         //'abcabc'                   'd'         ''                    0
+        
+         
+         another ex s = "ababaa"
+         The suffixes are ['ababaa', 'babaa', 'abaa', 'baa', 'aa', 'a']. 
+         The common prefix lengths of each of these suffixes with 
+         the original string are [6, 0, 3, 0, 1, 1] respectively, 
+         and they sum to 11.
+        
+         */
+        List< Integer> result = new ArrayList<>();
+        int sum = 0;
+        for (String str : inputs) {
+
+            int len = str.length();
+            sum = 0;
+            for (int i = 0; i <= len - 1; i++) {
+
+                String suffix = str.substring(i, len);
+                // System.out.println(suffix);
+                sum += commonPrefix_Helper(str, suffix, 0, 0);
+
+            }
+
+            result.add(sum);
+
+        }
+
+        return result;
 
     }
 
@@ -8647,12 +8987,130 @@ public class SomePracticeQuestion {
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-150-sde1-1-year-experienced/?ref=rp
 //        //https://www.geeksforgeeks.org/count-words-in-a-given-string/
 //        countNoOfWords("One two       three\n four\tfive  ");
+//        countNoOfWords("\n\t \n\t ");
+//        countNoOfWords("\n\tbcdef\n\t ");
 //..............................................................................
-        System.out.println("Rotate and delete");
-        //https://www.geeksforgeeks.org/amazon-interview-experience-set-150-sde1-1-year-experienced/?ref=rp
-        //https://practice.geeksforgeeks.org/problems/rotate-and-delete/0
-        //http://geeksalgorithms.blogspot.com/2017/01/rotate-and-delete.html
-        rotateAndDelete();
+//        System.out.println("Rotate and delete");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-150-sde1-1-year-experienced/?ref=rp
+//        //https://practice.geeksforgeeks.org/problems/rotate-and-delete/0
+//        //http://geeksalgorithms.blogspot.com/2017/01/rotate-and-delete.html
+//        rotateAndDelete();
+//..............................................................................
+//        System.out.println("1038. Binary Search Tree to Greater Sum Tree");
+//        //https://leetcode.com/problems/binary-search-tree-to-greater-sum-tree/
+//        TreeNode<Integer> root = new TreeNode<>(4);
+//        root.setLeft(new TreeNode<>(1));
+//        root.getLeft().setLeft(new TreeNode<>(0));
+//        root.getLeft().setRight(new TreeNode<>(2));
+//        root.getLeft().getRight().setRight(new TreeNode<>(3));
+//        root.setRight(new TreeNode<>(6));
+//        root.getRight().setLeft(new TreeNode<>(5));
+//        root.getRight().setRight(new TreeNode<>(7));
+//        root.getRight().getRight().setRight(new TreeNode<>(8));
+//        bstToGreaterSumTree(root); //expected output: [30,36,21,36,35,26,15,null,null,null,33,null,null,null,8]
+//..............................................................................
+//        System.out.println("Find minimum difference between any two elements");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-254-off-campus-sde1/?ref=rp
+//        //https://practice.geeksforgeeks.org/problems/minimum-difference-pair/0
+//        //https://www.geeksforgeeks.org/find-minimum-difference-pair/
+//        int arr[] = new int[]{1, 5, 3, 19, 18, 25}; 
+//        System.out.println("Minimum difference is "+ minDifferenceBetweenTwoPairOfElement_ONLogN(arr));
+//..............................................................................
+//        System.out.println("832. Flipping an Image");
+//        //https://leetcode.com/problems/flipping-an-image/
+//        int[][] A = {
+//            {1,1,0},
+//            {1,0,1},
+//            {0,0,0}
+//        };
+//        flipAndInvertImage(A);
+//..............................................................................
+//        System.out.println("Rearrange a Linked List in Zig-Zag fashion");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-254-off-campus-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/linked-list-in-zig-zag-fashion/
+//        Node<Integer> head = new Node<>(11);
+//        head.setNext(new Node<>(15));
+//        head.getNext().setNext(new Node<>(20));
+//        head.getNext().getNext().setNext(new Node<>(5));
+//        head.getNext().getNext().getNext().setNext(new Node<>(10));
+//        zigZagLinkedList(head);
+//        //asc sorted liste
+//        head = new Node<>(1);
+//        head.setNext(new Node<>(2));
+//        head.getNext().setNext(new Node<>(3));
+//        head.getNext().getNext().setNext(new Node<>(4));
+//        head.getNext().getNext().getNext().setNext(new Node<>(5));
+//        head.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        zigZagLinkedList(head);
+//        //desc sorted liste
+//        head = new Node<>(6);
+//        head.setNext(new Node<>(5));
+//        head.getNext().setNext(new Node<>(4));
+//        head.getNext().getNext().setNext(new Node<>(3));
+//        head.getNext().getNext().getNext().setNext(new Node<>(2));
+//        head.getNext().getNext().getNext().getNext().setNext(new Node<>(1));
+//        zigZagLinkedList(head);
+//..............................................................................
+//        System.out.println("Sum of all the left childs of any node in the given tree");
+//        TreeNode<Integer> root = new TreeNode<>(1);
+//        root.setLeft(new TreeNode<>(2));
+//        root.getLeft().setLeft(new TreeNode<>(4));
+//        root.getLeft().setRight(new TreeNode<>(5));
+//        root.getLeft().getRight().setLeft(new TreeNode<>(6));
+//        root.setRight(new TreeNode<>(3));
+//        root.getRight().setLeft(new TreeNode<>(7));
+//        root.getRight().setRight(new TreeNode<>(8));
+//        root.getRight().getRight().setLeft(new TreeNode<>(9));
+//        sumOfOnlyLeftChildOfNodeInTree(root);
+//
+//        root = new TreeNode<>(1);
+//        root.setLeft(new TreeNode<>(2));
+//        root.setRight(new TreeNode<>(3));
+//        sumOfOnlyLeftChildOfNodeInTree(root);
+//..............................................................................
+//        System.out.println("Sum of Left Leaf Nodes");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-254-off-campus-sde1/?ref=rp
+//        //https://practice.geeksforgeeks.org/problems/sum-of-left-leaf-nodes/1
+//        TreeNode<Integer> root = new TreeNode<>(1);
+//        root.setLeft(new TreeNode<>(2));
+//        root.getLeft().setLeft(new TreeNode<>(4));
+//        root.getLeft().setRight(new TreeNode<>(5));
+//        root.getLeft().getRight().setLeft(new TreeNode<>(6));
+//        root.setRight(new TreeNode<>(3));
+//        root.getRight().setLeft(new TreeNode<>(7));
+//        root.getRight().setRight(new TreeNode<>(8));
+//        root.getRight().getRight().setLeft(new TreeNode<>(9));
+//        sumOfLeftLeafNodesOfTree(root);
+//        
+//        root = new TreeNode<>(1);
+//        root.setLeft(new TreeNode<>(2));
+//        root.setRight(new TreeNode<>(3));
+//        sumOfLeftLeafNodesOfTree(root);
+//..............................................................................
+//        System.out.println("Word Break Problem");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-254-off-campus-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/word-break-problem-dp-32/ 
+//        String temp_dictionary[] = {"mobile","samsung","sam","sung",  
+//                            "man","mango","icecream","and",  
+//                            "go","i","like","ice","cream"}; 
+//                              
+//        // loop to add all strings in dictionary set  
+//        Set<String> dictionary = new HashSet<>();
+//        for (String temp :temp_dictionary) { 
+//            dictionary.add(temp); 
+//        } 
+//          
+//        // sample input cases 
+//        System.out.println(wordBreak(dictionary, "ilikesamsung")); 
+//        System.out.println(wordBreak(dictionary, "iiiiiiii")); 
+//        System.out.println(wordBreak(dictionary, "")); 
+//        System.out.println(wordBreak(dictionary, "ilikelikeimangoiii")); 
+//        System.out.println(wordBreak(dictionary, "samsungandmango")); 
+//        System.out.println(wordBreak(dictionary, "samsungandmangok")); 
+//..............................................................................
+//        System.out.println("Common prefix | HackerRank | Akash Inst.");
+//        List<String> testCases = Arrays.asList("abcabcd", "ababaa", "aa");
+//        System.out.println("Output per test case: " + commonPrefix(testCases));
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
