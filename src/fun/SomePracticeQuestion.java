@@ -888,7 +888,7 @@ public class SomePracticeQuestion {
 
     }
 
-    public static void everyLargestNoToRight(int[] a) {
+    public static void nextLargestNoToRight(int[] a) {
 
         int n = a.length;
         Stack<Integer> s = new Stack<>();
@@ -896,7 +896,7 @@ public class SomePracticeQuestion {
 
         for (int i = n - 1; i >= 0; i--) {
 
-            while (!s.isEmpty() && s.peek() <= a[i]) {
+            while (!s.isEmpty() && s.peek() < a[i]) {
                 s.pop();
             }
 
@@ -917,6 +917,97 @@ public class SomePracticeQuestion {
         }
 
         System.out.println();
+    }
+
+    public static void nextLargestNoToLeft(int[] a) {
+
+        int n = a.length;
+        Stack<Integer> s = new Stack<>();
+        List<Integer> l = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+
+            while (!s.isEmpty() && s.peek() < a[i]) {
+                s.pop();
+            }
+
+            if (s.isEmpty()) {
+                l.add(-1);
+            } else {
+                l.add(s.peek());
+            }
+
+            s.push(a[i]);
+
+        }
+
+        for (int m : l) {
+            System.out.print(m + " ");
+        }
+
+        System.out.println();
+    }
+
+    public static void nextSmallestNoToRight(int[] a) {
+
+        int n = a.length;
+        Stack<Integer> s = new Stack<>();
+        List<Integer> l = new ArrayList<>();
+
+        for (int i = n - 1; i >= 0; i--) {
+
+            while (!s.isEmpty() && s.peek() > a[i]) {
+                s.pop();
+            }
+
+            if (s.isEmpty()) {
+                l.add(-1);
+            } else {
+                l.add(s.peek());
+            }
+
+            s.push(a[i]);
+
+        }
+
+        Collections.reverse(l);
+
+        for (int m : l) {
+            System.out.print(m + " ");
+        }
+
+        System.out.println();
+
+    }
+
+    public static void nextSmallestNoToLeft(int[] a) {
+
+        int n = a.length;
+        Stack<Integer> s = new Stack<>();
+        List<Integer> l = new ArrayList<>();
+
+        for (int i = 0; i < n; i++) {
+
+            while (!s.isEmpty() && s.peek() > a[i]) {
+                s.pop();
+            }
+
+            if (s.isEmpty()) {
+                l.add(-1);
+            } else {
+                l.add(s.peek());
+            }
+
+            s.push(a[i]);
+
+        }
+
+        for (int m : l) {
+            System.out.print(m + " ");
+        }
+
+        System.out.println();
+
     }
 
     private static void propagate(int[][] a,
@@ -5497,6 +5588,258 @@ public class SomePracticeQuestion {
 
     }
 
+    private static TreeNode<Integer> bstFromPreOrderArray_Helper(int[] preorder, int start, int end) {
+
+        if (start > end) {
+            return null;
+        }
+
+        TreeNode<Integer> root = new TreeNode<>(preorder[start]);
+
+        int i;
+        for (i = start + 1; i <= end; i++) {
+            if (preorder[i] > root.getData()) {
+                //find the index i of the first greater element than the 
+                //root.data itself and break.
+                break;
+            }
+        }
+
+        root.setLeft(bstFromPreOrderArray_Helper(preorder, start + 1, i - 1));
+        root.setRight(bstFromPreOrderArray_Helper(preorder, i, end));
+
+        return root;
+
+    }
+
+    public static void bstFromPreOrderArray(int[] preorder) {
+
+        /*
+        
+         In preorder of a BST the first element is always root of tree
+         root = preorder[0]
+         and the whole preorder can be divided into two parts
+         elements less than preorder[0] are left sub tree of root
+         elements greater than preorder[0] are right sun tree of root
+        
+         the sub problem is also repeated in left and right sub tree respect.
+        
+         */
+        TreeNode<Integer> root = bstFromPreOrderArray_Helper(preorder, 0, preorder.length - 1);
+        BinaryTree<Integer> bt = new BinaryTree<>(root);
+        bt.treeBFS();
+        System.out.println();
+
+    }
+
+    private static TreeNode<Integer> bstFromPostOrderArray_Helper(int[] postorder, int start, int end) {
+
+        if (start > end) {
+            return null;
+        }
+
+        TreeNode<Integer> root = new TreeNode<>(postorder[end]);
+
+        int i;
+        for (i = end - 1; i >= start; i--) {
+            if (postorder[i] < root.getData()) {
+                //find the index i of the last greater element than the 
+                //root.data itself and break.
+                break;
+            }
+        }
+
+        root.setLeft(bstFromPostOrderArray_Helper(postorder, start, i));
+        root.setRight(bstFromPostOrderArray_Helper(postorder, i + 1, end - 1));
+
+        return root;
+
+    }
+
+    public static void bstFromPostOrderArray(int[] postorder) {
+
+        /*
+        
+         In postorder of a BST the last element is always root of tree
+         root = postorder[end]
+         and the whole postorder can be divided into two parts
+         elements less than preorder[end] are left sub tree of root
+         elements greater than preorder[end] are right sun tree of root
+        
+         the sub problem is also repeated in left and right sub tree respect.
+        
+         */
+        TreeNode<Integer> root = bstFromPostOrderArray_Helper(postorder, 0, postorder.length - 1);
+        BinaryTree<Integer> bt = new BinaryTree<>(root);
+        bt.treeBFS();
+        System.out.println();
+
+    }
+
+    static class Type {
+
+        int min;
+        int max;
+        int val;
+
+        Type(int min, int max, int val) {
+            this.min = min;
+            this.max = max;
+            this.val = val;
+        }
+    }
+
+    private static Type maxDiffBetweenNodeAndAncestor_Helper(TreeNode<Integer> node) {
+        if (node == null) {
+            return new Type(Integer.MAX_VALUE, Integer.MIN_VALUE, 0);
+        }
+        Type left = maxDiffBetweenNodeAndAncestor_Helper(node.getLeft());
+        Type right = maxDiffBetweenNodeAndAncestor_Helper(node.getRight());
+        int min = Math.min(Math.min(left.min, right.min), node.getData());
+        int max = Math.max(Math.max(left.max, right.max), node.getData());
+        int val = Math.max(Math.max(left.val, right.val),
+                Math.max(Math.abs(max - node.getData()), Math.abs(min - node.getData())));
+        return new Type(min, max, val);
+    }
+
+    public static int maxDiffBetweenNodeAndAncestor(TreeNode<Integer> root) {
+        return maxDiffBetweenNodeAndAncestor_Helper(root).val;
+    }
+
+    public static void maxAreaOfHistogram(int[] histogram, int n) {
+
+        //find next smaller element to right and next smaller element to left
+        //Pair: key = arr element, value = arr index i of element
+        Stack<Pair<Integer, Integer>> s = new Stack<>();
+        List<Pair<Integer, Integer>> smallerRight = new ArrayList<>();
+        List<Pair<Integer, Integer>> smallerLeft = new ArrayList<>();
+        //next smaller element to right
+        for (int i = n - 1; i >= 0; i--) {
+
+            while (!s.isEmpty() && s.peek().getKey() > histogram[i]) {
+                s.pop();
+            }
+
+            if (s.isEmpty()) {
+                smallerRight.add(new Pair<>(-1, n));
+            } else {
+                smallerRight.add(new Pair<>(s.peek().getKey(), s.peek().getValue()));
+            }
+
+            s.push(new Pair<>(histogram[i], i));
+
+        }
+
+        s.clear();
+        //reverse because the loop for smaller in right is run from right most end to left most end
+        //data processed in reverse order
+        Collections.reverse(smallerRight);
+
+        //next smaller element to left
+        for (int i = 0; i < n; i++) {
+
+            while (!s.isEmpty() && s.peek().getKey() > histogram[i]) {
+                s.pop();
+            }
+
+            if (s.isEmpty()) {
+                smallerLeft.add(new Pair<>(-1, -1));
+            } else {
+                smallerLeft.add(new Pair<>(s.peek().getKey(), s.peek().getValue()));
+            }
+
+            s.push(new Pair<>(histogram[i], i));
+
+        }
+
+        //calculate with of histogrm
+        int maxArea = Integer.MIN_VALUE;
+        for (int i = 0; i < n; i++) {
+
+            int width = smallerRight.get(i).getValue() - smallerLeft.get(i).getValue() - 1;
+            maxArea = Math.max(maxArea, width * histogram[i]);
+
+        }
+
+        System.out.println("Max area of the given histogram " + maxArea);
+
+    }
+
+    public static void pushZerosToEnd(int[] arr) {
+        // code here
+        //..........................O(N).....................
+        int start = 0;
+        int end = start + 1;
+
+        while (end < arr.length) {
+
+            if (arr[start] == 0 && arr[end] != 0) {
+                int temp = arr[start];
+                arr[start] = arr[end];
+                arr[end] = temp;
+                start++;
+            }
+            if (arr[start] != 0) {
+                start++;
+            }
+
+            end++;
+        }
+
+        //output
+        for (int x : arr) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+    }
+
+    public static void calculateAngleBetweenHourAndMin(int hour, int min) {
+
+        /*
+        
+         The idea is to take 12:00 (h = 12, m = 0) as a reference. Following are detailed steps.
+
+         1. Calculate the angle made by hour hand with respect to 12:00 in h hours and m minutes. 
+         2. Calculate the angle made by minute hand with respect to 12:00 in h hours and m minutes. 
+         3. The difference between the two angles is the angle between the two hands.
+
+         How to calculate the two angles with respect to 12:00? 
+         The minute hand moves 360 degrees in 60 minute(or 6 degrees in one minute) and hour hand moves 360 
+         degrees in 12 hours(or 0.5 degrees in 1 minute). In h hours and m minutes, 
+         the minute hand would move (h*60 + m)*6 and hour hand would move (h*60 + m)*0.5. 
+        
+         */
+        // validate the input
+        if (hour < 0 || min < 0 || hour > 12 || min > 60) {
+            System.out.println("Wrong input");
+        }
+
+        if (hour == 12) {
+            hour = 0;
+        }
+        if (min == 60) {
+            min = 0;
+            hour += 1;
+            if (hour > 12) {
+                hour = hour - 12;
+            }
+        }
+
+        // Calculate the angles moved by hour and minute hands
+        // with reference to 12:00
+        int hour_angle = (int) (0.5 * (hour * 60 + min));
+        int minute_angle = (int) (6 * min);
+
+        // Find the difference between two angles
+        int angle = Math.abs(hour_angle - minute_angle);
+
+        // smaller angle of two possible angles
+        angle = Math.min(360 - angle, angle);
+
+        System.out.println(angle + " degrees");
+
+    }
+
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
 
         //least end point when we reach to 0 index of string
@@ -7290,10 +7633,22 @@ public class SomePracticeQuestion {
 //        longestPrefixAlsoSuffixInString("aaaa");
 //        longestPrefixAlsoSuffixInString("blablabla");
 //..............................................................................
-//        System.out.println("Next greater element in same order as input");
+//        System.out.println("Next largest element to right");
 //        //https://www.geeksforgeeks.org/next-greater-element-in-same-order-as-input/
-//        everyLargestNoToRight(new int[]{4, 5, 2, 1, 25});
-//        everyLargestNoToRight(new int[]{4, 5, 2, 3, 25});
+//        nextLargestNoToRight(new int[]{4, 5, 2, 1, 25});
+//        nextLargestNoToRight(new int[]{4, 5, 2, 3, 25});
+//..............................................................................
+//        System.out.println("Next largest element to left");
+//        nextLargestNoToLeft(new int[]{4, 5, 2, 1, 25});
+//        nextLargestNoToLeft(new int[]{4, 5, 2, 3, 25});
+//..............................................................................
+//        System.out.println("Next smallest element to right");
+//        nextSmallestNoToRight(new int[]{4, 5, 2, 1, 25});
+//        nextSmallestNoToRight(new int[]{4, 5, 2, 3, 25});
+//..............................................................................
+//        System.out.println("Next smallest element to left");
+//        nextSmallestNoToLeft(new int[]{4, 5, 2, 1, 25});
+//        nextSmallestNoToLeft(new int[]{4, 5, 2, 3, 25});
 //..............................................................................
 //        System.out.println("Find the number of Islands");
 //        //https://www.geeksforgeeks.org/find-the-number-of-islands-set-2-using-disjoint-set/
@@ -9111,6 +9466,53 @@ public class SomePracticeQuestion {
 //        System.out.println("Common prefix | HackerRank | Akash Inst.");
 //        List<String> testCases = Arrays.asList("abcabcd", "ababaa", "aa");
 //        System.out.println("Output per test case: " + commonPrefix(testCases));
+//..............................................................................
+//        System.out.println("Generate BST from preorder List/Array");
+//        int[] preorder = {2,1,3};
+//        bstFromPreOrderArray(preorder);
+//        int[] preorder2 = {4,1,0,2,3,6,5,10};
+//        bstFromPreOrderArray(preorder2);
+//..............................................................................
+//        System.out.println("Generate BST from postorder List/Array");
+//        //https://www.geeksforgeeks.org/construct-a-binary-search-tree-from-given-postorder/
+//        int[] postorder = {1,3,2};
+//        bstFromPostOrderArray(postorder);
+//        int[] postorder2 = {1, 7, 5, 50, 40, 10};
+//        bstFromPostOrderArray(postorder2);
+//..............................................................................
+//        System.out.println("1026. Maximum Difference Between Node and Ancestor");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-259-1-yr-experienced-for-sde1/?ref=rp
+//        //https://leetcode.com/problems/maximum-difference-between-node-and-ancestor/
+//        TreeNode<Integer> root = new TreeNode<>(8);
+//        root.setLeft(new TreeNode<>(3));
+//        root.getLeft().setLeft(new TreeNode<>(1));
+//        root.getLeft().setRight(new TreeNode<>(6));
+//        root.getLeft().getRight().setLeft(new TreeNode<>(4));
+//        root.getLeft().getRight().setRight(new TreeNode<>(7));
+//        root.setRight(new TreeNode<>(10));
+//        root.getRight().setRight(new TreeNode<>(14));
+//        root.getRight().getRight().setLeft(new TreeNode<>(13));
+//        System.out.println("max diff between node and its ancestor "+maxDiffBetweenNodeAndAncestor(root));
+//..............................................................................
+//        System.out.println("Largest Rectangular Area in a Histogram");
+//        int hist[] = {6, 2, 5, 4, 5, 1, 6};
+//        maxAreaOfHistogram(hist, hist.length);
+//..............................................................................
+//        System.out.println("Move all zeroes to end of array");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-259-1-yr-experienced-for-sde1/?ref=rp
+//        //https://practice.geeksforgeeks.org/problems/move-all-zeroes-to-end-of-array0751/1
+//        //https://leetcode.com/problems/move-zeroes/
+//        int arr[] = {3, 5, 0, 0, 4};
+//        pushZerosToEnd(arr);
+//        int arrr[] = {0, 0, 0, 4};
+//        pushZerosToEnd(arrr);
+//..............................................................................
+        System.out.println("Calculate the angle between hour hand and minute hand");
+        //https://www.geeksforgeeks.org/amazon-interview-experience-set-281-for-sde1/?ref=rp
+        //https://www.geeksforgeeks.org/calculate-angle-hour-hand-minute-hand/
+        calculateAngleBetweenHourAndMin(9, 60);
+        calculateAngleBetweenHourAndMin(3, 30);
+        calculateAngleBetweenHourAndMin(3, 15);
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
