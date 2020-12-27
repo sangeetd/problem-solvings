@@ -845,12 +845,7 @@ public class SomePracticeQuestion {
         Map<Integer, Integer> map = new HashMap<>();
 
         for (int m : a) {
-            if (map.containsKey(m)) {
-                int counter = map.get(m);
-                map.put(m, counter + 1);
-            } else {
-                map.put(m, 1);
-            }
+            map.put(m, map.getOrDefault(m, 0) + 1);
         }
 
         map.entrySet().stream().forEach(e -> {
@@ -9507,12 +9502,12 @@ public class SomePracticeQuestion {
 //        int arrr[] = {0, 0, 0, 4};
 //        pushZerosToEnd(arrr);
 //..............................................................................
-        System.out.println("Calculate the angle between hour hand and minute hand");
-        //https://www.geeksforgeeks.org/amazon-interview-experience-set-281-for-sde1/?ref=rp
-        //https://www.geeksforgeeks.org/calculate-angle-hour-hand-minute-hand/
-        calculateAngleBetweenHourAndMin(9, 60);
-        calculateAngleBetweenHourAndMin(3, 30);
-        calculateAngleBetweenHourAndMin(3, 15);
+//        System.out.println("Calculate the angle between hour hand and minute hand");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-281-for-sde1/?ref=rp
+//        //https://www.geeksforgeeks.org/calculate-angle-hour-hand-minute-hand/
+//        calculateAngleBetweenHourAndMin(9, 60);
+//        calculateAngleBetweenHourAndMin(3, 30);
+//        calculateAngleBetweenHourAndMin(3, 15);
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";

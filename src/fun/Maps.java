@@ -83,6 +83,9 @@ public class Maps {
         
         n.put(c, 67);
         
+        b.key = "2_change";
+        n.put(b, 222);
+        
         for (Map.Entry<CustomClass, Integer> e : n.entrySet()) {
             System.out.println(e.getKey() + " " + e.getValue());
         }
