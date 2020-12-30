@@ -12,9 +12,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Stack;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javafx.util.Pair;
 
 /**
  *
@@ -91,148 +93,325 @@ public class DSA450Questions {
         return str.equals(reverseString(str));
 
     }
-    
-    public void printDuplicatesCharInString(String str){
-        System.out.println("For: "+str);
-        
+
+    public void printDuplicatesCharInString(String str) {
+        System.out.println("For: " + str);
+
         Map<Character, Integer> countMap = new HashMap<>();
-        for(char c: str.toCharArray()){
+        for (char c : str.toCharArray()) {
             countMap.put(c, countMap.getOrDefault(c, 0) + 1);
         }
-        
+
         countMap.entrySet().stream()
                 .filter(e -> e.getValue() > 1)
-                .forEach(e -> System.out.println(e.getKey()+" "+e.getValue()));
-        
+                .forEach(e -> System.out.println(e.getKey() + " " + e.getValue()));
+
     }
-    
-    public void reverseLinkedList_Iterative(Node<Integer> node){
+
+    public void reverseLinkedList_Iterative(Node<Integer> node) {
         System.out.println("Reverse linked list iterative");
         //actual
         LinkedListUtil<Integer> ll = new LinkedListUtil<>(node);
         ll.print();
-        
+
         Node<Integer> curr = node;
         Node<Integer> prev = null;
         Node<Integer> next = null;
-        
-        while(curr != null){
-            
+
+        while (curr != null) {
+
             next = curr.getNext();
             curr.setNext(prev);
             prev = curr;
             curr = next;
-            
+
         }
-        
+
         node = prev;
-        
+
         //output
         LinkedListUtil<Integer> output = new LinkedListUtil<>(node);
         output.print();
-        
+
     }
-    
+
     Node<Integer> reverseLinkedList_Recursive_NewHead;
-    private Node<Integer> reverseLinkedList_Recursive_Helper(Node<Integer> node){
-        
-        if(node.getNext() == null){
+
+    private Node<Integer> reverseLinkedList_Recursive_Helper(Node<Integer> node) {
+
+        if (node.getNext() == null) {
             reverseLinkedList_Recursive_NewHead = node;
             return node;
         }
-        
+
         Node<Integer> revNode = reverseLinkedList_Recursive_Helper(node.getNext());
         revNode.setNext(node);
         node.setNext(null);
-        
+
         return node;
-        
+
     }
-    
-    public void reverseLinkedList_Recursive(Node<Integer> node){
+
+    public void reverseLinkedList_Recursive(Node<Integer> node) {
         System.out.println("Reverse linked list recursive");
         //actual
         LinkedListUtil<Integer> ll = new LinkedListUtil<>(node);
         ll.print();
-        
+
         reverseLinkedList_Recursive_Helper(node);
-        
+
         //output
         LinkedListUtil<Integer> output = new LinkedListUtil<>(reverseLinkedList_Recursive_NewHead);
         output.print();
-        
+
     }
-    
-    public void levelOrderTraversal_Iterative(TreeNode root){
-        
-        if(root == null){
+
+    public void levelOrderTraversal_Iterative(TreeNode root) {
+
+        if (root == null) {
             return;
         }
-        
+
         //actuals
         BinaryTree bt = new BinaryTree(root);
         bt.treeBFS();
-        
+
         Queue<TreeNode> q = new LinkedList<>();
         q.add(root);
         Queue<TreeNode> intQ = new LinkedList<>();
-        
+
         List<List> levels = new ArrayList<>();
         List nodes = new ArrayList<>();
-        
-        while(!q.isEmpty()){
-            
+
+        while (!q.isEmpty()) {
+
             TreeNode t = q.poll();
             nodes.add(t.getData());
-            
-            if(t.getLeft() != null){
+
+            if (t.getLeft() != null) {
                 intQ.add(t.getLeft());
             }
-            if(t.getRight() != null){
+            if (t.getRight() != null) {
                 intQ.add(t.getRight());
             }
-            
-            if(q.isEmpty()){
+
+            if (q.isEmpty()) {
                 levels.add(nodes);
                 nodes = new ArrayList<>();
                 q.addAll(intQ);
                 intQ.clear();
             }
+
+        }
+
+        //output
+        System.out.println();
+        for (List l : levels) {
+            System.out.println(l);
+        }
+
+    }
+    
+    public void inOrderTraversal_Iterative(TreeNode root){
+        
+        if(root == null){
+            return;
+        }
+        
+        Stack<Pair<TreeNode, Integer>> stack = new Stack<>();
+        stack.push(new Pair<>(root, 0));
+        
+        while(!stack.isEmpty()){
+            
+            Pair<TreeNode, Integer> p = stack.pop(); 
+            TreeNode n = p.getKey();
+            int status = p.getValue();
+            
+            if(n == null || status == 3){
+                continue;
+            }
+            
+            stack.push(new Pair<>(n, status + 1));
+            
+            if(status == 0){
+                stack.push(new Pair<>(n.getLeft(), 0));
+            }
+            
+            if(status == 1){
+                System.out.print(n.getData() + " ");
+            }
+            
+            if(status == 2){
+                stack.push(new Pair<>(n.getRight(), 0));
+            }
             
         }
         
-        //output
         System.out.println();
-        for(List l: levels){
-            System.out.println(l);
-        }
         
     }
     
-    public int heightOfTree(TreeNode root){
+    public void inOrderTraversal_Recursive(TreeNode root){
         
         if(root == null){
+            return;
+        }
+        
+        inOrderTraversal_Recursive(root.getLeft());
+        System.out.print(root.getData() + " ");
+        inOrderTraversal_Recursive(root.getRight());
+    }
+    
+    public void preOrderTraversal_Iterative(TreeNode root){
+        
+        if(root == null){
+            return;
+        }
+        
+        Stack<Pair<TreeNode, Integer>> stack = new Stack<>();
+        stack.push(new Pair<>(root, 0));
+        
+        while(!stack.isEmpty()){
+            
+            Pair<TreeNode, Integer> p = stack.pop();
+            TreeNode n = p.getKey();
+            int status = p.getValue();
+            
+            if(n == null || status == 3){
+                continue;
+            }
+            
+            stack.push(new Pair<>(n, status + 1));
+            
+            if(status == 0){
+                System.out.print(n.getData() + " ");
+            }
+            
+            if(status == 1){
+                stack.push(new Pair<>(n.getLeft(), 0));
+            }
+            
+            if(status == 2){
+                stack.push(new Pair<>(n.getRight(), 0));
+            }
+            
+        }
+        
+        System.out.println();
+        
+    }
+    
+    public void preOrderTraversal_Recursive(TreeNode root){
+        
+        if(root == null){
+            return;
+        }
+        
+        System.out.print(root.getData() + " ");
+        preOrderTraversal_Recursive(root.getLeft());
+        preOrderTraversal_Recursive(root.getRight());
+        
+    }
+    
+    public void postOrderTraversal_Iterative(TreeNode root){
+        
+        if(root == null){
+            return;
+        }
+        
+        Stack<Pair<TreeNode, Integer>> stack = new Stack<>();
+        stack.push(new Pair<>(root, 0));
+        
+        while(!stack.isEmpty()){
+            
+            Pair<TreeNode, Integer> p = stack.pop();
+            TreeNode n = p.getKey();
+            int status = p.getValue();
+            
+            if(n == null || status == 3){
+                continue;
+            }
+            
+            stack.push(new Pair<>(n, status + 1));
+            
+            if(status == 0){
+                stack.push(new Pair<>(n.getLeft(), 0));
+            }
+            
+            if(status == 1){
+                stack.push(new Pair<>(n.getRight(), 0));
+            }
+            
+            if(status == 2){
+                System.out.print(n.getData() + " ");
+            }
+            
+        }
+        
+        System.out.println();
+    }
+    
+    public void postOrderTraversal_recursive(TreeNode root){
+        
+        if(root == null){
+            return;
+        }
+        
+        postOrderTraversal_recursive(root.getLeft());
+        postOrderTraversal_recursive(root.getRight());
+        System.out.print(root.getData() + " ");
+        
+    }
+
+    public int heightOfTree(TreeNode root) {
+
+        if (root == null) {
             return -1;
         }
-        
-        return Math.max(heightOfTree(root.getLeft()), 
+
+        return Math.max(heightOfTree(root.getLeft()),
                 heightOfTree(root.getRight())) + 1;
-        
+
     }
-    
-    public TreeNode mirrorOfTree(TreeNode root){
-        
-        if(root == null){
+
+    public TreeNode mirrorOfTree(TreeNode root) {
+
+        if (root == null) {
             return null;
         }
-        
+
         TreeNode left = mirrorOfTree(root.getLeft());
         TreeNode right = mirrorOfTree(root.getRight());
         root.setLeft(right);
         root.setRight(left);
-        
+
         return root;
-        
+
+    }
+    
+    int middleElementInStack_Element = Integer.MIN_VALUE;
+    private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
+
+        if (n == index || s.isEmpty()) {
+            return;
+        }
+
+        int ele = s.pop();
+        middleElementInStack_Helper(s, n, index + 1);
+        if (index == n / 2) {
+            middleElementInStack_Element = ele;
+        }
+        s.push(ele);
+    }
+
+    public void middleElementInStack(Stack<Integer> stack) {
+        int n = stack.size();
+        int index = 0;
+        middleElementInStack_Helper(stack, n, index);
+        //outputs
+        System.out.println("Middle eleement of the stack: "+middleElementInStack_Element);
+        //just reseting
+        middleElementInStack_Element = Integer.MIN_VALUE;
     }
 
     public static void main(String[] args) {
@@ -312,7 +491,75 @@ public class DSA450Questions {
 //        System.out.println(obj.heightOfTree(root2));
         //......................................................................
 //        Row: 181
-        System.out.println("Mirror of tree");
+//        System.out.println("Mirror of tree");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        //actual
+//        BinaryTree bt = new BinaryTree<>(root1);
+//        bt.treeBFS();
+//        obj.mirrorOfTree(root1);
+//        System.out.println();
+//        //output
+//        bt = new BinaryTree<>(root1);
+//        bt.treeBFS();
+        //......................................................................
+//        Row: 299
+//        System.out.println("Middle element in the stack");
+//        Stack<Integer> stack = new Stack<>();
+//        stack.addAll(Arrays.asList(1, 2, 3, 4, 5, 6, 7));
+//        obj.middleElementInStack(stack);
+//        stack.clear();
+//        stack.addAll(Arrays.asList(1, 2, 3, 4));
+//        obj.middleElementInStack(stack);
+//        stack.clear();
+//        //empty stack!!
+//        obj.middleElementInStack(stack);
+        //......................................................................
+//        Row: 182
+//        System.out.println("Inorder traversal of tree Iterative/recursive");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        //actual
+//        BinaryTree bt = new BinaryTree<>(root1);
+//        bt.treeBFS();
+//        System.out.println();
+//        obj.inOrderTraversal_Iterative(root1);
+//        obj.inOrderTraversal_Recursive(root1);
+        //......................................................................
+//        Row: 183
+//        System.out.println("Preorder traversal of tree Iterative/recursive");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        //actual
+//        BinaryTree bt = new BinaryTree<>(root1);
+//        bt.treeBFS();
+//        System.out.println();
+//        obj.preOrderTraversal_Iterative(root1);
+//        obj.preOrderTraversal_Recursive(root1);
+        //......................................................................
+//        Row: 184
+        System.out.println("Postsorder traversal of tree Iterative/recursive");
         TreeNode<Integer> root1 = new TreeNode<>(6);
         root1.setLeft(new TreeNode(2));
         root1.getLeft().setLeft(new TreeNode(0));
@@ -325,11 +572,9 @@ public class DSA450Questions {
         //actual
         BinaryTree bt = new BinaryTree<>(root1);
         bt.treeBFS();
-        obj.mirrorOfTree(root1);
         System.out.println();
-        //output
-        bt = new BinaryTree<>(root1);
-        bt.treeBFS();
+        obj.postOrderTraversal_Iterative(root1);
+        obj.postOrderTraversal_recursive(root1);
     }
 
 }
