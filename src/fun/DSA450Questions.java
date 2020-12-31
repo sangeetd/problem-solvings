@@ -7,12 +7,14 @@ package fun;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -165,6 +167,54 @@ public class DSA450Questions {
         output.print();
 
     }
+    
+    private Stack<Integer> sumOfNumbersAsLinkedList_ToStack(Node<Integer> node){
+        
+        Stack<Integer> s = new Stack<>();
+        Node<Integer> temp = node;
+        while(temp != null){
+            
+            s.push(temp.getData());
+            temp = temp.getNext();
+            
+        }
+        
+        return s;
+        
+    }
+    
+    public void sumOfNumbersAsLinkedList(Node<Integer> n1, Node<Integer> n2){
+        
+        Stack<Integer> nS1 = sumOfNumbersAsLinkedList_ToStack(n1);
+        Stack<Integer> nS2 = sumOfNumbersAsLinkedList_ToStack(n2);
+        
+        int carry = 0;
+        LinkedListUtil<Integer> ll = new LinkedListUtil<>();
+        while(!nS1.isEmpty() || !nS2.isEmpty()){
+            
+            int sum = carry;
+            
+            if(!nS1.isEmpty()){
+                sum += nS1.pop();
+            }
+            
+            if(!nS2.isEmpty()){
+                sum += nS2.pop();
+            }
+            
+            carry = sum/10;
+            ll.addAtHead(sum%10);
+            
+        }
+        
+        if(carry > 0){
+            ll.addAtHead(carry);
+        }
+        
+        //output
+        ll.print();
+        
+    }
 
     public void levelOrderTraversal_Iterative(TreeNode root) {
 
@@ -210,6 +260,54 @@ public class DSA450Questions {
             System.out.println(l);
         }
 
+    }
+    
+    public void reverseLevelOrderTraversal(TreeNode<Integer> root){
+        
+        //actuals
+        BinaryTree bt = new BinaryTree(root);
+        bt.treeBFS();
+        
+        List<Integer> singleListReverseLevelOrder = new ArrayList<>();
+        
+        Queue<TreeNode<Integer>> q = new LinkedList<>();
+        q.add(root);
+        Queue<TreeNode<Integer>> intQ = new LinkedList<>();
+        
+        List<List<Integer>> level = new ArrayList<>();
+        List<Integer> nodes = new ArrayList<>();
+        
+        while(!q.isEmpty()){
+            
+            TreeNode<Integer> temp = q.poll();
+            nodes.add(temp.getData());
+            
+            if(temp.getLeft() != null){
+                intQ.add(temp.getLeft());
+            }
+            
+            if(temp.getRight() != null){
+                intQ.add(temp.getRight());
+            }
+            
+            if(q.isEmpty()){
+                level.add(nodes);
+                nodes = new ArrayList<>();
+                q.addAll(intQ);
+                intQ.clear();
+            }
+            
+        }
+        
+        //output
+        System.out.println();
+        Collections.reverse(level);
+        System.out.println("Level wise: " + level);
+        
+        for(List l: level){
+            singleListReverseLevelOrder.addAll(l);
+        }
+        System.out.println("Single node list: " + singleListReverseLevelOrder);
     }
     
     public void inOrderTraversal_Iterative(TreeNode root){
@@ -389,6 +487,177 @@ public class DSA450Questions {
 
     }
     
+    private void leftViewOfTree_Helper(TreeNode<Integer> root, int level, Map<Integer, Integer> result){
+        if(root == null){
+            return;
+        }
+        
+        if(!result.containsKey(level)){
+            result.put(level, root.getData());
+        }
+        
+        //for left view
+        leftViewOfTree_Helper(root.getLeft(), level+1, result);
+        leftViewOfTree_Helper(root.getRight(), level+1, result);
+    }
+    
+    public void leftViewOfTree(TreeNode<Integer> root){
+        Map<Integer, Integer> result = new TreeMap<>();
+        leftViewOfTree_Helper(root, 0, result);
+        
+        result.entrySet().stream().forEach(e -> {
+            System.out.print(e.getValue()+ " ");
+        });
+        
+        System.out.println();
+    }
+    
+    private void rightViewOfTree_Helper(TreeNode<Integer> root, int level, Map<Integer, Integer> result){
+        
+        if(root == null){
+            return;
+        }
+        
+        if(!result.containsKey(level)){
+            result.put(level, root.getData());
+        }
+        
+        //for right view
+        rightViewOfTree_Helper(root.getRight(), level+1, result);
+        rightViewOfTree_Helper(root.getLeft(), level+1, result);
+    }
+    
+    public void rightViewOfTree(TreeNode<Integer> root){
+        
+        Map<Integer, Integer> result = new TreeMap<>();
+        rightViewOfTree_Helper(root, 0, result);
+        
+        result.entrySet().stream().forEach(e -> {
+            System.out.print(e.getValue()+ " ");
+        });
+        
+        System.out.println();
+        
+    }
+    
+    public void topViewOfTree(TreeNode<Integer> root){
+        
+        Queue<Pair<TreeNode<Integer>, Integer>> q = new LinkedList<>();
+        q.add(new Pair<>(root, 0));
+        
+        Map<Integer, Integer> result = new TreeMap<>();
+        
+        while(!q.isEmpty()){
+            
+            Pair<TreeNode<Integer>, Integer> p = q.poll();
+            TreeNode<Integer> n = p.getKey();
+            int vLevel = p.getValue();
+            
+            if(!result.containsKey(vLevel)){
+                result.put(vLevel, n.getData());
+            }
+            
+            if(n.getLeft() != null){
+                q.add(new Pair<>(n.getLeft(), vLevel-1));
+            }
+            if(n.getRight() != null){
+                q.add(new Pair<>(n.getRight(), vLevel+1));
+            }
+        }
+        
+        result.entrySet().stream().forEach(e -> {
+            System.out.print(e.getValue()+ " ");
+        });
+        
+        System.out.println();
+        
+    }
+    
+    public void bottomViewOfTree(TreeNode<Integer> root){
+        
+        //pair: node,vlevels
+        Queue<Pair<TreeNode<Integer>, Integer>> q = new LinkedList<>();
+        q.add(new Pair<>(root, 0));
+        
+        Map<Integer, Integer> bottomView = new TreeMap<>();
+        
+        while(!q.isEmpty()){
+            
+            Pair<TreeNode<Integer>, Integer> p = q.poll();
+            TreeNode<Integer> n = p.getKey();
+            int vLevel = p.getValue();
+            
+            //updates the vlevel with new node data, as we go down the tree in level order wise
+            bottomView.put(vLevel, n.getData());
+            
+            if(n.getLeft() != null){
+                q.add(new Pair<>(n.getLeft(), vLevel - 1));
+            }
+            
+            if(n.getRight() != null){
+                q.add(new Pair<>(n.getRight(), vLevel + 1));
+            }
+            
+        }
+        
+        bottomView.entrySet().stream().forEach(e -> {
+            System.out.print(e.getValue()+ " ");
+        });
+        
+        System.out.println();
+    }
+    
+    public void zigZagTreeTraversal(TreeNode<Integer> root, boolean ltr){
+        
+        Stack<TreeNode<Integer>> s = new Stack<>();
+        s.push(root);
+        Stack<TreeNode<Integer>> intS = new Stack<>();
+        
+        List<List<Integer>> level = new ArrayList<>();
+        List<Integer> zigZagNodes = new ArrayList<>();
+        
+        while(!s.isEmpty()){
+            
+            TreeNode<Integer> t = s.pop();
+            zigZagNodes.add(t.getData());
+            
+            if(ltr){
+               
+                if(t.getRight() != null){
+                    intS.push(t.getRight());
+                }
+                
+                if(t.getLeft() != null){
+                    intS.push(t.getLeft());
+                }
+                
+            }else {
+                
+                if(t.getLeft() != null){
+                    intS.push(t.getLeft());
+                }
+                
+                if(t.getRight() != null){
+                    intS.push(t.getRight());
+                }
+                
+            }
+            
+            if(s.isEmpty()){
+                
+                ltr = !ltr;
+                level.add(zigZagNodes);
+                zigZagNodes = new ArrayList<>();
+                s.addAll(intS);
+                intS.clear();
+            }
+            
+        }
+        
+        //output
+        System.out.println("Output: "+level);
+    }
+    
     int middleElementInStack_Element = Integer.MIN_VALUE;
     private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
 
@@ -559,7 +828,100 @@ public class DSA450Questions {
 //        obj.preOrderTraversal_Recursive(root1);
         //......................................................................
 //        Row: 184
-        System.out.println("Postsorder traversal of tree Iterative/recursive");
+//        System.out.println("Postsorder traversal of tree Iterative/recursive");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        //actual
+//        BinaryTree bt = new BinaryTree<>(root1);
+//        bt.treeBFS();
+//        System.out.println();
+//        obj.postOrderTraversal_Iterative(root1);
+//        obj.postOrderTraversal_recursive(root1);
+        //......................................................................
+//        Row: 148
+//        System.out.println("Add two numbers represented by linked list");
+//        Node<Integer> n1 = new Node<>(4);
+//        n1.setNext(new Node<>(5));
+//        Node<Integer> n2 = new Node<>(3);
+//        n2.setNext(new Node<>(4));
+//        n2.getNext().setNext(new Node<>(5));
+//        obj.sumOfNumbersAsLinkedList(n1, n2);
+        //......................................................................
+//        Row: 178
+//        System.out.println("Reverse level order traversal");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.reverseLevelOrderTraversal(root1);
+        //......................................................................
+//        Row: 185
+//        System.out.println("Left view of tree");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.leftViewOfTree(root1);
+        //......................................................................
+//        Row: 186
+//        System.out.println("Right view of tree");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.rightViewOfTree(root1);
+        //......................................................................
+//        Row: 187
+//        System.out.println("Top view of tree");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.topViewOfTree(root1);
+        //......................................................................
+//        Row: 188
+//        System.out.println("Bottom view of tree");
+//        //https://practice.geeksforgeeks.org/problems/bottom-view-of-binary-tree/1
+//        TreeNode<Integer> root1 = new TreeNode<>(20);
+//        root1.setLeft(new TreeNode(8));
+//        root1.getLeft().setLeft(new TreeNode(5));
+//        root1.getLeft().setRight(new TreeNode(3));
+//        root1.getLeft().getRight().setLeft(new TreeNode(10));
+//        root1.setRight(new TreeNode(22));
+//        root1.getRight().setLeft(new TreeNode(4));
+//        root1.getRight().setRight(new TreeNode(25));
+//        root1.getRight().getLeft().setRight(new TreeNode(14));
+//        obj.bottomViewOfTree(root1);
+        //......................................................................
+//        Row: 189
+        System.out.println("Zig zag traversal of tree");
         TreeNode<Integer> root1 = new TreeNode<>(6);
         root1.setLeft(new TreeNode(2));
         root1.getLeft().setLeft(new TreeNode(0));
@@ -569,12 +931,18 @@ public class DSA450Questions {
         root1.setRight(new TreeNode(8));
         root1.getRight().setLeft(new TreeNode(7));
         root1.getRight().setRight(new TreeNode(9));
-        //actual
-        BinaryTree bt = new BinaryTree<>(root1);
-        bt.treeBFS();
-        System.out.println();
-        obj.postOrderTraversal_Iterative(root1);
-        obj.postOrderTraversal_recursive(root1);
+        obj.zigZagTreeTraversal(root1, true);
+        root1 = new TreeNode<>(20);
+        root1.setLeft(new TreeNode(8));
+        root1.getLeft().setLeft(new TreeNode(5));
+        root1.getLeft().setRight(new TreeNode(3));
+        root1.getLeft().getRight().setLeft(new TreeNode(10));
+        root1.setRight(new TreeNode(22));
+        root1.getRight().setLeft(new TreeNode(4));
+        root1.getRight().setRight(new TreeNode(25));
+        root1.getRight().getLeft().setRight(new TreeNode(14));
+        obj.zigZagTreeTraversal(root1, false);
+        
     }
 
 }
