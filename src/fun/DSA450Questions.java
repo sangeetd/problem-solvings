@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -43,6 +44,24 @@ public class DSA450Questions {
         }
         System.out.println();
 
+    }
+    
+    public void arrayElementMoreThan_NDivK(int[] a, int K){
+        
+        int N = a.length;
+        int count = N/K;
+        Map<Integer, Integer> map = new HashMap<>();
+        for(int x: a){
+            map.put(x, map.getOrDefault(x, 0) + 1);
+        }
+        
+        map.entrySet().stream()
+                .filter(e -> e.getValue() > count)
+                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()))
+                .entrySet()
+                .stream()
+                .forEach(e -> System.out.println(e.getKey()));
+        
     }
 
     public String reverseString(String str) {
@@ -108,6 +127,81 @@ public class DSA450Questions {
                 .filter(e -> e.getValue() > 1)
                 .forEach(e -> System.out.println(e.getKey() + " " + e.getValue()));
 
+    }
+    
+    public void romanStringToDecimal(String str){
+        
+        //actual
+        System.out.println("roman: "+str);
+        
+        Map<Character, Integer> roman = new HashMap<>();
+        roman.put('I', 1);
+        roman.put('V', 5);
+        roman.put('X', 10);
+        roman.put('L', 50);
+        roman.put('C', 100);
+        roman.put('D', 500);
+        roman.put('M', 1000);
+        
+        int decimal = 0;
+        for(int i=0; i<str.length(); i++){
+            
+            char c = str.charAt(i);
+            if(i>0 && roman.get(str.charAt(i-1)) < roman.get(c)){
+                decimal += roman.get(c) - 2*roman.get(str.charAt(i-1));
+            }else {
+                decimal += roman.get(c);
+            }
+            
+        }
+        
+        //output
+        System.out.println("Decimal: "+decimal);
+        
+    }
+    
+    public void longestCommonSubsequence(String a, String b){
+        
+        //memoization
+        int[][] memo = new int[a.length()+1][b.length()+1];
+        //base cond
+        for(int[] x: memo){
+            Arrays.fill(x, 0);
+        }
+        
+        for(int x = 1; x<a.length()+1; x++){
+            for(int y = 1; y<b.length()+1; y++){
+                if(a.charAt(x - 1) == b.charAt(y - 1)){
+                    memo[x][y] = memo[x-1][y-1] + 1;
+                }else {
+                    memo[x][y] = Math.max(memo[x-1][y], memo[x][y-1]);
+                }
+            }
+        }
+        
+        int l = a.length();
+        int m = b.length();
+        StringBuilder sb = new StringBuilder();
+        while(l>0 && m>0){
+            
+            if(a.charAt(l-1) == b.charAt(m - 1)){
+                sb.insert(0,a.charAt(l-1));
+                l--;
+                m--;
+            }else{
+                
+                if(memo[l-1][m] > memo[l][m-1]){
+                    l--;
+                }else{
+                    m--;
+                }
+                
+            }
+            
+        }
+        
+        //output
+        System.out.println("Longest common subseq: "+sb.toString());
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -212,6 +306,34 @@ public class DSA450Questions {
         }
         
         //output
+        ll.print();
+        
+    }
+    
+    public void removeDuplicateFromSortedLinkedList(Node<Integer> node){
+        
+        //actual
+        LinkedListUtil<Integer> ll = new LinkedListUtil<>(node);
+        ll.print();
+        
+        Node<Integer> curr = node;
+        Node<Integer> temp = node.getNext();
+        
+        while(temp != null){
+            
+            if(curr.getData() != temp.getData()){
+                curr.setNext(temp);
+                curr = temp;
+            }
+            
+            temp = temp.getNext();
+            
+        }
+        
+        curr.setNext(temp);
+        
+        //output
+        ll = new LinkedListUtil<>(node);
         ll.print();
         
     }
@@ -658,6 +780,46 @@ public class DSA450Questions {
         System.out.println("Output: "+level);
     }
     
+    TreeNode treeToDoublyLinkedList_Prev;
+    TreeNode treeToDoublyLinkedList_HeadOfDLL;
+    private void treeToDoublyLinkedList_Helper(TreeNode root){
+        if(root == null){
+            return;
+        }
+        
+        treeToDoublyLinkedList_Helper(root.getLeft());
+        
+        if(treeToDoublyLinkedList_Prev == null){
+            treeToDoublyLinkedList_HeadOfDLL = root;
+        }else{
+            root.setLeft(treeToDoublyLinkedList_Prev);
+            treeToDoublyLinkedList_Prev.setRight(root);
+        }
+        
+        treeToDoublyLinkedList_Prev = root;
+        
+        treeToDoublyLinkedList_Helper(root.getRight());
+    }
+    
+    private void treeToDoublyLinkedList_Print(){
+        
+        while(treeToDoublyLinkedList_HeadOfDLL != null){
+            
+            System.out.print(treeToDoublyLinkedList_HeadOfDLL.getData()+ " ");
+            treeToDoublyLinkedList_HeadOfDLL = treeToDoublyLinkedList_HeadOfDLL.getRight();
+            
+        }
+        System.out.println();
+    }
+    
+    public void treeToDoublyLinkedList(TreeNode root){
+        treeToDoublyLinkedList_Helper(root);
+        treeToDoublyLinkedList_Print();
+        //just resetting
+        treeToDoublyLinkedList_Prev = null;
+        treeToDoublyLinkedList_HeadOfDLL = null;
+    }
+    
     int middleElementInStack_Element = Integer.MIN_VALUE;
     private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
 
@@ -921,7 +1083,77 @@ public class DSA450Questions {
 //        obj.bottomViewOfTree(root1);
         //......................................................................
 //        Row: 189
-        System.out.println("Zig zag traversal of tree");
+//        System.out.println("Zig zag traversal of tree");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.zigZagTreeTraversal(root1, true);
+//        root1 = new TreeNode<>(20);
+//        root1.setLeft(new TreeNode(8));
+//        root1.getLeft().setLeft(new TreeNode(5));
+//        root1.getLeft().setRight(new TreeNode(3));
+//        root1.getLeft().getRight().setLeft(new TreeNode(10));
+//        root1.setRight(new TreeNode(22));
+//        root1.getRight().setLeft(new TreeNode(4));
+//        root1.getRight().setRight(new TreeNode(25));
+//        root1.getRight().getLeft().setRight(new TreeNode(14));
+//        obj.zigZagTreeTraversal(root1, false);
+        //......................................................................
+//        Row: 30
+//        System.out.println("All the element from array[N] and given K that occurs more than N/K times");
+//        obj.arrayElementMoreThan_NDivK(new int[]{3, 1, 2, 2, 1, 2, 3, 3}, 4);
+        //......................................................................
+//        Row: 81
+//        System.out.println("Roman numeral string to decimal");
+//        obj.romanStringToDecimal("III");
+//        obj.romanStringToDecimal("CI");
+//        obj.romanStringToDecimal("IM");
+//        obj.romanStringToDecimal("V");
+        //......................................................................
+//        Row: 86
+//        System.out.println("Longest commn subsequence");
+//        obj.longestCommonSubsequence("ababcba", "ababcba");
+//        obj.longestCommonSubsequence("abxayzbcpqba", "kgxyhgtzpnlerq");
+//        obj.longestCommonSubsequence("abcd", "pqrs");
+        //......................................................................
+//        Row: 144
+//        System.out.println("Remove duplicates from sorted linked list");
+//        Node<Integer> node1 = new Node<>(1);
+//        node1.setNext(new Node<>(1));
+//        node1.getNext().setNext(new Node<>(2));
+//        node1.getNext().getNext().setNext(new Node<>(2));
+//        node1.getNext().getNext().getNext().setNext(new Node<>(2));
+//        node1.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
+//        node1.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(4));
+//        node1.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+//        node1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+//        obj.removeDuplicateFromSortedLinkedList(node1);
+//        node1 = new Node<>(1);
+//        node1.setNext(new Node<>(2));
+//        node1.getNext().setNext(new Node<>(2));
+//        node1.getNext().getNext().setNext(new Node<>(3));
+//        node1.getNext().getNext().getNext().setNext(new Node<>(3));
+//        node1.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
+//        node1.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(4));
+//        node1.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(4));
+//        node1.getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+//        obj.removeDuplicateFromSortedLinkedList(node1);
+//        node1 = new Node<>(1);
+//        node1.setNext(new Node<>(2));
+//        node1.getNext().setNext(new Node<>(3));
+//        node1.getNext().getNext().setNext(new Node<>(4));
+//        node1.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node1.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        obj.removeDuplicateFromSortedLinkedList(node1);
+        //......................................................................
+//        Row: 194
+        System.out.println("Convert tree to doubly linked list");
         TreeNode<Integer> root1 = new TreeNode<>(6);
         root1.setLeft(new TreeNode(2));
         root1.getLeft().setLeft(new TreeNode(0));
@@ -931,7 +1163,7 @@ public class DSA450Questions {
         root1.setRight(new TreeNode(8));
         root1.getRight().setLeft(new TreeNode(7));
         root1.getRight().setRight(new TreeNode(9));
-        obj.zigZagTreeTraversal(root1, true);
+        obj.treeToDoublyLinkedList(root1);
         root1 = new TreeNode<>(20);
         root1.setLeft(new TreeNode(8));
         root1.getLeft().setLeft(new TreeNode(5));
@@ -941,8 +1173,7 @@ public class DSA450Questions {
         root1.getRight().setLeft(new TreeNode(4));
         root1.getRight().setRight(new TreeNode(25));
         root1.getRight().getLeft().setRight(new TreeNode(14));
-        obj.zigZagTreeTraversal(root1, false);
-        
+        obj.treeToDoublyLinkedList(root1);
     }
 
 }
