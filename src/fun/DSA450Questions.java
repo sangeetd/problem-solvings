@@ -9,11 +9,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.function.Function;
@@ -780,6 +783,28 @@ public class DSA450Questions {
         System.out.println("Output: "+level);
     }
     
+    private void minAndMaxInBST_Helper(TreeNode<Integer> root, List<Integer> l){
+        
+        if(root == null){
+            return;
+        }
+        
+        //inorder traversal
+        minAndMaxInBST_Helper(root.getLeft(), l);
+        if(root != null){
+            l.add(root.getData());
+        }
+        minAndMaxInBST_Helper(root.getRight(), l);
+    }
+    
+    public void minAndMaxInBST(TreeNode<Integer> root){
+        List<Integer> inOrder = new ArrayList<>();
+        minAndMaxInBST_Helper(root, inOrder);
+        
+        System.out.println("Min & Max in BST: "+inOrder.get(0)+" "+inOrder.get(inOrder.size() - 1));
+        
+    }
+    
     TreeNode treeToDoublyLinkedList_Prev;
     TreeNode treeToDoublyLinkedList_HeadOfDLL;
     private void treeToDoublyLinkedList_Helper(TreeNode root){
@@ -818,6 +843,110 @@ public class DSA450Questions {
         //just resetting
         treeToDoublyLinkedList_Prev = null;
         treeToDoublyLinkedList_HeadOfDLL = null;
+    }
+    
+    private void checkIfAllLeafNodeOfTreeAtSameLevel_Helper(TreeNode root, int level, Set<Integer> levels){
+        
+        if(root == null){
+            return;
+        }
+        
+        //leaf
+        if(root.getLeft() == null && root.getRight() == null){
+            levels.add(level);
+        }
+        
+        checkIfAllLeafNodeOfTreeAtSameLevel_Helper(root.getLeft(), level+1, levels);
+        checkIfAllLeafNodeOfTreeAtSameLevel_Helper(root.getRight(), level+1, levels);
+        
+    }
+    
+    public void checkIfAllLeafNodeOfTreeAtSameLevel(TreeNode root){
+        Set<Integer> levels = new HashSet<>();
+        checkIfAllLeafNodeOfTreeAtSameLevel_Helper(root, 0, levels);
+        
+        System.out.println("Leaf at same level: "+(levels.size() == 1));
+        
+    }
+    
+    TreeNode<Integer> isTreeBST_Prev;
+    private boolean isTreeBST_Helper(TreeNode<Integer> root){
+        
+        if(root == null){
+            return true;
+        }
+        
+        isTreeBST_Helper(root.getLeft());
+        if(isTreeBST_Prev != null && isTreeBST_Prev.getData() > root.getData()){
+            return false;
+        }
+        
+        isTreeBST_Prev = root;
+        return isTreeBST_Helper(root.getRight());
+    }
+    
+    public void isTreeBST(TreeNode<Integer> root){
+        
+        System.out.println("Tree is BST: "+ isTreeBST_Helper(root));
+        //just resetting
+        isTreeBST_Prev = null;
+    }
+    
+    private void kThLargestNodeInBST_Helper(TreeNode<Integer> root, int K, PriorityQueue<Integer> minHeap){
+        
+        if(root == null){
+            return;
+        }
+        
+        minHeap.add(root.getData());
+        if(minHeap.size() > K){
+            minHeap.poll();
+        }
+        
+        kThLargestNodeInBST_Helper(root.getLeft(), K, minHeap);
+        kThLargestNodeInBST_Helper(root.getRight(), K, minHeap);
+        
+    }
+    
+    public void kTHLargestNodeInBST(TreeNode<Integer> root, int K){
+        //actual
+        //inorder of BST is sorted nodes list
+        inOrderTraversal_Iterative(root);
+        
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        kThLargestNodeInBST_Helper(root, K, minHeap);
+        
+        System.out.println(K+" largest node from BST: "+minHeap.poll());
+    }
+    
+    private void kThSmallestNodeInBST_Helper(TreeNode<Integer> root, int K, PriorityQueue<Integer> maxHeap){
+        
+        if(root == null){
+            return;
+        }
+        
+        maxHeap.add(root.getData());
+        if(maxHeap.size() > K){
+            maxHeap.poll();
+        }
+        
+        kThLargestNodeInBST_Helper(root.getLeft(), K, maxHeap);
+        kThLargestNodeInBST_Helper(root.getRight(), K, maxHeap);
+        
+    }
+    
+    public void kTHSmallestNodeInBST(TreeNode<Integer> root, int K){
+        //actual
+        //inorder of BST is sorted nodes list
+        inOrderTraversal_Iterative(root);
+        
+        //maxHeap
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(
+                (o1, o2) -> o2.compareTo(o1)
+        );
+        kThSmallestNodeInBST_Helper(root, K, maxHeap);
+        
+        System.out.println(K+" smallest node from BST: "+maxHeap.poll());
     }
     
     int middleElementInStack_Element = Integer.MIN_VALUE;
@@ -1153,7 +1282,96 @@ public class DSA450Questions {
 //        obj.removeDuplicateFromSortedLinkedList(node1);
         //......................................................................
 //        Row: 194
-        System.out.println("Convert tree to doubly linked list");
+//        System.out.println("Convert tree to doubly linked list");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.treeToDoublyLinkedList(root1);
+//        root1 = new TreeNode<>(20);
+//        root1.setLeft(new TreeNode(8));
+//        root1.getLeft().setLeft(new TreeNode(5));
+//        root1.getLeft().setRight(new TreeNode(3));
+//        root1.getLeft().getRight().setLeft(new TreeNode(10));
+//        root1.setRight(new TreeNode(22));
+//        root1.getRight().setLeft(new TreeNode(4));
+//        root1.getRight().setRight(new TreeNode(25));
+//        root1.getRight().getLeft().setRight(new TreeNode(14));
+//        obj.treeToDoublyLinkedList(root1);
+        //......................................................................
+//        Row: 199
+//        System.out.println("Check if all the leaf nodes of tree are at same level");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.checkIfAllLeafNodeOfTreeAtSameLevel(root1);
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode(2));
+//        root1.setRight(new TreeNode(3));
+//        obj.checkIfAllLeafNodeOfTreeAtSameLevel(root1);
+        //......................................................................
+//        Row: 216
+//        System.out.println("Min & max in the BST");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.minAndMaxInBST(root1);
+        //......................................................................
+//        Row: 218
+//        System.out.println("Check if a tree is BST");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.isTreeBST(root1);
+//        root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(10)); //BST break cond.
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.isTreeBST(root1);
+        //......................................................................
+//        Row: 225
+//        System.out.println("Kth largest node in the BST");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.kTHLargestNodeInBST(root1, 4);
+        //......................................................................
+//        Row: 226
+        System.out.println("Kth smallest node in the BST");
         TreeNode<Integer> root1 = new TreeNode<>(6);
         root1.setLeft(new TreeNode(2));
         root1.getLeft().setLeft(new TreeNode(0));
@@ -1163,17 +1381,7 @@ public class DSA450Questions {
         root1.setRight(new TreeNode(8));
         root1.getRight().setLeft(new TreeNode(7));
         root1.getRight().setRight(new TreeNode(9));
-        obj.treeToDoublyLinkedList(root1);
-        root1 = new TreeNode<>(20);
-        root1.setLeft(new TreeNode(8));
-        root1.getLeft().setLeft(new TreeNode(5));
-        root1.getLeft().setRight(new TreeNode(3));
-        root1.getLeft().getRight().setLeft(new TreeNode(10));
-        root1.setRight(new TreeNode(22));
-        root1.getRight().setLeft(new TreeNode(4));
-        root1.getRight().setRight(new TreeNode(25));
-        root1.getRight().getLeft().setRight(new TreeNode(14));
-        obj.treeToDoublyLinkedList(root1);
+        obj.kTHSmallestNodeInBST(root1, 4);
     }
 
 }
