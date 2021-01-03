@@ -340,6 +340,134 @@ public class DSA450Questions {
         ll.print();
         
     }
+    
+    public void mergeKSortedLinkedList(Node<Integer>[] nodes){
+        
+        PriorityQueue<Node<Integer>> minHeap = new PriorityQueue<>(
+                (o1, o2) -> o1.getData().compareTo(o2.getData())
+        );
+        
+        for(Node<Integer> x: nodes){
+            while(x != null){
+                minHeap.add(x);
+                x = x.getNext();
+            }
+        }
+        
+        //head to point arbitary infinite value to start with
+        Node<Integer> head = new Node<>(Integer.MIN_VALUE);
+        //saving the actual head's ref
+        Node<Integer> copyHead = head;
+        while(!minHeap.isEmpty()){
+            
+            copyHead.setNext(minHeap.poll());
+            copyHead = copyHead.getNext();
+            
+        }
+        
+        //actual merged list starts with next of arbitary head pointer
+        LinkedListUtil<Integer> ll = new LinkedListUtil<>(head.getNext());
+        ll.print();
+    }
+    
+    public void kThNodeFromEndOfLinkedList_1(Node node, int K){
+        
+        //1. Approach
+        //using additional space (Stack)
+        //................O(N)+O(K)
+        //time O(N) creating stack of N nodes from linked list + O(K) reaching out to Kth node
+        //in the stack.
+        //.......................space complexity O(N)
+        
+        Stack<Node> s = new Stack<>();
+        Node temp = node;
+        //T: O(N)
+        //S: O{N}
+        while(temp != null){
+            s.push(temp);
+            temp = temp.getNext();
+        }
+        
+        //T: O(K)
+        while(!s.isEmpty()){
+            
+            K--;
+            Object element = s.pop().getData();
+            if(K == 0){
+                System.out.println("Kth node from end is: "+element);
+            }
+            
+        }
+        
+    }
+    
+    public void kThNodeFromEndOfLinkedList_2(Node node, int K){
+        
+        //2. Approach
+        //using Len - K + 1 formula
+        //calculate the full length of the linked list frst 
+        //then move the head pointer upto (Len - K + 1) limit which
+        // is Kth node from the end
+        //.................T: O(N) + O(Len - K + 1)
+        //1. calculating Len O(N)
+        //2. moving to Len - k + 1 pointer is O(Len - K + 1)
+        
+        int len = 0;
+        Node temp = node;
+        while(temp != null){
+            temp = temp.getNext();
+            len++;
+        }
+        
+        //Kth node from end = len - K + 1
+        temp = node;
+        //i=1 as we consider the first node from 1 onwards
+        for(int i=1; i<(len - K + 1); i++){
+            temp = temp.getNext();
+        }
+        
+        //output
+        System.out.println("Kth node from end is: "+temp.getData());
+        
+    }
+    
+    public void kThNodeFromEndOfLinkedList_3(Node node, int K){
+        
+        //3. Approach (OPTIMISED)
+        //Two pointer method
+        //Theory: 
+        //maintain ref pointer, main pointer
+        //both start from the head ref
+        //move ref pointer to K dist. Once ref pointer reaches the K dist from main pointer
+        //start moving the ref and main pointer one by one.
+        //at the time ref pointer reaches the end of linked list
+        //main pointer will be K dist behind the ref pointer(already at end now)
+        //print the main pointer that will be answer
+        //............T: O(N) S: O(1)
+        
+        Node ref = node;
+        Node main = node;
+        
+        while(K-- != 0){
+            ref = ref.getNext();
+        }
+        
+        //now ref is K dist ahead of main pointer
+        
+        //now move both pointer one by one
+        //until ref reaches end of linked list
+        //bt the time main pointer will be K dist behind the ref pointer
+        while(ref != null){
+            
+            main = main.getNext();
+            ref = ref.getNext();
+            
+        }
+        
+        //output
+        System.out.println("Kth node from end is: "+main.getData());
+        
+    }
 
     public void levelOrderTraversal_Iterative(TreeNode root) {
 
@@ -949,6 +1077,59 @@ public class DSA450Questions {
         System.out.println(K+" smallest node from BST: "+maxHeap.poll());
     }
     
+    class Height{
+        int height = 0;
+    }
+    
+    private boolean isTreeHeightBalanced_Helper(TreeNode root, Height h){
+        
+        //this approach calculates height and check height balanced at the same time
+        if(root == null){
+            h.height = -1;
+            return true;
+        }
+        
+        Height lh = new Height();
+        Height rh = new Height();
+        
+        boolean isLeftBal = isTreeHeightBalanced_Helper(root.getLeft(), lh);
+        boolean isRightBal = isTreeHeightBalanced_Helper(root.getRight(), rh);
+        
+        //calculate the height for the current node
+        h.height = Math.max(lh.height, rh.height) + 1;
+        
+        //checking the cond if height balanced
+        //if diff b/w left subtree or right sub tree is greater than 1 it's
+        //not balanced
+        if(Math.abs(lh.height - rh.height) > 1){
+            return false;
+        }
+        
+        //if the above cond doesn't fulfil
+        //it should check if any of the left or right sub tree both are balanced or not
+        return isLeftBal && isRightBal;
+        
+    }
+    
+    public void isTreeHeightBalanced(TreeNode root){
+        Height h = new Height();
+        System.out.println("Is tree heght  balanced: "+isTreeHeightBalanced_Helper(root, h));
+    }
+   
+    public boolean checkTwoTreeAreMirror(TreeNode<Integer> root1, TreeNode<Integer> root2){
+        if(root1 == null && root2 == null){
+            return true;
+        }
+        
+        if(root1 == null || root2 == null){
+            return false;
+        }
+        
+        return root1.getData() == root2.getData() && 
+                checkTwoTreeAreMirror(root1.getLeft(), root2.getRight()) &&
+                checkTwoTreeAreMirror(root1.getRight(), root2.getLeft());
+    }
+    
     int middleElementInStack_Element = Integer.MIN_VALUE;
     private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
 
@@ -972,6 +1153,61 @@ public class DSA450Questions {
         System.out.println("Middle eleement of the stack: "+middleElementInStack_Element);
         //just reseting
         middleElementInStack_Element = Integer.MIN_VALUE;
+    }
+    
+    public void nextSmallerElementInRightInArray(int[] a){
+        
+        Stack<Integer> s = new Stack<>();
+        List<Integer> result = new ArrayList<>();
+        for(int i=a.length-1; i>=0; i--){
+            
+            while(!s.isEmpty() && s.peek() > a[i]){
+                s.pop();
+            }
+            
+            if(s.isEmpty()){
+                result.add(-1);
+            }else {
+                result.add(s.peek());
+            }
+            s.push(a[i]);
+        }
+        
+        Collections.reverse(result);
+        
+        //output
+        System.out.println("result: "+result);
+        
+    }
+    
+    private void reserveStack_Recursion_Insert(Stack<Integer> stack, int element){
+        
+        if(stack.isEmpty()){
+            stack.push(element);
+            return;
+        }
+        
+        int popped = stack.pop();
+        reserveStack_Recursion_Insert(stack, element);
+        stack.push(popped);
+    }
+    
+    private void reserveStack_Recursion(Stack<Integer> stack){
+        
+        if(stack.isEmpty()){
+            return;
+        }
+        
+        int popped = stack.pop();
+        reserveStack_Recursion(stack);
+        reserveStack_Recursion_Insert(stack, popped);
+        
+    }
+    
+    public void reverseStack(Stack<Integer> stack){
+        System.out.println("actual: "+stack);
+        reserveStack_Recursion(stack);
+        System.out.println("output: "+stack);
     }
 
     public static void main(String[] args) {
@@ -1371,17 +1607,92 @@ public class DSA450Questions {
 //        obj.kTHLargestNodeInBST(root1, 4);
         //......................................................................
 //        Row: 226
-        System.out.println("Kth smallest node in the BST");
-        TreeNode<Integer> root1 = new TreeNode<>(6);
-        root1.setLeft(new TreeNode(2));
-        root1.getLeft().setLeft(new TreeNode(0));
-        root1.getLeft().setRight(new TreeNode(4));
-        root1.getLeft().getRight().setLeft(new TreeNode(3));
-        root1.getLeft().getRight().setRight(new TreeNode(5));
-        root1.setRight(new TreeNode(8));
-        root1.getRight().setLeft(new TreeNode(7));
-        root1.getRight().setRight(new TreeNode(9));
-        obj.kTHSmallestNodeInBST(root1, 4);
+//        System.out.println("Kth smallest node in the BST");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.kTHSmallestNodeInBST(root1, 4);
+        //......................................................................
+//        Row: 169
+//        System.out.println("Merge K sorted linked lists");
+//        Node<Integer> n1 = new Node<>(1);
+//        n1.setNext(new Node<>(2));
+//        n1.getNext().setNext(new Node<>(3));
+//        Node<Integer> n2 = new Node<>(4);
+//        n2.setNext(new Node<>(10));
+//        n2.getNext().setNext(new Node<>(15));
+//        Node<Integer> n3 = new Node<>(3);
+//        n3.setNext(new Node<>(9));
+//        n3.getNext().setNext(new Node<>(27));
+//        int K = 3;
+//        Node<Integer>[] nodes = new Node[K];
+//        nodes[0] = n1;
+//        nodes[1] = n2;
+//        nodes[2] = n3;
+//        obj.mergeKSortedLinkedList(nodes);
+        //......................................................................
+//        Row: 173
+//        System.out.println("Print the Kth node from the end of a linked list 3 approaches");
+//        //https://www.geeksforgeeks.org/nth-node-from-the-end-of-a-linked-list/
+//        Node<Integer> n1 = new Node<>(1);
+//        n1.setNext(new Node<>(2));
+//        n1.getNext().setNext(new Node<>(3));
+//        n1.getNext().getNext().setNext(new Node<>(5));
+//        n1.getNext().getNext().getNext().setNext(new Node<>(9));
+//        n1.getNext().getNext().getNext().getNext().setNext(new Node<>(15));
+//        obj.kThNodeFromEndOfLinkedList_1(n1, 3);
+//        obj.kThNodeFromEndOfLinkedList_2(n1, 3);
+//        obj.kThNodeFromEndOfLinkedList_3(n1, 3); //OPTIMISED O(N)
+        //......................................................................
+//        Row: 190
+//        System.out.println("Check if a tree is height balanced or not");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.isTreeHeightBalanced(root1);
+//        root1 = new TreeNode<>(1); //SKEWED TREE
+//        root1.setLeft(new TreeNode(10));
+//        root1.getLeft().setLeft(new TreeNode(15));
+//        obj.isTreeHeightBalanced(root1);
+        //......................................................................
+//        Row: 201
+//        System.out.println("Check if 2 trees are mirror or not");
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.setRight(new TreeNode<>(3));
+//        TreeNode<Integer> root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode<>(3));
+//        root2.setRight(new TreeNode<>(2));
+//        System.out.println("2 tree are mirror: "+obj.checkTwoTreeAreMirror(root1, root2));
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.setRight(new TreeNode<>(3));
+//        root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode<>(2)); //SAME 
+//        root2.setRight(new TreeNode<>(3)); //SAME
+//        System.out.println("2 tree are mirror: "+obj.checkTwoTreeAreMirror(root1, root2));
+        //......................................................................
+//        Row: 333
+//        System.out.println("Next smaller element to right in array");
+//        obj.nextSmallerElementInRightInArray(new int[]{4, 8, 5, 2, 25});
+        //......................................................................
+//        Row: 309
+        System.out.println("Reverse a stack using recursion");
+        Stack<Integer> stack = new Stack<>();
+        stack.addAll(Arrays.asList(1, 2, 3, 4, 5));
+        obj.reverseStack(stack);
     }
 
 }
