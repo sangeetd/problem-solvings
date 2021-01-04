@@ -48,22 +48,213 @@ public class DSA450Questions {
         System.out.println();
 
     }
-    
-    public void arrayElementMoreThan_NDivK(int[] a, int K){
-        
+
+    public void arrayElementMoreThan_NDivK(int[] a, int K) {
+
         int N = a.length;
-        int count = N/K;
+        int count = N / K;
         Map<Integer, Integer> map = new HashMap<>();
-        for(int x: a){
+        for (int x : a) {
             map.put(x, map.getOrDefault(x, 0) + 1);
         }
-        
+
         map.entrySet().stream()
                 .filter(e -> e.getValue() > count)
                 .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()))
                 .entrySet()
                 .stream()
                 .forEach(e -> System.out.println(e.getKey()));
+
+    }
+
+    public void minMaxInArray_1(int[] a) {
+
+        //...................T: O(N)
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+
+        for (int i = 0; i < a.length; i++) {
+
+            max = Math.max(max, a[i]);
+            min = Math.min(min, a[i]);
+
+        }
+
+        //outpur
+        System.out.println("Min and max value in array: " + min + " " + max);
+
+    }
+
+    public void minMaxInArray_2(int[] a) {
+
+        //https://www.geeksforgeeks.org/maximum-and-minimum-in-an-array/
+        //...................T: O(N)
+        //Min no of comparision
+        int min = Integer.MIN_VALUE;
+        int max = Integer.MAX_VALUE;
+
+        int n = a.length;
+        int itr = 0;
+        //check if array is even/odd
+        if (n % 2 == 0) {
+            max = Math.max(a[0], a[1]);
+            min = Math.min(a[0], a[1]);
+            //in case of even choose min & max from first tw element
+            //and set itr to start from 2nd index i.e(3rd element) in pair wise
+            itr = 2;
+        } else {
+            max = a[0];
+            min = a[0];
+            //in case of odd choose first element as min & max both
+            //set itr to 1 i.e, 2nd element
+            itr = 1;
+        }
+
+        //since we checking itr and itr+1 value in loop 
+        //so run loop to n-1 so that itr+1th element corresponds to n-1th element
+        while (itr < n - 1) {
+
+            //check current itr and itr+1 element
+            if (a[itr] > a[itr + 1]) {
+                max = Math.max(max, a[itr]);
+                min = Math.min(min, a[itr + 1]);
+            } else {
+                max = Math.max(max, a[itr + 1]);
+                min = Math.min(min, a[itr]);
+            }
+            itr++;
+        }
+
+        //outpur
+        System.out.println("Min and max value in array: " + min + " " + max);
+
+    }
+
+    public void kThSmallestElementInArray(int[] a, int K) {
+
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(
+                (o1, o2) -> o2.compareTo(o1)
+        );
+
+        for (int x : a) {
+            maxHeap.add(x);
+            if (maxHeap.size() > K) {
+                maxHeap.poll();
+            }
+        }
+
+        //output
+        System.out.println(K + " th smallest element: " + maxHeap.peek());
+
+    }
+
+    public void kThLargestElementInArray(int[] a, int K) {
+
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+        for (int x : a) {
+            minHeap.add(x);
+            if (minHeap.size() > K) {
+                minHeap.poll();
+            }
+        }
+
+        //output
+        System.out.println(K + " th largest element: " + minHeap.peek());
+
+    }
+
+    public void sortArrayOf012_1(int[] a) {
+
+        //.............T: O(N)
+        //.............S: O(3)
+        Map<Integer, Integer> map = new TreeMap<>();
+        for (int x : a) {
+            map.put(x, map.getOrDefault(x, 0) + 1);
+        }
+
+        //creating array
+        int k = 0;
+        for (Map.Entry<Integer, Integer> e : map.entrySet()) {
+            for (int i = 0; i < e.getValue(); i++) {
+                a[k++] = e.getKey();
+            }
+        }
+
+        //output
+        for (int x : a) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+    }
+
+    private void swapIntArray(int[] a, int x, int y) {
+        int temp;
+        temp = a[x];
+        a[x] = a[y];
+        a[y] = temp;
+    }
+    
+    public void sortArrayOf012_2(int[] a) {
+
+        //.............T: O(N)
+        //.............S: O(1)
+        //based on Dutch National Flag Algorithm
+        //https://www.geeksforgeeks.org/sort-an-array-of-0s-1s-and-2s/
+        int lo = 0;
+        int hi = a.length - 1;
+        int mid = 0, temp = 0;
+        while (mid <= hi) {
+            switch (a[mid]) {
+                case 0: {
+                    swapIntArray(a, lo, mid);
+                    lo++;
+                    mid++;
+                    break;
+                }
+                case 1:
+                    mid++;
+                    break;
+                case 2: {
+                    swapIntArray(a, mid, hi);
+                    hi--;
+                    break;
+                }
+            }
+        }
+        
+        //output
+        for (int x : a) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+
+    }
+    
+    public void rotateMatrixClockWise90Deg(int[][] mat){
+        
+        int row = mat.length;
+        int col = mat[0].length;
+        int N = mat.length;
+        for(int x=0; x<N/2; x++){
+            for(int y=x; y<N - x - 1; y++){
+                
+                int temp = mat[x][y];
+                mat[x][y] = mat[y][N - 1 - x];
+                mat[y][N - 1 - x] = mat[N - 1 - x][N - 1 - y];
+                mat[N - 1 - x][N - 1 - y] = mat[N - 1 - y][x];
+                mat[N - 1 - y][x] = temp;
+                
+            }
+        }
+        
+        //output
+        for(int[] r: mat){
+            for(int c: r){
+                System.out.print(c+"\t");
+            }
+            System.out.println();
+        }
         
     }
 
@@ -131,12 +322,12 @@ public class DSA450Questions {
                 .forEach(e -> System.out.println(e.getKey() + " " + e.getValue()));
 
     }
-    
-    public void romanStringToDecimal(String str){
-        
+
+    public void romanStringToDecimal(String str) {
+
         //actual
-        System.out.println("roman: "+str);
-        
+        System.out.println("roman: " + str);
+
         Map<Character, Integer> roman = new HashMap<>();
         roman.put('I', 1);
         roman.put('V', 5);
@@ -145,66 +336,66 @@ public class DSA450Questions {
         roman.put('C', 100);
         roman.put('D', 500);
         roman.put('M', 1000);
-        
+
         int decimal = 0;
-        for(int i=0; i<str.length(); i++){
-            
+        for (int i = 0; i < str.length(); i++) {
+
             char c = str.charAt(i);
-            if(i>0 && roman.get(str.charAt(i-1)) < roman.get(c)){
-                decimal += roman.get(c) - 2*roman.get(str.charAt(i-1));
-            }else {
+            if (i > 0 && roman.get(str.charAt(i - 1)) < roman.get(c)) {
+                decimal += roman.get(c) - 2 * roman.get(str.charAt(i - 1));
+            } else {
                 decimal += roman.get(c);
             }
-            
+
         }
-        
+
         //output
-        System.out.println("Decimal: "+decimal);
-        
+        System.out.println("Decimal: " + decimal);
+
     }
-    
-    public void longestCommonSubsequence(String a, String b){
-        
+
+    public void longestCommonSubsequence(String a, String b) {
+
         //memoization
-        int[][] memo = new int[a.length()+1][b.length()+1];
+        int[][] memo = new int[a.length() + 1][b.length() + 1];
         //base cond
-        for(int[] x: memo){
+        for (int[] x : memo) {
             Arrays.fill(x, 0);
         }
-        
-        for(int x = 1; x<a.length()+1; x++){
-            for(int y = 1; y<b.length()+1; y++){
-                if(a.charAt(x - 1) == b.charAt(y - 1)){
-                    memo[x][y] = memo[x-1][y-1] + 1;
-                }else {
-                    memo[x][y] = Math.max(memo[x-1][y], memo[x][y-1]);
+
+        for (int x = 1; x < a.length() + 1; x++) {
+            for (int y = 1; y < b.length() + 1; y++) {
+                if (a.charAt(x - 1) == b.charAt(y - 1)) {
+                    memo[x][y] = memo[x - 1][y - 1] + 1;
+                } else {
+                    memo[x][y] = Math.max(memo[x - 1][y], memo[x][y - 1]);
                 }
             }
         }
-        
+
         int l = a.length();
         int m = b.length();
         StringBuilder sb = new StringBuilder();
-        while(l>0 && m>0){
-            
-            if(a.charAt(l-1) == b.charAt(m - 1)){
-                sb.insert(0,a.charAt(l-1));
+        while (l > 0 && m > 0) {
+
+            if (a.charAt(l - 1) == b.charAt(m - 1)) {
+                sb.insert(0, a.charAt(l - 1));
                 l--;
                 m--;
-            }else{
-                
-                if(memo[l-1][m] > memo[l][m-1]){
+            } else {
+
+                if (memo[l - 1][m] > memo[l][m - 1]) {
                     l--;
-                }else{
+                } else {
                     m--;
                 }
-                
+
             }
-            
+
         }
-        
+
         //output
-        System.out.println("Longest common subseq: "+sb.toString());
+        System.out.println("Longest common subseq: " + sb.toString());
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -264,145 +455,144 @@ public class DSA450Questions {
         output.print();
 
     }
-    
-    private Stack<Integer> sumOfNumbersAsLinkedList_ToStack(Node<Integer> node){
-        
+
+    private Stack<Integer> sumOfNumbersAsLinkedList_ToStack(Node<Integer> node) {
+
         Stack<Integer> s = new Stack<>();
         Node<Integer> temp = node;
-        while(temp != null){
-            
+        while (temp != null) {
+
             s.push(temp.getData());
             temp = temp.getNext();
-            
+
         }
-        
+
         return s;
-        
+
     }
-    
-    public void sumOfNumbersAsLinkedList(Node<Integer> n1, Node<Integer> n2){
-        
+
+    public void sumOfNumbersAsLinkedList(Node<Integer> n1, Node<Integer> n2) {
+
         Stack<Integer> nS1 = sumOfNumbersAsLinkedList_ToStack(n1);
         Stack<Integer> nS2 = sumOfNumbersAsLinkedList_ToStack(n2);
-        
+
         int carry = 0;
         LinkedListUtil<Integer> ll = new LinkedListUtil<>();
-        while(!nS1.isEmpty() || !nS2.isEmpty()){
-            
+        while (!nS1.isEmpty() || !nS2.isEmpty()) {
+
             int sum = carry;
-            
-            if(!nS1.isEmpty()){
+
+            if (!nS1.isEmpty()) {
                 sum += nS1.pop();
             }
-            
-            if(!nS2.isEmpty()){
+
+            if (!nS2.isEmpty()) {
                 sum += nS2.pop();
             }
-            
-            carry = sum/10;
-            ll.addAtHead(sum%10);
-            
+
+            carry = sum / 10;
+            ll.addAtHead(sum % 10);
+
         }
-        
-        if(carry > 0){
+
+        if (carry > 0) {
             ll.addAtHead(carry);
         }
-        
+
         //output
         ll.print();
-        
+
     }
-    
-    public void removeDuplicateFromSortedLinkedList(Node<Integer> node){
-        
+
+    public void removeDuplicateFromSortedLinkedList(Node<Integer> node) {
+
         //actual
         LinkedListUtil<Integer> ll = new LinkedListUtil<>(node);
         ll.print();
-        
+
         Node<Integer> curr = node;
         Node<Integer> temp = node.getNext();
-        
-        while(temp != null){
-            
-            if(curr.getData() != temp.getData()){
+
+        while (temp != null) {
+
+            if (curr.getData() != temp.getData()) {
                 curr.setNext(temp);
                 curr = temp;
             }
-            
+
             temp = temp.getNext();
-            
+
         }
-        
+
         curr.setNext(temp);
-        
+
         //output
         ll = new LinkedListUtil<>(node);
         ll.print();
-        
+
     }
-    
-    public void mergeKSortedLinkedList(Node<Integer>[] nodes){
-        
+
+    public void mergeKSortedLinkedList(Node<Integer>[] nodes) {
+
         PriorityQueue<Node<Integer>> minHeap = new PriorityQueue<>(
                 (o1, o2) -> o1.getData().compareTo(o2.getData())
         );
-        
-        for(Node<Integer> x: nodes){
-            while(x != null){
+
+        for (Node<Integer> x : nodes) {
+            while (x != null) {
                 minHeap.add(x);
                 x = x.getNext();
             }
         }
-        
+
         //head to point arbitary infinite value to start with
         Node<Integer> head = new Node<>(Integer.MIN_VALUE);
         //saving the actual head's ref
         Node<Integer> copyHead = head;
-        while(!minHeap.isEmpty()){
-            
+        while (!minHeap.isEmpty()) {
+
             copyHead.setNext(minHeap.poll());
             copyHead = copyHead.getNext();
-            
+
         }
-        
+
         //actual merged list starts with next of arbitary head pointer
         LinkedListUtil<Integer> ll = new LinkedListUtil<>(head.getNext());
         ll.print();
     }
-    
-    public void kThNodeFromEndOfLinkedList_1(Node node, int K){
-        
+
+    public void kThNodeFromEndOfLinkedList_1(Node node, int K) {
+
         //1. Approach
         //using additional space (Stack)
         //................O(N)+O(K)
         //time O(N) creating stack of N nodes from linked list + O(K) reaching out to Kth node
         //in the stack.
         //.......................space complexity O(N)
-        
         Stack<Node> s = new Stack<>();
         Node temp = node;
         //T: O(N)
         //S: O{N}
-        while(temp != null){
+        while (temp != null) {
             s.push(temp);
             temp = temp.getNext();
         }
-        
+
         //T: O(K)
-        while(!s.isEmpty()){
-            
+        while (!s.isEmpty()) {
+
             K--;
             Object element = s.pop().getData();
-            if(K == 0){
-                System.out.println("Kth node from end is: "+element);
+            if (K == 0) {
+                System.out.println("Kth node from end is: " + element);
             }
-            
+
         }
-        
+
     }
-    
-    public void kThNodeFromEndOfLinkedList_2(Node node, int K){
-        
+
+    public void kThNodeFromEndOfLinkedList_2(Node node, int K) {
+
         //2. Approach
         //using Len - K + 1 formula
         //calculate the full length of the linked list frst 
@@ -411,28 +601,27 @@ public class DSA450Questions {
         //.................T: O(N) + O(Len - K + 1)
         //1. calculating Len O(N)
         //2. moving to Len - k + 1 pointer is O(Len - K + 1)
-        
         int len = 0;
         Node temp = node;
-        while(temp != null){
+        while (temp != null) {
             temp = temp.getNext();
             len++;
         }
-        
+
         //Kth node from end = len - K + 1
         temp = node;
         //i=1 as we consider the first node from 1 onwards
-        for(int i=1; i<(len - K + 1); i++){
+        for (int i = 1; i < (len - K + 1); i++) {
             temp = temp.getNext();
         }
-        
+
         //output
-        System.out.println("Kth node from end is: "+temp.getData());
-        
+        System.out.println("Kth node from end is: " + temp.getData());
+
     }
-    
-    public void kThNodeFromEndOfLinkedList_3(Node node, int K){
-        
+
+    public void kThNodeFromEndOfLinkedList_3(Node node, int K) {
+
         //3. Approach (OPTIMISED)
         //Two pointer method
         //Theory: 
@@ -444,29 +633,27 @@ public class DSA450Questions {
         //main pointer will be K dist behind the ref pointer(already at end now)
         //print the main pointer that will be answer
         //............T: O(N) S: O(1)
-        
         Node ref = node;
         Node main = node;
-        
-        while(K-- != 0){
+
+        while (K-- != 0) {
             ref = ref.getNext();
         }
-        
+
         //now ref is K dist ahead of main pointer
-        
         //now move both pointer one by one
         //until ref reaches end of linked list
         //bt the time main pointer will be K dist behind the ref pointer
-        while(ref != null){
-            
+        while (ref != null) {
+
             main = main.getNext();
             ref = ref.getNext();
-            
+
         }
-        
+
         //output
-        System.out.println("Kth node from end is: "+main.getData());
-        
+        System.out.println("Kth node from end is: " + main.getData());
+
     }
 
     public void levelOrderTraversal_Iterative(TreeNode root) {
@@ -514,204 +701,204 @@ public class DSA450Questions {
         }
 
     }
-    
-    public void reverseLevelOrderTraversal(TreeNode<Integer> root){
-        
+
+    public void reverseLevelOrderTraversal(TreeNode<Integer> root) {
+
         //actuals
         BinaryTree bt = new BinaryTree(root);
         bt.treeBFS();
-        
+
         List<Integer> singleListReverseLevelOrder = new ArrayList<>();
-        
+
         Queue<TreeNode<Integer>> q = new LinkedList<>();
         q.add(root);
         Queue<TreeNode<Integer>> intQ = new LinkedList<>();
-        
+
         List<List<Integer>> level = new ArrayList<>();
         List<Integer> nodes = new ArrayList<>();
-        
-        while(!q.isEmpty()){
-            
+
+        while (!q.isEmpty()) {
+
             TreeNode<Integer> temp = q.poll();
             nodes.add(temp.getData());
-            
-            if(temp.getLeft() != null){
+
+            if (temp.getLeft() != null) {
                 intQ.add(temp.getLeft());
             }
-            
-            if(temp.getRight() != null){
+
+            if (temp.getRight() != null) {
                 intQ.add(temp.getRight());
             }
-            
-            if(q.isEmpty()){
+
+            if (q.isEmpty()) {
                 level.add(nodes);
                 nodes = new ArrayList<>();
                 q.addAll(intQ);
                 intQ.clear();
             }
-            
+
         }
-        
+
         //output
         System.out.println();
         Collections.reverse(level);
         System.out.println("Level wise: " + level);
-        
-        for(List l: level){
+
+        for (List l : level) {
             singleListReverseLevelOrder.addAll(l);
         }
         System.out.println("Single node list: " + singleListReverseLevelOrder);
     }
-    
-    public void inOrderTraversal_Iterative(TreeNode root){
-        
-        if(root == null){
+
+    public void inOrderTraversal_Iterative(TreeNode root) {
+
+        if (root == null) {
             return;
         }
-        
+
         Stack<Pair<TreeNode, Integer>> stack = new Stack<>();
         stack.push(new Pair<>(root, 0));
-        
-        while(!stack.isEmpty()){
-            
-            Pair<TreeNode, Integer> p = stack.pop(); 
+
+        while (!stack.isEmpty()) {
+
+            Pair<TreeNode, Integer> p = stack.pop();
             TreeNode n = p.getKey();
             int status = p.getValue();
-            
-            if(n == null || status == 3){
+
+            if (n == null || status == 3) {
                 continue;
             }
-            
+
             stack.push(new Pair<>(n, status + 1));
-            
-            if(status == 0){
+
+            if (status == 0) {
                 stack.push(new Pair<>(n.getLeft(), 0));
             }
-            
-            if(status == 1){
+
+            if (status == 1) {
                 System.out.print(n.getData() + " ");
             }
-            
-            if(status == 2){
+
+            if (status == 2) {
                 stack.push(new Pair<>(n.getRight(), 0));
             }
-            
+
         }
-        
+
         System.out.println();
-        
+
     }
-    
-    public void inOrderTraversal_Recursive(TreeNode root){
-        
-        if(root == null){
+
+    public void inOrderTraversal_Recursive(TreeNode root) {
+
+        if (root == null) {
             return;
         }
-        
+
         inOrderTraversal_Recursive(root.getLeft());
         System.out.print(root.getData() + " ");
         inOrderTraversal_Recursive(root.getRight());
     }
-    
-    public void preOrderTraversal_Iterative(TreeNode root){
-        
-        if(root == null){
+
+    public void preOrderTraversal_Iterative(TreeNode root) {
+
+        if (root == null) {
             return;
         }
-        
+
         Stack<Pair<TreeNode, Integer>> stack = new Stack<>();
         stack.push(new Pair<>(root, 0));
-        
-        while(!stack.isEmpty()){
-            
+
+        while (!stack.isEmpty()) {
+
             Pair<TreeNode, Integer> p = stack.pop();
             TreeNode n = p.getKey();
             int status = p.getValue();
-            
-            if(n == null || status == 3){
+
+            if (n == null || status == 3) {
                 continue;
             }
-            
+
             stack.push(new Pair<>(n, status + 1));
-            
-            if(status == 0){
+
+            if (status == 0) {
                 System.out.print(n.getData() + " ");
             }
-            
-            if(status == 1){
+
+            if (status == 1) {
                 stack.push(new Pair<>(n.getLeft(), 0));
             }
-            
-            if(status == 2){
+
+            if (status == 2) {
                 stack.push(new Pair<>(n.getRight(), 0));
             }
-            
+
         }
-        
+
         System.out.println();
-        
+
     }
-    
-    public void preOrderTraversal_Recursive(TreeNode root){
-        
-        if(root == null){
+
+    public void preOrderTraversal_Recursive(TreeNode root) {
+
+        if (root == null) {
             return;
         }
-        
+
         System.out.print(root.getData() + " ");
         preOrderTraversal_Recursive(root.getLeft());
         preOrderTraversal_Recursive(root.getRight());
-        
+
     }
-    
-    public void postOrderTraversal_Iterative(TreeNode root){
-        
-        if(root == null){
+
+    public void postOrderTraversal_Iterative(TreeNode root) {
+
+        if (root == null) {
             return;
         }
-        
+
         Stack<Pair<TreeNode, Integer>> stack = new Stack<>();
         stack.push(new Pair<>(root, 0));
-        
-        while(!stack.isEmpty()){
-            
+
+        while (!stack.isEmpty()) {
+
             Pair<TreeNode, Integer> p = stack.pop();
             TreeNode n = p.getKey();
             int status = p.getValue();
-            
-            if(n == null || status == 3){
+
+            if (n == null || status == 3) {
                 continue;
             }
-            
+
             stack.push(new Pair<>(n, status + 1));
-            
-            if(status == 0){
+
+            if (status == 0) {
                 stack.push(new Pair<>(n.getLeft(), 0));
             }
-            
-            if(status == 1){
+
+            if (status == 1) {
                 stack.push(new Pair<>(n.getRight(), 0));
             }
-            
-            if(status == 2){
+
+            if (status == 2) {
                 System.out.print(n.getData() + " ");
             }
-            
+
         }
-        
+
         System.out.println();
     }
-    
-    public void postOrderTraversal_recursive(TreeNode root){
-        
-        if(root == null){
+
+    public void postOrderTraversal_recursive(TreeNode root) {
+
+        if (root == null) {
             return;
         }
-        
+
         postOrderTraversal_recursive(root.getLeft());
         postOrderTraversal_recursive(root.getRight());
         System.out.print(root.getData() + " ");
-        
+
     }
 
     public int heightOfTree(TreeNode root) {
@@ -739,398 +926,402 @@ public class DSA450Questions {
         return root;
 
     }
-    
-    private void leftViewOfTree_Helper(TreeNode<Integer> root, int level, Map<Integer, Integer> result){
-        if(root == null){
+
+    private void leftViewOfTree_Helper(TreeNode<Integer> root, int level, Map<Integer, Integer> result) {
+        if (root == null) {
             return;
         }
-        
-        if(!result.containsKey(level)){
+
+        if (!result.containsKey(level)) {
             result.put(level, root.getData());
         }
-        
+
         //for left view
-        leftViewOfTree_Helper(root.getLeft(), level+1, result);
-        leftViewOfTree_Helper(root.getRight(), level+1, result);
+        leftViewOfTree_Helper(root.getLeft(), level + 1, result);
+        leftViewOfTree_Helper(root.getRight(), level + 1, result);
     }
-    
-    public void leftViewOfTree(TreeNode<Integer> root){
+
+    public void leftViewOfTree(TreeNode<Integer> root) {
         Map<Integer, Integer> result = new TreeMap<>();
         leftViewOfTree_Helper(root, 0, result);
-        
+
         result.entrySet().stream().forEach(e -> {
-            System.out.print(e.getValue()+ " ");
+            System.out.print(e.getValue() + " ");
         });
-        
+
         System.out.println();
     }
-    
-    private void rightViewOfTree_Helper(TreeNode<Integer> root, int level, Map<Integer, Integer> result){
-        
-        if(root == null){
+
+    private void rightViewOfTree_Helper(TreeNode<Integer> root, int level, Map<Integer, Integer> result) {
+
+        if (root == null) {
             return;
         }
-        
-        if(!result.containsKey(level)){
+
+        if (!result.containsKey(level)) {
             result.put(level, root.getData());
         }
-        
+
         //for right view
-        rightViewOfTree_Helper(root.getRight(), level+1, result);
-        rightViewOfTree_Helper(root.getLeft(), level+1, result);
+        rightViewOfTree_Helper(root.getRight(), level + 1, result);
+        rightViewOfTree_Helper(root.getLeft(), level + 1, result);
     }
-    
-    public void rightViewOfTree(TreeNode<Integer> root){
-        
+
+    public void rightViewOfTree(TreeNode<Integer> root) {
+
         Map<Integer, Integer> result = new TreeMap<>();
         rightViewOfTree_Helper(root, 0, result);
-        
+
         result.entrySet().stream().forEach(e -> {
-            System.out.print(e.getValue()+ " ");
+            System.out.print(e.getValue() + " ");
         });
-        
+
         System.out.println();
-        
+
     }
-    
-    public void topViewOfTree(TreeNode<Integer> root){
-        
+
+    public void topViewOfTree(TreeNode<Integer> root) {
+
         Queue<Pair<TreeNode<Integer>, Integer>> q = new LinkedList<>();
         q.add(new Pair<>(root, 0));
-        
+
         Map<Integer, Integer> result = new TreeMap<>();
-        
-        while(!q.isEmpty()){
-            
+
+        while (!q.isEmpty()) {
+
             Pair<TreeNode<Integer>, Integer> p = q.poll();
             TreeNode<Integer> n = p.getKey();
             int vLevel = p.getValue();
-            
-            if(!result.containsKey(vLevel)){
+
+            if (!result.containsKey(vLevel)) {
                 result.put(vLevel, n.getData());
             }
-            
-            if(n.getLeft() != null){
-                q.add(new Pair<>(n.getLeft(), vLevel-1));
+
+            if (n.getLeft() != null) {
+                q.add(new Pair<>(n.getLeft(), vLevel - 1));
             }
-            if(n.getRight() != null){
-                q.add(new Pair<>(n.getRight(), vLevel+1));
+            if (n.getRight() != null) {
+                q.add(new Pair<>(n.getRight(), vLevel + 1));
             }
         }
-        
+
         result.entrySet().stream().forEach(e -> {
-            System.out.print(e.getValue()+ " ");
+            System.out.print(e.getValue() + " ");
         });
-        
+
         System.out.println();
-        
+
     }
-    
-    public void bottomViewOfTree(TreeNode<Integer> root){
-        
+
+    public void bottomViewOfTree(TreeNode<Integer> root) {
+
         //pair: node,vlevels
         Queue<Pair<TreeNode<Integer>, Integer>> q = new LinkedList<>();
         q.add(new Pair<>(root, 0));
-        
+
         Map<Integer, Integer> bottomView = new TreeMap<>();
-        
-        while(!q.isEmpty()){
-            
+
+        while (!q.isEmpty()) {
+
             Pair<TreeNode<Integer>, Integer> p = q.poll();
             TreeNode<Integer> n = p.getKey();
             int vLevel = p.getValue();
-            
+
             //updates the vlevel with new node data, as we go down the tree in level order wise
             bottomView.put(vLevel, n.getData());
-            
-            if(n.getLeft() != null){
+
+            if (n.getLeft() != null) {
                 q.add(new Pair<>(n.getLeft(), vLevel - 1));
             }
-            
-            if(n.getRight() != null){
+
+            if (n.getRight() != null) {
                 q.add(new Pair<>(n.getRight(), vLevel + 1));
             }
-            
+
         }
-        
+
         bottomView.entrySet().stream().forEach(e -> {
-            System.out.print(e.getValue()+ " ");
+            System.out.print(e.getValue() + " ");
         });
-        
+
         System.out.println();
     }
-    
-    public void zigZagTreeTraversal(TreeNode<Integer> root, boolean ltr){
-        
+
+    public void zigZagTreeTraversal(TreeNode<Integer> root, boolean ltr) {
+
         Stack<TreeNode<Integer>> s = new Stack<>();
         s.push(root);
         Stack<TreeNode<Integer>> intS = new Stack<>();
-        
+
         List<List<Integer>> level = new ArrayList<>();
         List<Integer> zigZagNodes = new ArrayList<>();
-        
-        while(!s.isEmpty()){
-            
+
+        while (!s.isEmpty()) {
+
             TreeNode<Integer> t = s.pop();
             zigZagNodes.add(t.getData());
-            
-            if(ltr){
-               
-                if(t.getRight() != null){
+
+            if (ltr) {
+
+                if (t.getRight() != null) {
                     intS.push(t.getRight());
                 }
-                
-                if(t.getLeft() != null){
+
+                if (t.getLeft() != null) {
                     intS.push(t.getLeft());
                 }
-                
-            }else {
-                
-                if(t.getLeft() != null){
+
+            } else {
+
+                if (t.getLeft() != null) {
                     intS.push(t.getLeft());
                 }
-                
-                if(t.getRight() != null){
+
+                if (t.getRight() != null) {
                     intS.push(t.getRight());
                 }
-                
+
             }
-            
-            if(s.isEmpty()){
-                
+
+            if (s.isEmpty()) {
+
                 ltr = !ltr;
                 level.add(zigZagNodes);
                 zigZagNodes = new ArrayList<>();
                 s.addAll(intS);
                 intS.clear();
             }
-            
+
         }
-        
+
         //output
-        System.out.println("Output: "+level);
+        System.out.println("Output: " + level);
     }
-    
-    private void minAndMaxInBST_Helper(TreeNode<Integer> root, List<Integer> l){
-        
-        if(root == null){
+
+    private void minAndMaxInBST_Helper(TreeNode<Integer> root, List<Integer> l) {
+
+        if (root == null) {
             return;
         }
-        
+
         //inorder traversal
         minAndMaxInBST_Helper(root.getLeft(), l);
-        if(root != null){
+        if (root != null) {
             l.add(root.getData());
         }
         minAndMaxInBST_Helper(root.getRight(), l);
     }
-    
-    public void minAndMaxInBST(TreeNode<Integer> root){
+
+    public void minAndMaxInBST(TreeNode<Integer> root) {
         List<Integer> inOrder = new ArrayList<>();
         minAndMaxInBST_Helper(root, inOrder);
-        
-        System.out.println("Min & Max in BST: "+inOrder.get(0)+" "+inOrder.get(inOrder.size() - 1));
-        
+
+        System.out.println("Min & Max in BST: " + inOrder.get(0) + " " + inOrder.get(inOrder.size() - 1));
+
     }
-    
+
     TreeNode treeToDoublyLinkedList_Prev;
     TreeNode treeToDoublyLinkedList_HeadOfDLL;
-    private void treeToDoublyLinkedList_Helper(TreeNode root){
-        if(root == null){
+
+    private void treeToDoublyLinkedList_Helper(TreeNode root) {
+        if (root == null) {
             return;
         }
-        
+
         treeToDoublyLinkedList_Helper(root.getLeft());
-        
-        if(treeToDoublyLinkedList_Prev == null){
+
+        if (treeToDoublyLinkedList_Prev == null) {
             treeToDoublyLinkedList_HeadOfDLL = root;
-        }else{
+        } else {
             root.setLeft(treeToDoublyLinkedList_Prev);
             treeToDoublyLinkedList_Prev.setRight(root);
         }
-        
+
         treeToDoublyLinkedList_Prev = root;
-        
+
         treeToDoublyLinkedList_Helper(root.getRight());
     }
-    
-    private void treeToDoublyLinkedList_Print(){
-        
-        while(treeToDoublyLinkedList_HeadOfDLL != null){
-            
-            System.out.print(treeToDoublyLinkedList_HeadOfDLL.getData()+ " ");
+
+    private void treeToDoublyLinkedList_Print() {
+
+        while (treeToDoublyLinkedList_HeadOfDLL != null) {
+
+            System.out.print(treeToDoublyLinkedList_HeadOfDLL.getData() + " ");
             treeToDoublyLinkedList_HeadOfDLL = treeToDoublyLinkedList_HeadOfDLL.getRight();
-            
+
         }
         System.out.println();
     }
-    
-    public void treeToDoublyLinkedList(TreeNode root){
+
+    public void treeToDoublyLinkedList(TreeNode root) {
         treeToDoublyLinkedList_Helper(root);
         treeToDoublyLinkedList_Print();
         //just resetting
         treeToDoublyLinkedList_Prev = null;
         treeToDoublyLinkedList_HeadOfDLL = null;
     }
-    
-    private void checkIfAllLeafNodeOfTreeAtSameLevel_Helper(TreeNode root, int level, Set<Integer> levels){
-        
-        if(root == null){
+
+    private void checkIfAllLeafNodeOfTreeAtSameLevel_Helper(TreeNode root, int level, Set<Integer> levels) {
+
+        if (root == null) {
             return;
         }
-        
+
         //leaf
-        if(root.getLeft() == null && root.getRight() == null){
+        if (root.getLeft() == null && root.getRight() == null) {
             levels.add(level);
         }
-        
-        checkIfAllLeafNodeOfTreeAtSameLevel_Helper(root.getLeft(), level+1, levels);
-        checkIfAllLeafNodeOfTreeAtSameLevel_Helper(root.getRight(), level+1, levels);
-        
+
+        checkIfAllLeafNodeOfTreeAtSameLevel_Helper(root.getLeft(), level + 1, levels);
+        checkIfAllLeafNodeOfTreeAtSameLevel_Helper(root.getRight(), level + 1, levels);
+
     }
-    
-    public void checkIfAllLeafNodeOfTreeAtSameLevel(TreeNode root){
+
+    public void checkIfAllLeafNodeOfTreeAtSameLevel(TreeNode root) {
         Set<Integer> levels = new HashSet<>();
         checkIfAllLeafNodeOfTreeAtSameLevel_Helper(root, 0, levels);
-        
-        System.out.println("Leaf at same level: "+(levels.size() == 1));
-        
+
+        System.out.println("Leaf at same level: " + (levels.size() == 1));
+
     }
-    
+
     TreeNode<Integer> isTreeBST_Prev;
-    private boolean isTreeBST_Helper(TreeNode<Integer> root){
-        
-        if(root == null){
+
+    private boolean isTreeBST_Helper(TreeNode<Integer> root) {
+
+        if (root == null) {
             return true;
         }
-        
+
         isTreeBST_Helper(root.getLeft());
-        if(isTreeBST_Prev != null && isTreeBST_Prev.getData() > root.getData()){
+        if (isTreeBST_Prev != null && isTreeBST_Prev.getData() > root.getData()) {
             return false;
         }
-        
+
         isTreeBST_Prev = root;
         return isTreeBST_Helper(root.getRight());
     }
-    
-    public void isTreeBST(TreeNode<Integer> root){
-        
-        System.out.println("Tree is BST: "+ isTreeBST_Helper(root));
+
+    public void isTreeBST(TreeNode<Integer> root) {
+
+        System.out.println("Tree is BST: " + isTreeBST_Helper(root));
         //just resetting
         isTreeBST_Prev = null;
     }
-    
-    private void kThLargestNodeInBST_Helper(TreeNode<Integer> root, int K, PriorityQueue<Integer> minHeap){
-        
-        if(root == null){
+
+    private void kThLargestNodeInBST_Helper(TreeNode<Integer> root, int K, PriorityQueue<Integer> minHeap) {
+
+        if (root == null) {
             return;
         }
-        
+
         minHeap.add(root.getData());
-        if(minHeap.size() > K){
+        if (minHeap.size() > K) {
             minHeap.poll();
         }
-        
+
         kThLargestNodeInBST_Helper(root.getLeft(), K, minHeap);
         kThLargestNodeInBST_Helper(root.getRight(), K, minHeap);
-        
+
     }
-    
-    public void kTHLargestNodeInBST(TreeNode<Integer> root, int K){
+
+    public void kTHLargestNodeInBST(TreeNode<Integer> root, int K) {
         //actual
         //inorder of BST is sorted nodes list
         inOrderTraversal_Iterative(root);
-        
+
         PriorityQueue<Integer> minHeap = new PriorityQueue<>();
         kThLargestNodeInBST_Helper(root, K, minHeap);
-        
-        System.out.println(K+" largest node from BST: "+minHeap.poll());
+
+        System.out.println(K + " largest node from BST: " + minHeap.poll());
     }
-    
-    private void kThSmallestNodeInBST_Helper(TreeNode<Integer> root, int K, PriorityQueue<Integer> maxHeap){
-        
-        if(root == null){
+
+    private void kThSmallestNodeInBST_Helper(TreeNode<Integer> root, int K, PriorityQueue<Integer> maxHeap) {
+
+        if (root == null) {
             return;
         }
-        
+
         maxHeap.add(root.getData());
-        if(maxHeap.size() > K){
+        if (maxHeap.size() > K) {
             maxHeap.poll();
         }
-        
+
         kThLargestNodeInBST_Helper(root.getLeft(), K, maxHeap);
         kThLargestNodeInBST_Helper(root.getRight(), K, maxHeap);
-        
+
     }
-    
-    public void kTHSmallestNodeInBST(TreeNode<Integer> root, int K){
+
+    public void kTHSmallestNodeInBST(TreeNode<Integer> root, int K) {
         //actual
         //inorder of BST is sorted nodes list
         inOrderTraversal_Iterative(root);
-        
+
         //maxHeap
         PriorityQueue<Integer> maxHeap = new PriorityQueue<>(
                 (o1, o2) -> o2.compareTo(o1)
         );
         kThSmallestNodeInBST_Helper(root, K, maxHeap);
-        
-        System.out.println(K+" smallest node from BST: "+maxHeap.poll());
+
+        System.out.println(K + " smallest node from BST: " + maxHeap.poll());
     }
-    
-    class Height{
+
+    class Height {
+
         int height = 0;
     }
-    
-    private boolean isTreeHeightBalanced_Helper(TreeNode root, Height h){
-        
+
+    private boolean isTreeHeightBalanced_Helper(TreeNode root, Height h) {
+
         //this approach calculates height and check height balanced at the same time
-        if(root == null){
+        if (root == null) {
             h.height = -1;
             return true;
         }
-        
+
         Height lh = new Height();
         Height rh = new Height();
-        
+
         boolean isLeftBal = isTreeHeightBalanced_Helper(root.getLeft(), lh);
         boolean isRightBal = isTreeHeightBalanced_Helper(root.getRight(), rh);
-        
+
         //calculate the height for the current node
         h.height = Math.max(lh.height, rh.height) + 1;
-        
+
         //checking the cond if height balanced
         //if diff b/w left subtree or right sub tree is greater than 1 it's
         //not balanced
-        if(Math.abs(lh.height - rh.height) > 1){
+        if (Math.abs(lh.height - rh.height) > 1) {
             return false;
         }
-        
+
         //if the above cond doesn't fulfil
         //it should check if any of the left or right sub tree both are balanced or not
         return isLeftBal && isRightBal;
-        
+
     }
-    
-    public void isTreeHeightBalanced(TreeNode root){
+
+    public void isTreeHeightBalanced(TreeNode root) {
         Height h = new Height();
-        System.out.println("Is tree heght  balanced: "+isTreeHeightBalanced_Helper(root, h));
+        System.out.println("Is tree heght  balanced: " + isTreeHeightBalanced_Helper(root, h));
     }
-   
-    public boolean checkTwoTreeAreMirror(TreeNode<Integer> root1, TreeNode<Integer> root2){
-        if(root1 == null && root2 == null){
+
+    public boolean checkTwoTreeAreMirror(TreeNode<Integer> root1, TreeNode<Integer> root2) {
+        if (root1 == null && root2 == null) {
             return true;
         }
-        
-        if(root1 == null || root2 == null){
+
+        if (root1 == null || root2 == null) {
             return false;
         }
-        
-        return root1.getData() == root2.getData() && 
-                checkTwoTreeAreMirror(root1.getLeft(), root2.getRight()) &&
-                checkTwoTreeAreMirror(root1.getRight(), root2.getLeft());
+
+        return root1.getData() == root2.getData()
+                && checkTwoTreeAreMirror(root1.getLeft(), root2.getRight())
+                && checkTwoTreeAreMirror(root1.getRight(), root2.getLeft());
     }
-    
+
     int middleElementInStack_Element = Integer.MIN_VALUE;
+
     private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
 
         if (n == index || s.isEmpty()) {
@@ -1150,64 +1341,64 @@ public class DSA450Questions {
         int index = 0;
         middleElementInStack_Helper(stack, n, index);
         //outputs
-        System.out.println("Middle eleement of the stack: "+middleElementInStack_Element);
+        System.out.println("Middle eleement of the stack: " + middleElementInStack_Element);
         //just reseting
         middleElementInStack_Element = Integer.MIN_VALUE;
     }
-    
-    public void nextSmallerElementInRightInArray(int[] a){
-        
+
+    public void nextSmallerElementInRightInArray(int[] a) {
+
         Stack<Integer> s = new Stack<>();
         List<Integer> result = new ArrayList<>();
-        for(int i=a.length-1; i>=0; i--){
-            
-            while(!s.isEmpty() && s.peek() > a[i]){
+        for (int i = a.length - 1; i >= 0; i--) {
+
+            while (!s.isEmpty() && s.peek() > a[i]) {
                 s.pop();
             }
-            
-            if(s.isEmpty()){
+
+            if (s.isEmpty()) {
                 result.add(-1);
-            }else {
+            } else {
                 result.add(s.peek());
             }
             s.push(a[i]);
         }
-        
+
         Collections.reverse(result);
-        
+
         //output
-        System.out.println("result: "+result);
-        
+        System.out.println("result: " + result);
+
     }
-    
-    private void reserveStack_Recursion_Insert(Stack<Integer> stack, int element){
-        
-        if(stack.isEmpty()){
+
+    private void reserveStack_Recursion_Insert(Stack<Integer> stack, int element) {
+
+        if (stack.isEmpty()) {
             stack.push(element);
             return;
         }
-        
+
         int popped = stack.pop();
         reserveStack_Recursion_Insert(stack, element);
         stack.push(popped);
     }
-    
-    private void reserveStack_Recursion(Stack<Integer> stack){
-        
-        if(stack.isEmpty()){
+
+    private void reserveStack_Recursion(Stack<Integer> stack) {
+
+        if (stack.isEmpty()) {
             return;
         }
-        
+
         int popped = stack.pop();
         reserveStack_Recursion(stack);
         reserveStack_Recursion_Insert(stack, popped);
-        
+
     }
-    
-    public void reverseStack(Stack<Integer> stack){
-        System.out.println("actual: "+stack);
+
+    public void reverseStack(Stack<Integer> stack) {
+        System.out.println("actual: " + stack);
         reserveStack_Recursion(stack);
-        System.out.println("output: "+stack);
+        System.out.println("output: " + stack);
     }
 
     public static void main(String[] args) {
@@ -1689,10 +1880,30 @@ public class DSA450Questions {
 //        obj.nextSmallerElementInRightInArray(new int[]{4, 8, 5, 2, 25});
         //......................................................................
 //        Row: 309
-        System.out.println("Reverse a stack using recursion");
-        Stack<Integer> stack = new Stack<>();
-        stack.addAll(Arrays.asList(1, 2, 3, 4, 5));
-        obj.reverseStack(stack);
+//        System.out.println("Reverse a stack using recursion");
+//        Stack<Integer> stack = new Stack<>();
+//        stack.addAll(Arrays.asList(1, 2, 3, 4, 5));
+//        obj.reverseStack(stack);
+        //......................................................................
+//        Row: 7
+//        System.out.println("Min & max in array");
+//        obj.minMaxInArray_1(new int[]{1000, 11, 445, 1, 330, 3000});
+//        obj.minMaxInArray_2(new int[]{1000, 11, 445, 1, 330, 3000});
+        //......................................................................
+//        Row: 8
+//        System.out.println("Kth smallest and largest element in array");
+//        obj.kThSmallestElementInArray(new int[]{7, 10, 4, 3, 20, 15}, 3);
+//        obj.kThLargestElementInArray(new int[]{7, 10, 4, 3, 20, 15}, 3);
+        //......................................................................
+//        Row: 9
+//        System.out.println("Sort the array containing elements 0, 1, 2");
+//        obj.sortArrayOf012_1(new int[]{0, 1, 1, 0, 1, 2, 1, 2, 0, 0, 0, 1});
+//        obj.sortArrayOf012_2(new int[]{0, 1, 1, 0, 1, 2, 1, 2, 0, 0, 0, 1}); //DUTCH NATIONAL FLAG ALGO
+        //......................................................................
+//        Row: 51
+        System.out.println("Rotate a matrix 90 degrees");
+        int[][] mat = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        obj.rotateMatrixClockWise90Deg(mat);
     }
 
 }
