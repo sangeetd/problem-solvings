@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -194,7 +195,7 @@ public class DSA450Questions {
         a[x] = a[y];
         a[y] = temp;
     }
-    
+
     public void sortArrayOf012_2(int[] a) {
 
         //.............T: O(N)
@@ -222,7 +223,7 @@ public class DSA450Questions {
                 }
             }
         }
-        
+
         //output
         for (int x : a) {
             System.out.print(x + " ");
@@ -230,32 +231,32 @@ public class DSA450Questions {
         System.out.println();
 
     }
-    
-    public void rotateMatrixClockWise90Deg(int[][] mat){
-        
+
+    public void rotateMatrixClockWise90Deg(int[][] mat) {
+
         int row = mat.length;
         int col = mat[0].length;
         int N = mat.length;
-        for(int x=0; x<N/2; x++){
-            for(int y=x; y<N - x - 1; y++){
-                
+        for (int x = 0; x < N / 2; x++) {
+            for (int y = x; y < N - x - 1; y++) {
+
                 int temp = mat[x][y];
                 mat[x][y] = mat[y][N - 1 - x];
                 mat[y][N - 1 - x] = mat[N - 1 - x][N - 1 - y];
                 mat[N - 1 - x][N - 1 - y] = mat[N - 1 - y][x];
                 mat[N - 1 - y][x] = temp;
-                
+
             }
         }
-        
+
         //output
-        for(int[] r: mat){
-            for(int c: r){
-                System.out.print(c+"\t");
+        for (int[] r : mat) {
+            for (int c : r) {
+                System.out.print(c + "\t");
             }
             System.out.println();
         }
-        
+
     }
 
     public String reverseString(String str) {
@@ -396,6 +397,131 @@ public class DSA450Questions {
 
         //output
         System.out.println("Longest common subseq: " + sb.toString());
+    }
+
+    public String countAndSay_Helper(int n) {
+
+        //https://leetcode.com/problems/count-and-say/
+        //base cond
+        if (n == 1) {
+            return "1";
+        }
+
+        String ans = countAndSay_Helper(n - 1);
+
+        StringBuilder sb = new StringBuilder();
+
+        char ch = ans.charAt(0);
+        int counter = 1;
+        //for i==ans.length() i.e very last itr of loop
+        //this itr will only invoke else cond below
+        for (int i = 1; i <= ans.length(); i++) {
+            //i<ans.length() bound the calculations upto string length
+            if (i < ans.length() && ans.charAt(i) == ch) {
+                counter++;
+            } else {
+                sb.append(counter).append(ch);
+                //i<ans.length() bound the calculations upto string length
+                if (i < ans.length()) {
+                    ch = ans.charAt(i);
+                }
+
+                counter = 1;
+            }
+
+        }
+
+        return sb.toString();
+
+    }
+
+    public void countAndSay(int n) {
+        System.out.println("Count and say: " + countAndSay_Helper(n));
+    }
+
+    public void removeConsecutiveDuplicateInString(String str) {
+        
+        //https://www.geeksforgeeks.org/remove-consecutive-duplicates-string/
+        
+        char[] ch = str.toCharArray();
+        int f = 0;
+        int l = 1;
+
+        while (l < ch.length) {
+
+            if (ch[f] == ch[l]) {
+                l++;
+            } else {
+                ch[f + 1] = ch[l];
+                f++;
+            }
+
+        }
+
+        System.out.println("output: " + String.valueOf(ch, 0, f + 1));
+
+    }
+    
+    public void majorityElement_1(int[] a){
+        
+        //.............T: O(N)
+        //.............S: O(Unique ele in a)
+        
+        int maj = a.length/2;
+        
+        Map<Integer, Integer> map = new HashMap<>();
+        for(int x: a){
+            map.put(x, map.getOrDefault(x, 0)+1);
+        }
+        
+        for(Map.Entry<Integer, Integer> e: map.entrySet()){
+            if(e.getValue() > maj){
+                System.out.println("Majority element: "+e.getKey());
+                return;
+            }
+        }
+        
+        System.out.println("Majority element: -1");
+        
+    }
+    
+    public void majorityElement_2(int[] a){
+        
+        //Moore’s Voting Algorithm
+        //https://www.geeksforgeeks.org/majority-element/
+        
+        //..........T: O(N)
+        //..........S: O(1)
+        
+        //finding candidate
+        int maj_index = 0, count = 1;
+        int i;
+        for (i = 1; i < a.length; i++) {
+            if (a[maj_index] == a[i])
+                count++;
+            else
+                count--;
+            if (count == 0) {
+                maj_index = i;
+                count = 1;
+            }
+        }
+        int cand = a[maj_index];
+        
+        //validating the cand 
+        count = 0;
+        for (i = 0; i < a.length; i++) {
+            if (a[i] == cand)
+                count++;
+        }
+        if (count > a.length / 2){
+            System.out.println("Majority element: "+cand);
+            return;
+        } else{
+            System.out.println("Majority element: -1");
+            return;
+        }
+        
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -1901,9 +2027,31 @@ public class DSA450Questions {
 //        obj.sortArrayOf012_2(new int[]{0, 1, 1, 0, 1, 2, 1, 2, 0, 0, 0, 1}); //DUTCH NATIONAL FLAG ALGO
         //......................................................................
 //        Row: 51
-        System.out.println("Rotate a matrix 90 degrees");
-        int[][] mat = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-        obj.rotateMatrixClockWise90Deg(mat);
+//        System.out.println("Rotate a matrix 90 degrees");
+//        int[][] mat = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+//        obj.rotateMatrixClockWise90Deg(mat);
+        //......................................................................
+//        Row: 62
+//        System.out.println("Count and say");
+//        obj.countAndSay(1);
+//        obj.countAndSay(2);
+//        obj.countAndSay(3);
+//        obj.countAndSay(10);
+        //......................................................................
+//        Row: 93
+//        System.out.println("Remove consecutive duplicate char in string");
+//        obj.removeConsecutiveDuplicateInString("aababbccd");
+//        obj.removeConsecutiveDuplicateInString("aaabbbcccbbbbaaaa");
+//        obj.removeConsecutiveDuplicateInString("xyzpqrs");
+//        obj.removeConsecutiveDuplicateInString("abcppqrspplmn");
+//        obj.removeConsecutiveDuplicateInString("abcdlllllmmmmm");
+        //......................................................................
+//        Row: 108
+        System.out.println("Majority Element");
+        obj.majorityElement_1(new int[] { 1, 3, 3, 1, 2 });
+        obj.majorityElement_1(new int[] { 1, 3, 3, 3, 2 });
+        obj.majorityElement_2(new int[] { 1, 3, 3, 1, 2 }); //MOORE'S VOTING ALGO
+        obj.majorityElement_2(new int[] { 1, 3, 3, 3, 2 }); //MOORE'S VOTING ALGO
     }
 
 }
