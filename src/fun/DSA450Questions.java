@@ -1445,6 +1445,136 @@ public class DSA450Questions {
                 && checkTwoTreeAreMirror(root1.getLeft(), root2.getRight())
                 && checkTwoTreeAreMirror(root1.getRight(), root2.getLeft());
     }
+    
+    private int convertTreeToSumTree_Sum(TreeNode<Integer> root){
+        
+        if(root == null){
+            return 0;
+        }
+        
+        int lSum = convertTreeToSumTree_Sum(root.getLeft());
+        int rSum = convertTreeToSumTree_Sum(root.getRight());
+        
+        return lSum+rSum+root.getData();
+        
+    }
+    
+    public void convertTreeToSumTree(TreeNode<Integer> root){
+        
+        //actual
+        BinaryTree<Integer> bt = new BinaryTree<>(root);
+        bt.treeBFS();
+        
+        Queue<TreeNode<Integer>> q = new LinkedList<>();
+        q.add(root);
+        
+        while(!q.isEmpty()){
+            
+            TreeNode<Integer> t = q.poll();
+            
+            if(t.getLeft() != null){
+                q.add(t.getLeft());
+            }
+            
+            if(t.getRight() != null){
+                q.add(t.getRight());
+            }
+             
+            //leaf
+            if(t.getLeft() == null && t.getRight() == null){
+                t.setData(0);
+                continue;
+            }
+            
+            // - t.getData() just don't include the value of that node itself
+            t.setData(convertTreeToSumTree_Sum(t) - t.getData());
+            
+        }
+        
+        //output
+        System.out.println();
+        bt = new BinaryTree<>(root);
+        bt.treeBFS();
+        System.out.println();
+         
+    }
+    
+    private int convertTreeToSumTree_Recursion_Helper(TreeNode<Integer> root){
+        
+        if(root == null){
+            return 0;
+        }
+        
+        int data = root.getData();
+        
+        int lSum = convertTreeToSumTree_Recursion_Helper(root.getLeft());
+        int rSum = convertTreeToSumTree_Recursion_Helper(root.getRight());
+        
+        //leaf
+        if(root.getLeft() == null && root.getRight() == null){
+            root.setData(0);
+            return data;
+        }else {
+            root.setData(lSum+rSum);
+            return lSum+rSum+data;
+        }
+        
+    }
+    
+    public void convertTreeToSumTree_Recursion(TreeNode<Integer> root){
+        
+        //OPTIMISED
+        
+        //actual
+        BinaryTree<Integer> bt = new BinaryTree<>(root);
+        bt.treeBFS();
+        
+        convertTreeToSumTree_Recursion_Helper(root);
+        
+        //output
+        System.out.println();
+        bt = new BinaryTree<>(root);
+        bt.treeBFS();
+        System.out.println();
+         
+    }
+    
+    List<Integer> printKSumPathAnyNodeTopToDown_PathList;
+    private void printKSumPathAnyNodeTopToDown_Helper(TreeNode<Integer> root, int K){
+        
+        if(root == null){
+            return;
+        }
+        
+        printKSumPathAnyNodeTopToDown_PathList.add(root.getData());
+        
+        printKSumPathAnyNodeTopToDown_Helper(root.getLeft(), K);
+        printKSumPathAnyNodeTopToDown_Helper(root.getRight(), K);
+        
+        int pathSum = 0;
+        for(int i=printKSumPathAnyNodeTopToDown_PathList.size()-1; i>=0; i--){
+            
+            pathSum += printKSumPathAnyNodeTopToDown_PathList.get(i);
+            if(pathSum == K){
+                //print actual nodes data
+                for(int j=i; j<printKSumPathAnyNodeTopToDown_PathList.size(); j++){
+                    System.out.print(printKSumPathAnyNodeTopToDown_PathList.get(j)+ " ");
+                }
+                System.out.println();
+            }
+            
+        }
+        
+        //remove current node
+        printKSumPathAnyNodeTopToDown_PathList.remove(printKSumPathAnyNodeTopToDown_PathList.size() - 1);
+        
+    }
+    
+    public void printKSumPathAnyNodeTopToDown(TreeNode<Integer> root, int K){
+        printKSumPathAnyNodeTopToDown_PathList = new ArrayList<>();
+        printKSumPathAnyNodeTopToDown_Helper(root, K);
+    }
+    
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
@@ -2047,11 +2177,51 @@ public class DSA450Questions {
 //        obj.removeConsecutiveDuplicateInString("abcdlllllmmmmm");
         //......................................................................
 //        Row: 108
-        System.out.println("Majority Element");
-        obj.majorityElement_1(new int[] { 1, 3, 3, 1, 2 });
-        obj.majorityElement_1(new int[] { 1, 3, 3, 3, 2 });
-        obj.majorityElement_2(new int[] { 1, 3, 3, 1, 2 }); //MOORE'S VOTING ALGO
-        obj.majorityElement_2(new int[] { 1, 3, 3, 3, 2 }); //MOORE'S VOTING ALGO
+//        System.out.println("Majority Element");
+//        obj.majorityElement_1(new int[] { 1, 3, 3, 1, 2 });
+//        obj.majorityElement_1(new int[] { 1, 3, 3, 3, 2 });
+//        obj.majorityElement_2(new int[] { 1, 3, 3, 1, 2 }); //MOORE'S VOTING ALGO
+//        obj.majorityElement_2(new int[] { 1, 3, 3, 3, 2 }); //MOORE'S VOTING ALGO
+        //......................................................................
+//        Row: 195
+//        System.out.println("Convert tree to its sun tree");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.convertTreeToSumTree(root1); //EXTRA QUEUE SPACE IS USED
+//        //reset root
+//        root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.convertTreeToSumTree_Recursion(root1); //NO EXTRA QUEUE SPACE IS USED - OPTIMISED
+        //......................................................................
+//        Row: 206
+        System.out.println("K sum path from any node top to down");
+        TreeNode<Integer> root1 = new TreeNode<>(1);
+        root1.setLeft(new TreeNode(3));
+        root1.getLeft().setLeft(new TreeNode(2));
+        root1.getLeft().setRight(new TreeNode(1));
+        root1.getLeft().getRight().setLeft(new TreeNode(1));
+        root1.setRight(new TreeNode(-1));
+        root1.getRight().setLeft(new TreeNode(4));
+        root1.getRight().getLeft().setLeft(new TreeNode(1));
+        root1.getRight().getLeft().setRight(new TreeNode(2));
+        root1.getRight().setRight(new TreeNode(5));
+        root1.getRight().getRight().setRight(new TreeNode(6));
+        obj.printKSumPathAnyNodeTopToDown(root1, 5);
+        
     }
 
 }
