@@ -440,9 +440,8 @@ public class DSA450Questions {
     }
 
     public void removeConsecutiveDuplicateInString(String str) {
-        
+
         //https://www.geeksforgeeks.org/remove-consecutive-duplicates-string/
-        
         char[] ch = str.toCharArray();
         int f = 0;
         int l = 1;
@@ -461,67 +460,137 @@ public class DSA450Questions {
         System.out.println("output: " + String.valueOf(ch, 0, f + 1));
 
     }
-    
-    public void majorityElement_1(int[] a){
-        
+
+    public void majorityElement_1(int[] a) {
+
         //.............T: O(N)
         //.............S: O(Unique ele in a)
-        
-        int maj = a.length/2;
-        
+        int maj = a.length / 2;
+
         Map<Integer, Integer> map = new HashMap<>();
-        for(int x: a){
-            map.put(x, map.getOrDefault(x, 0)+1);
+        for (int x : a) {
+            map.put(x, map.getOrDefault(x, 0) + 1);
         }
-        
-        for(Map.Entry<Integer, Integer> e: map.entrySet()){
-            if(e.getValue() > maj){
-                System.out.println("Majority element: "+e.getKey());
+
+        for (Map.Entry<Integer, Integer> e : map.entrySet()) {
+            if (e.getValue() > maj) {
+                System.out.println("Majority element: " + e.getKey());
                 return;
             }
         }
-        
+
         System.out.println("Majority element: -1");
-        
+
     }
-    
-    public void majorityElement_2(int[] a){
-        
+
+    public void majorityElement_2(int[] a) {
+
         //Moore’s Voting Algorithm
         //https://www.geeksforgeeks.org/majority-element/
-        
         //..........T: O(N)
         //..........S: O(1)
-        
         //finding candidate
         int maj_index = 0, count = 1;
         int i;
         for (i = 1; i < a.length; i++) {
-            if (a[maj_index] == a[i])
+            if (a[maj_index] == a[i]) {
                 count++;
-            else
+            } else {
                 count--;
+            }
             if (count == 0) {
                 maj_index = i;
                 count = 1;
             }
         }
         int cand = a[maj_index];
-        
+
         //validating the cand 
         count = 0;
         for (i = 0; i < a.length; i++) {
-            if (a[i] == cand)
+            if (a[i] == cand) {
                 count++;
+            }
         }
-        if (count > a.length / 2){
-            System.out.println("Majority element: "+cand);
+        if (count > a.length / 2) {
+            System.out.println("Majority element: " + cand);
             return;
-        } else{
+        } else {
             System.out.println("Majority element: -1");
             return;
         }
-        
+
+    }
+
+    private void printSentencesFromCollectionOfWords_Propagte_Recursion(String[][] words,
+            int m, int n,
+            String[] output) {
+        // Add current word to output array
+        output[m] = words[m][n];
+
+        // If this is last word of 
+        // current output sentence, 
+        // then print the output sentence
+        if (m == words.length - 1) {
+            for (int i = 0; i < words.length; i++) {
+                System.out.print(output[i] + " ");
+            }
+            System.out.println();
+            return;
+        }
+
+        // Recur for next row
+        for (int i = 0; i < words.length; i++) {
+            if (words[m + 1][i] != "" && m < words.length) {
+                printSentencesFromCollectionOfWords_Propagte_Recursion(words, m + 1, i, output);
+            }
+        }
+    }
+
+    public void printSentencesFromCollectionOfWords(String[][] words) {
+
+        //https://www.geeksforgeeks.org/recursively-print-all-sentences-that-can-be-formed-from-list-of-word-lists/
+        String[] output = new String[words.length];
+
+        // Consider all words for first 
+        // row as starting points and
+        // print all sentences
+        for (int i = 0; i < words.length; i++) {
+            if (words[0][i] != "") {
+                printSentencesFromCollectionOfWords_Propagte_Recursion(words, 0, i, output);
+            }
+        }
+    }
+
+    public void longestPrefixAlsoSuffixInString_KMPAlgo(String s) {
+        int N = s.length();
+        int[] lps = new int[N];
+        lps[0] = 1;
+        int len = 0;
+        int i = 1;
+        while (i < N) {
+
+            if (s.charAt(i) == s.charAt(len)) {
+                len++;
+                lps[i] = len;
+                i++;
+            } else {
+
+                if (len != 0) {
+                    len = lps[len - 1];
+                } else {
+                    lps[i] = 0;
+                    i++;
+                }
+
+            }
+
+        }
+
+        int res = lps[N - 1];
+
+        System.out.println("Length of longest prefix: "+((res > N / 2) ? N / 2 : res));
+
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -660,6 +729,7 @@ public class DSA450Questions {
 
     public void mergeKSortedLinkedList(Node<Integer>[] nodes) {
 
+        //HEAP based method
         PriorityQueue<Node<Integer>> minHeap = new PriorityQueue<>(
                 (o1, o2) -> o1.getData().compareTo(o2.getData())
         );
@@ -1445,136 +1515,135 @@ public class DSA450Questions {
                 && checkTwoTreeAreMirror(root1.getLeft(), root2.getRight())
                 && checkTwoTreeAreMirror(root1.getRight(), root2.getLeft());
     }
-    
-    private int convertTreeToSumTree_Sum(TreeNode<Integer> root){
-        
-        if(root == null){
+
+    private int convertTreeToSumTree_Sum(TreeNode<Integer> root) {
+
+        if (root == null) {
             return 0;
         }
-        
+
         int lSum = convertTreeToSumTree_Sum(root.getLeft());
         int rSum = convertTreeToSumTree_Sum(root.getRight());
-        
-        return lSum+rSum+root.getData();
-        
+
+        return lSum + rSum + root.getData();
+
     }
-    
-    public void convertTreeToSumTree(TreeNode<Integer> root){
-        
+
+    public void convertTreeToSumTree(TreeNode<Integer> root) {
+
         //actual
         BinaryTree<Integer> bt = new BinaryTree<>(root);
         bt.treeBFS();
-        
+
         Queue<TreeNode<Integer>> q = new LinkedList<>();
         q.add(root);
-        
-        while(!q.isEmpty()){
-            
+
+        while (!q.isEmpty()) {
+
             TreeNode<Integer> t = q.poll();
-            
-            if(t.getLeft() != null){
+
+            if (t.getLeft() != null) {
                 q.add(t.getLeft());
             }
-            
-            if(t.getRight() != null){
+
+            if (t.getRight() != null) {
                 q.add(t.getRight());
             }
-             
+
             //leaf
-            if(t.getLeft() == null && t.getRight() == null){
+            if (t.getLeft() == null && t.getRight() == null) {
                 t.setData(0);
                 continue;
             }
-            
+
             // - t.getData() just don't include the value of that node itself
             t.setData(convertTreeToSumTree_Sum(t) - t.getData());
-            
+
         }
-        
+
         //output
         System.out.println();
         bt = new BinaryTree<>(root);
         bt.treeBFS();
         System.out.println();
-         
+
     }
-    
-    private int convertTreeToSumTree_Recursion_Helper(TreeNode<Integer> root){
-        
-        if(root == null){
+
+    private int convertTreeToSumTree_Recursion_Helper(TreeNode<Integer> root) {
+
+        if (root == null) {
             return 0;
         }
-        
+
         int data = root.getData();
-        
+
         int lSum = convertTreeToSumTree_Recursion_Helper(root.getLeft());
         int rSum = convertTreeToSumTree_Recursion_Helper(root.getRight());
-        
+
         //leaf
-        if(root.getLeft() == null && root.getRight() == null){
+        if (root.getLeft() == null && root.getRight() == null) {
             root.setData(0);
             return data;
-        }else {
-            root.setData(lSum+rSum);
-            return lSum+rSum+data;
+        } else {
+            root.setData(lSum + rSum);
+            return lSum + rSum + data;
         }
-        
+
     }
-    
-    public void convertTreeToSumTree_Recursion(TreeNode<Integer> root){
-        
+
+    public void convertTreeToSumTree_Recursion(TreeNode<Integer> root) {
+
         //OPTIMISED
-        
         //actual
         BinaryTree<Integer> bt = new BinaryTree<>(root);
         bt.treeBFS();
-        
+
         convertTreeToSumTree_Recursion_Helper(root);
-        
+
         //output
         System.out.println();
         bt = new BinaryTree<>(root);
         bt.treeBFS();
         System.out.println();
-         
+
     }
-    
+
     List<Integer> printKSumPathAnyNodeTopToDown_PathList;
-    private void printKSumPathAnyNodeTopToDown_Helper(TreeNode<Integer> root, int K){
-        
-        if(root == null){
+
+    private void printKSumPathAnyNodeTopToDown_Helper(TreeNode<Integer> root, int K) {
+
+        if (root == null) {
             return;
         }
-        
+
         printKSumPathAnyNodeTopToDown_PathList.add(root.getData());
-        
+
         printKSumPathAnyNodeTopToDown_Helper(root.getLeft(), K);
         printKSumPathAnyNodeTopToDown_Helper(root.getRight(), K);
-        
+
         int pathSum = 0;
-        for(int i=printKSumPathAnyNodeTopToDown_PathList.size()-1; i>=0; i--){
-            
+        for (int i = printKSumPathAnyNodeTopToDown_PathList.size() - 1; i >= 0; i--) {
+
             pathSum += printKSumPathAnyNodeTopToDown_PathList.get(i);
-            if(pathSum == K){
+            if (pathSum == K) {
                 //print actual nodes data
-                for(int j=i; j<printKSumPathAnyNodeTopToDown_PathList.size(); j++){
-                    System.out.print(printKSumPathAnyNodeTopToDown_PathList.get(j)+ " ");
+                for (int j = i; j < printKSumPathAnyNodeTopToDown_PathList.size(); j++) {
+                    System.out.print(printKSumPathAnyNodeTopToDown_PathList.get(j) + " ");
                 }
                 System.out.println();
             }
-            
+
         }
-        
+
         //remove current node
         printKSumPathAnyNodeTopToDown_PathList.remove(printKSumPathAnyNodeTopToDown_PathList.size() - 1);
-        
+
     }
-    
-    public void printKSumPathAnyNodeTopToDown(TreeNode<Integer> root, int K){
+
+    public void printKSumPathAnyNodeTopToDown(TreeNode<Integer> root, int K) {
         printKSumPathAnyNodeTopToDown_PathList = new ArrayList<>();
         printKSumPathAnyNodeTopToDown_Helper(root, K);
     }
-    
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
@@ -1655,6 +1724,166 @@ public class DSA450Questions {
         System.out.println("actual: " + stack);
         reserveStack_Recursion(stack);
         System.out.println("output: " + stack);
+    }
+
+    public void minCostOfRope(int[] a) {
+
+        //GREEDY ALGO
+        //HEAP based approach
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        for (int x : a) {
+            minHeap.add(x);
+        }
+
+        //calculations
+        int cost = 0;
+        while (minHeap.size() >= 2) {
+
+            int rope1 = minHeap.poll();
+            int rope2 = minHeap.poll();
+
+            cost += rope1 + rope2;
+            int newRope = rope1 + rope2;
+            minHeap.add(newRope);
+
+        }
+
+        //output
+        System.out.println("Min cost to combine all rpes into one rope: " + cost);
+
+    }
+
+    class CharCount {
+
+        //reorganizeString
+        char letter;
+        int count;
+
+        public CharCount(char letter, int count) {
+            this.letter = letter;
+            this.count = count;
+        }
+    }
+
+    public String reorganizeString(String S) {
+
+        //https://leetcode.com/problems/reorganize-string/
+        int N = S.length();
+        int[] charCount = new int[26];
+        for (char c : S.toCharArray()) {
+            charCount[c - 'a']++;
+        }
+
+        PriorityQueue<CharCount> heap = new PriorityQueue<>(
+                (o1, o2) -> o1.count == o2.count ? o1.letter - o2.letter : o2.count - o1.count
+        );
+
+        for (int i = 0; i < 26; i++) {
+
+            if (charCount[i] > 0) {
+                if (charCount[i] > (N + 1) / 2) {
+                    return "";
+                }
+                heap.add(new CharCount((char) (i + 'a'), charCount[i]));
+            }
+
+        }
+
+        StringBuilder sb = new StringBuilder();
+        while (heap.size() >= 2) {
+
+            CharCount chC1 = heap.poll();
+            CharCount chC2 = heap.poll();
+
+            sb.append(chC1.letter);
+            sb.append(chC2.letter);
+
+            if (--chC1.count > 0) {
+                heap.add(chC1);
+            }
+            if (--chC2.count > 0) {
+                heap.add(chC2);
+            }
+
+        }
+
+        if (heap.size() > 0) {
+            sb.append(heap.poll().letter);
+        }
+
+        return sb.toString();
+
+    }
+
+    private int[] KMP_PatternMatchning_Algorithm_LPSArray(String pattern, int size) {
+
+        int[] lps = new int[size];
+        lps[0] = 0; //always 0th index is 0
+        int i = 1;
+        int len = 0;
+        while (i < size) {
+
+            if (pattern.charAt(i) == pattern.charAt(len)) {
+                len++;
+                lps[i] = len;
+                i++;
+            } else {
+                // char doesn't match
+                // This is tricky. Consider the example. 
+                // AAACAAAA and i = 7. The idea is similar 
+                // to search step. 
+                if (len != 0) {
+                    len = lps[len - 1];
+
+                    // Also, note that we do not increment 
+                    // i here 
+                } else {
+                    lps[i] = len;
+                    i++;
+                }
+            }
+
+        }
+
+        return lps;
+
+    }
+
+    public void KMP_PatternMatchning_Algorithm(String text, String pattern) {
+
+        //geeksforgeeks.org/kmp-algorithm-for-pattern-searching/
+        int M = text.length();
+        int N = pattern.length();
+
+        //create LPS array for pattern
+        int[] lps = KMP_PatternMatchning_Algorithm_LPSArray(pattern, N);
+
+        //text and pattern matching
+        int i = 0; // index for text
+        int j = 0; // index for pattern
+        while (i < M) {
+
+            if (text.charAt(i) == pattern.charAt(j)) {
+                i++;
+                j++;
+            }
+
+            //j reached the length of pattern
+            if (j == N) {
+                System.out.println("Pattern matched at: " + (i - j));
+                j = lps[j - 1];
+            } else if (i < M && text.charAt(i) != pattern.charAt(j)) {
+                // Do not match lps[0..lps[j-1]] characters, 
+                // they will match anyway 
+                if (j != 0) {
+                    j = lps[j - 1];
+                } else {
+                    i++;
+                }
+            }
+
+        }
+
     }
 
     public static void main(String[] args) {
@@ -2208,20 +2437,49 @@ public class DSA450Questions {
 //        obj.convertTreeToSumTree_Recursion(root1); //NO EXTRA QUEUE SPACE IS USED - OPTIMISED
         //......................................................................
 //        Row: 206
-        System.out.println("K sum path from any node top to down");
-        TreeNode<Integer> root1 = new TreeNode<>(1);
-        root1.setLeft(new TreeNode(3));
-        root1.getLeft().setLeft(new TreeNode(2));
-        root1.getLeft().setRight(new TreeNode(1));
-        root1.getLeft().getRight().setLeft(new TreeNode(1));
-        root1.setRight(new TreeNode(-1));
-        root1.getRight().setLeft(new TreeNode(4));
-        root1.getRight().getLeft().setLeft(new TreeNode(1));
-        root1.getRight().getLeft().setRight(new TreeNode(2));
-        root1.getRight().setRight(new TreeNode(5));
-        root1.getRight().getRight().setRight(new TreeNode(6));
-        obj.printKSumPathAnyNodeTopToDown(root1, 5);
-        
+//        System.out.println("K sum path from any node top to down");
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode(3));
+//        root1.getLeft().setLeft(new TreeNode(2));
+//        root1.getLeft().setRight(new TreeNode(1));
+//        root1.getLeft().getRight().setLeft(new TreeNode(1));
+//        root1.setRight(new TreeNode(-1));
+//        root1.getRight().setLeft(new TreeNode(4));
+//        root1.getRight().getLeft().setLeft(new TreeNode(1));
+//        root1.getRight().getLeft().setRight(new TreeNode(2));
+//        root1.getRight().setRight(new TreeNode(5));
+//        root1.getRight().getRight().setRight(new TreeNode(6));
+//        obj.printKSumPathAnyNodeTopToDown(root1, 5);
+        //......................................................................
+//        Row: 349
+//        System.out.println("Min cost to combine ropes of diff lengths into one big rope");
+//        obj.minCostOfRope(new int[]{4, 3, 2, 6});
+        //......................................................................
+//        Row: 344
+//        System.out.println("Reorganise string");
+//        //https://leetcode.com/problems/reorganize-string/
+//        System.out.println("Reorganise string output: "+obj.reorganizeString("aab"));
+//        System.out.println("Reorganise string output: "+obj.reorganizeString("aaab"));
+        //......................................................................
+//        Row: 98
+//        System.out.println("Print all sentences that can be formed from list/array of words");
+//        String[][] arr = {{"you", "we", ""},
+//        {"have", "are", ""},
+//        {"sleep", "eat", "drink"}};
+//        obj.printSentencesFromCollectionOfWords(arr); //GRAPH LIKE DFS
+        //......................................................................
+//        Row: 74
+        System.out.println("KMP pattern matching algo");
+        String txt = "ABABDABACDABABCABAB";
+        String pat = "ABABCABAB";
+        obj.KMP_PatternMatchning_Algorithm(txt, pat);
+        txt = "sangeeangt";
+        pat = "ang";
+        obj.KMP_PatternMatchning_Algorithm(txt, pat);
+        obj.longestPrefixAlsoSuffixInString_KMPAlgo("abab");
+        obj.longestPrefixAlsoSuffixInString_KMPAlgo("aaaa");
+        obj.longestPrefixAlsoSuffixInString_KMPAlgo("aabcavefaabca"); //FAIL CASE
+        obj.longestPrefixAlsoSuffixInString_KMPAlgo("abcdef");
     }
 
 }
