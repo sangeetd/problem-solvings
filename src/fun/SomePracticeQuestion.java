@@ -3081,31 +3081,36 @@ public class SomePracticeQuestion {
 
     }
 
-    public static Node<Integer> reverseLinkedListInKGroups(Node<Integer> head, int k) {
-        //1. test weather we have more then k node left, if less then k node left we just return head 
-//        System.out.println(head.getData()+"||");
-        Node<Integer> node = head;
+    public static Node<Integer> reverseLinkedListInKGroups_1(Node<Integer> head, int k) {
+        
+        //https://www.geeksforgeeks.org/reverse-a-list-in-groups-of-given-size/
+        
+        //EXACT EFFICIENT
+        //much better explanation
+        Node<Integer> current = head;
+        Node<Integer> next = null;
+        Node<Integer> prev = null;
+
         int count = 0;
-        while (count < k) {
-            if (node == null) {
-                return head;
-            }
-            node = node.getNext();
+
+        /* Reverse first k nodes of linked list */
+        while (count < k && current != null) {
+            next = current.getNext();
+            current.setNext(prev);
+            prev = current;
+            current = next;
             count++;
         }
 
-//        System.out.println(node.getData()+" "+count);
-        // 2.reverse k node at current level 
-        Node<Integer> pre = reverseLinkedListInKGroups(node, k); //pre node point to the the answer of sub-problem 
-//        System.out.println(pre.getData()+"-"+count);
-        while (count > 0) {
-            Node next = head.getNext();
-            head.setNext(pre);
-            pre = head;
-            head = next;
-            count = count - 1;
+        /* next is now a pointer to (k+1)th node  
+         Recursively call for the list starting from current. 
+         And make rest of the list as next of first node */
+        if (next != null) {
+            head.setNext(reverseLinkedListInKGroups_1(next, k));
         }
-        return pre;
+
+        // prev is now head of input list 
+        return prev;
     }
 
     public static int stiklerThief(int[] houses, int n) {
@@ -8487,12 +8492,21 @@ public class SomePracticeQuestion {
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-sde1/?ref=rp
 //        //https://practice.geeksforgeeks.org/problems/reverse-a-linked-list-in-groups-of-given-size/1
 //        //https://leetcode.com/problems/reverse-nodes-in-k-group/
+//        //https://www.geeksforgeeks.org/reverse-a-list-in-groups-of-given-size/
 //        Node<Integer> head1 = new Node<>(1);
 //        head1.setNext(new Node<>(2));
 //        head1.getNext().setNext(new Node<>(3));
 //        head1.getNext().getNext().setNext(new Node<>(4));
 //        head1.getNext().getNext().getNext().setNext(new Node<>(5));
-//        LinkedListUtil<Integer> ll = new LinkedListUtil<>(reverseLinkedListInKGroups(head1, 2));
+//        LinkedListUtil<Integer> ll = new LinkedListUtil<>(reverseLinkedListInKGroups_1(head1, 2)); //EXACT
+//        ll.print();
+//        head1 = new Node<>(3);
+//        head1.setNext(new Node<>(8));
+//        head1.getNext().setNext(new Node<>(7));
+//        head1.getNext().getNext().setNext(new Node<>(2));
+//        head1.getNext().getNext().getNext().setNext(new Node<>(5));
+//        head1.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
+//        ll = new LinkedListUtil<>(reverseLinkedListInKGroups_1(head1, 4)); //EXACT
 //        ll.print();
 //..............................................................................
 //        System.out.println("Maximum sum such that no two elements are adjacent");

@@ -461,67 +461,6 @@ public class DSA450Questions {
 
     }
 
-    public void majorityElement_1(int[] a) {
-
-        //.............T: O(N)
-        //.............S: O(Unique ele in a)
-        int maj = a.length / 2;
-
-        Map<Integer, Integer> map = new HashMap<>();
-        for (int x : a) {
-            map.put(x, map.getOrDefault(x, 0) + 1);
-        }
-
-        for (Map.Entry<Integer, Integer> e : map.entrySet()) {
-            if (e.getValue() > maj) {
-                System.out.println("Majority element: " + e.getKey());
-                return;
-            }
-        }
-
-        System.out.println("Majority element: -1");
-
-    }
-
-    public void majorityElement_2(int[] a) {
-
-        //Moore’s Voting Algorithm
-        //https://www.geeksforgeeks.org/majority-element/
-        //..........T: O(N)
-        //..........S: O(1)
-        //finding candidate
-        int maj_index = 0, count = 1;
-        int i;
-        for (i = 1; i < a.length; i++) {
-            if (a[maj_index] == a[i]) {
-                count++;
-            } else {
-                count--;
-            }
-            if (count == 0) {
-                maj_index = i;
-                count = 1;
-            }
-        }
-        int cand = a[maj_index];
-
-        //validating the cand 
-        count = 0;
-        for (i = 0; i < a.length; i++) {
-            if (a[i] == cand) {
-                count++;
-            }
-        }
-        if (count > a.length / 2) {
-            System.out.println("Majority element: " + cand);
-            return;
-        } else {
-            System.out.println("Majority element: -1");
-            return;
-        }
-
-    }
-
     private void printSentencesFromCollectionOfWords_Propagte_Recursion(String[][] words,
             int m, int n,
             String[] output) {
@@ -589,7 +528,102 @@ public class DSA450Questions {
 
         int res = lps[N - 1];
 
-        System.out.println("Length of longest prefix: "+((res > N / 2) ? N / 2 : res));
+        System.out.println("Length of longest prefix: " + ((res > N / 2) ? N / 2 : res));
+
+    }
+
+    class CharCount {
+
+        //reorganizeString
+        char letter;
+        int count;
+
+        public CharCount(char letter, int count) {
+            this.letter = letter;
+            this.count = count;
+        }
+    }
+
+    public String reorganizeString(String S) {
+
+        //https://leetcode.com/problems/reorganize-string/
+        int N = S.length();
+        int[] charCount = new int[26];
+        for (char c : S.toCharArray()) {
+            charCount[c - 'a']++;
+        }
+
+        PriorityQueue<CharCount> heap = new PriorityQueue<>(
+                (o1, o2) -> o1.count == o2.count ? o1.letter - o2.letter : o2.count - o1.count
+        );
+
+        for (int i = 0; i < 26; i++) {
+
+            if (charCount[i] > 0) {
+                if (charCount[i] > (N + 1) / 2) {
+                    return "";
+                }
+                heap.add(new CharCount((char) (i + 'a'), charCount[i]));
+            }
+
+        }
+
+        StringBuilder sb = new StringBuilder();
+        while (heap.size() >= 2) {
+
+            CharCount chC1 = heap.poll();
+            CharCount chC2 = heap.poll();
+
+            sb.append(chC1.letter);
+            sb.append(chC2.letter);
+
+            if (--chC1.count > 0) {
+                heap.add(chC1);
+            }
+            if (--chC2.count > 0) {
+                heap.add(chC2);
+            }
+
+        }
+
+        if (heap.size() > 0) {
+            sb.append(heap.poll().letter);
+        }
+
+        return sb.toString();
+
+    }
+
+    public void longestCommonPrefix(String[] strs) {
+
+        //https://leetcode.com/problems/longest-common-prefix/
+        if (strs == null || strs.length == 0) {
+            return;
+        }
+
+        if (strs.length == 1) {
+            System.out.println("Longest common prefix in list of strings: " + strs[0]);
+            return;
+        }
+
+        String prefix = strs[0]; // first string as starting point
+        int minLenPrefix = Integer.MAX_VALUE;
+        for (int i = 1; i < strs.length; i++) {
+            String s = strs[i];
+            int index = 0;
+            while (index < Math.min(s.length(), prefix.length())) {
+
+                if (prefix.charAt(index) != s.charAt(index)) {
+                    break;
+                }
+                index++;
+
+            }
+
+            minLenPrefix = Math.min(minLenPrefix, (index - 0));
+        }
+
+        System.out.println("Longest common prefix in list of strings: " + (prefix.length() >= minLenPrefix ? prefix.substring(0, minLenPrefix) : ""));
 
     }
 
@@ -849,6 +883,36 @@ public class DSA450Questions {
 
         //output
         System.out.println("Kth node from end is: " + main.getData());
+
+    }
+
+    public Node<Integer> reverseLinkedListInKGroups(Node<Integer> node, int K) {
+
+        //https://www.geeksforgeeks.org/reverse-a-list-in-groups-of-given-size/
+        Node current = node;
+        Node next = null;
+        Node prev = null;
+
+        int count = 0;
+
+        /* Reverse first k nodes of linked list */
+        while (count < K && current != null) {
+            next = current.getNext();
+            current.setNext(prev);
+            prev = current;
+            current = next;
+            count++;
+        }
+
+        /* next is now a pointer to (k+1)th node  
+         Recursively call for the list starting from current. 
+         And make rest of the list as next of first node */
+        if (next != null) {
+            node.setNext(reverseLinkedListInKGroups(next, K));
+        }
+
+        // prev is now head of input list 
+        return prev;
 
     }
 
@@ -1753,69 +1817,100 @@ public class DSA450Questions {
 
     }
 
-    class CharCount {
+    public void majorityElement_1(int[] a) {
 
-        //reorganizeString
-        char letter;
-        int count;
+        //.............T: O(N)
+        //.............S: O(Unique ele in a)
+        int maj = a.length / 2;
 
-        public CharCount(char letter, int count) {
-            this.letter = letter;
-            this.count = count;
-        }
-    }
-
-    public String reorganizeString(String S) {
-
-        //https://leetcode.com/problems/reorganize-string/
-        int N = S.length();
-        int[] charCount = new int[26];
-        for (char c : S.toCharArray()) {
-            charCount[c - 'a']++;
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int x : a) {
+            map.put(x, map.getOrDefault(x, 0) + 1);
         }
 
-        PriorityQueue<CharCount> heap = new PriorityQueue<>(
-                (o1, o2) -> o1.count == o2.count ? o1.letter - o2.letter : o2.count - o1.count
-        );
-
-        for (int i = 0; i < 26; i++) {
-
-            if (charCount[i] > 0) {
-                if (charCount[i] > (N + 1) / 2) {
-                    return "";
-                }
-                heap.add(new CharCount((char) (i + 'a'), charCount[i]));
+        for (Map.Entry<Integer, Integer> e : map.entrySet()) {
+            if (e.getValue() > maj) {
+                System.out.println("Majority element: " + e.getKey());
+                return;
             }
-
         }
 
-        StringBuilder sb = new StringBuilder();
-        while (heap.size() >= 2) {
-
-            CharCount chC1 = heap.poll();
-            CharCount chC2 = heap.poll();
-
-            sb.append(chC1.letter);
-            sb.append(chC2.letter);
-
-            if (--chC1.count > 0) {
-                heap.add(chC1);
-            }
-            if (--chC2.count > 0) {
-                heap.add(chC2);
-            }
-
-        }
-
-        if (heap.size() > 0) {
-            sb.append(heap.poll().letter);
-        }
-
-        return sb.toString();
+        System.out.println("Majority element: -1");
 
     }
 
-    private int[] KMP_PatternMatchning_Algorithm_LPSArray(String pattern, int size) {
+    public void majorityElement_2(int[] a) {
+
+        //Moore’s Voting Algorithm
+        //https://www.geeksforgeeks.org/majority-element/
+        //..........T: O(N)
+        //..........S: O(1)
+        //finding candidate
+        int maj_index = 0, count = 1;
+        int i;
+        for (i = 1; i < a.length; i++) {
+            if (a[maj_index] == a[i]) {
+                count++;
+            } else {
+                count--;
+            }
+            if (count == 0) {
+                maj_index = i;
+                count = 1;
+            }
+        }
+        int cand = a[maj_index];
+
+        //validating the cand 
+        count = 0;
+        for (i = 0; i < a.length; i++) {
+            if (a[i] == cand) {
+                count++;
+            }
+        }
+        if (count > a.length / 2) {
+            System.out.println("Majority element: " + cand);
+        } else {
+            System.out.println("Majority element: -1");
+        }
+
+    }
+
+    public void mergeTwoSortedArraysWithoutExtraSpace(int[] arr1, int[] arr2, int m, int n) {
+
+        //https://www.geeksforgeeks.org/merge-two-sorted-arrays-o1-extra-space/
+        // Iterate through all elements of ar2[] starting from 
+        // the last element 
+        for (int i = n - 1; i >= 0; i--) {
+            /* Find the smallest element greater than ar2[i]. Move all 
+             elements one position ahead till the smallest greater 
+             element is not found */
+            int j, last = arr1[m - 1];
+            for (j = m - 2; j >= 0 && arr1[j] > arr2[i]; j--) {
+                arr1[j + 1] = arr1[j];
+            }
+
+            // If there was a greater element 
+            if (j != m - 2 || last > arr2[i]) {
+                arr1[j + 1] = arr2[i];
+                arr2[i] = last;
+            }
+        }
+
+        //output
+        for (int x : arr1) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+        for (int x : arr2) {
+            System.out.print(x + " ");
+        }
+
+        System.out.println();
+
+    }
+
+    private int[] KMP_PatternMatching_Algorithm_LPSArray(String pattern, int size) {
 
         int[] lps = new int[size];
         lps[0] = 0; //always 0th index is 0
@@ -1849,14 +1944,14 @@ public class DSA450Questions {
 
     }
 
-    public void KMP_PatternMatchning_Algorithm(String text, String pattern) {
+    public void KMP_PatternMatching_Algorithm(String text, String pattern) {
 
         //geeksforgeeks.org/kmp-algorithm-for-pattern-searching/
         int M = text.length();
         int N = pattern.length();
 
         //create LPS array for pattern
-        int[] lps = KMP_PatternMatchning_Algorithm_LPSArray(pattern, N);
+        int[] lps = KMP_PatternMatching_Algorithm_LPSArray(pattern, N);
 
         //text and pattern matching
         int i = 0; // index for text
@@ -2156,6 +2251,9 @@ public class DSA450Questions {
 //        obj.romanStringToDecimal("CI");
 //        obj.romanStringToDecimal("IM");
 //        obj.romanStringToDecimal("V");
+//        obj.romanStringToDecimal("XI");
+//        obj.romanStringToDecimal("IX");
+//        obj.romanStringToDecimal("IV");
         //......................................................................
 //        Row: 86
 //        System.out.println("Longest commn subsequence");
@@ -2469,17 +2567,48 @@ public class DSA450Questions {
 //        obj.printSentencesFromCollectionOfWords(arr); //GRAPH LIKE DFS
         //......................................................................
 //        Row: 74
-        System.out.println("KMP pattern matching algo");
-        String txt = "ABABDABACDABABCABAB";
-        String pat = "ABABCABAB";
-        obj.KMP_PatternMatchning_Algorithm(txt, pat);
-        txt = "sangeeangt";
-        pat = "ang";
-        obj.KMP_PatternMatchning_Algorithm(txt, pat);
-        obj.longestPrefixAlsoSuffixInString_KMPAlgo("abab");
-        obj.longestPrefixAlsoSuffixInString_KMPAlgo("aaaa");
-        obj.longestPrefixAlsoSuffixInString_KMPAlgo("aabcavefaabca"); //FAIL CASE
-        obj.longestPrefixAlsoSuffixInString_KMPAlgo("abcdef");
+//        System.out.println("KMP pattern matching algo");
+//        String txt = "ABABDABACDABABCABAB";
+//        String pat = "ABABCABAB";
+//        obj.KMP_PatternMatching_Algorithm(txt, pat);
+//        txt = "sangeeangt";
+//        pat = "ang";
+//        obj.KMP_PatternMatching_Algorithm(txt, pat);
+//        obj.longestPrefixAlsoSuffixInString_KMPAlgo("abab");
+//        obj.longestPrefixAlsoSuffixInString_KMPAlgo("aaaa");
+//        obj.longestPrefixAlsoSuffixInString_KMPAlgo("aabcavefaabca"); //FAIL CASE
+//        obj.longestPrefixAlsoSuffixInString_KMPAlgo("abcdef");
+        //......................................................................
+//        Row: 82
+//        System.out.println("Longest common prefix in list of strings");
+//        obj.longestCommonPrefix(new String[]{"flower", "flow", "flight"});
+//        obj.longestCommonPrefix(new String[]{"dog", "racecar", "car"});
+//        obj.longestCommonPrefix(new String[]{"a"});
+//        obj.longestCommonPrefix(new String[]{"abc", "abcdef", "abcdlmno"});
+        //......................................................................
+//        Row: 114
+//        System.out.println("Merge 2 sorted arrays without using extra space");
+//        int arr1[] = new int[]{1, 5, 9, 10, 15, 20};
+//        int arr2[] = new int[]{2, 3, 8, 13};
+//        obj.mergeTwoSortedArraysWithoutExtraSpace(arr1, arr2, arr1.length, arr2.length);
+        //......................................................................
+//        Row: 140
+        System.out.println("Reverse a linked list in K groups");
+        Node<Integer> node = new Node<>(1);
+        node.setNext(new Node<>(2));
+        node.getNext().setNext(new Node<>(3));
+        node.getNext().getNext().setNext(new Node<>(4));
+        node.getNext().getNext().getNext().setNext(new Node<>(5));
+        LinkedListUtil<Integer> ll = new LinkedListUtil<>(obj.reverseLinkedListInKGroups(node, 2));
+        ll.print();
+        node = new Node<>(3);
+        node.setNext(new Node<>(8));
+        node.getNext().setNext(new Node<>(7));
+        node.getNext().getNext().setNext(new Node<>(2));
+        node.getNext().getNext().getNext().setNext(new Node<>(5));
+        node.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
+        ll = new LinkedListUtil<>(obj.reverseLinkedListInKGroups(node, 4));
+        ll.print();
     }
 
 }
