@@ -1708,6 +1708,31 @@ public class DSA450Questions {
         printKSumPathAnyNodeTopToDown_PathList = new ArrayList<>();
         printKSumPathAnyNodeTopToDown_Helper(root, K);
     }
+    
+    private TreeNode<Integer> lowestCommonAncestorOfTree_Helper(TreeNode<Integer> root, int N1, int N2){
+        
+        if(root == null){
+            return null;
+        }
+        
+        if(N1 == root.getData() || N2 == root.getData()){
+            return root;
+        }
+        
+        TreeNode<Integer> leftNode = lowestCommonAncestorOfTree_Helper(root.getLeft(), N1, N2);
+        TreeNode<Integer> rightNode = lowestCommonAncestorOfTree_Helper(root.getRight(), N1, N2);
+        
+        if(leftNode != null && rightNode != null){
+            return root;
+        }
+        
+        return leftNode == null ? rightNode : leftNode;
+        
+    }
+    
+    public void lowestCommonAncestorOfTree(TreeNode<Integer> root, int N1, int N2){
+        System.out.println("Lowest common ancestor of "+N1+" "+N2+": "+lowestCommonAncestorOfTree_Helper(root, N1, N2));
+    }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
@@ -2593,22 +2618,54 @@ public class DSA450Questions {
 //        obj.mergeTwoSortedArraysWithoutExtraSpace(arr1, arr2, arr1.length, arr2.length);
         //......................................................................
 //        Row: 140
-        System.out.println("Reverse a linked list in K groups");
-        Node<Integer> node = new Node<>(1);
-        node.setNext(new Node<>(2));
-        node.getNext().setNext(new Node<>(3));
-        node.getNext().getNext().setNext(new Node<>(4));
-        node.getNext().getNext().getNext().setNext(new Node<>(5));
-        LinkedListUtil<Integer> ll = new LinkedListUtil<>(obj.reverseLinkedListInKGroups(node, 2));
-        ll.print();
-        node = new Node<>(3);
-        node.setNext(new Node<>(8));
-        node.getNext().setNext(new Node<>(7));
-        node.getNext().getNext().setNext(new Node<>(2));
-        node.getNext().getNext().getNext().setNext(new Node<>(5));
-        node.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
-        ll = new LinkedListUtil<>(obj.reverseLinkedListInKGroups(node, 4));
-        ll.print();
+//        System.out.println("Reverse a linked list in K groups");
+//        Node<Integer> node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        LinkedListUtil<Integer> ll = new LinkedListUtil<>(obj.reverseLinkedListInKGroups(node, 2));
+//        ll.print();
+//        node = new Node<>(3);
+//        node.setNext(new Node<>(8));
+//        node.getNext().setNext(new Node<>(7));
+//        node.getNext().getNext().setNext(new Node<>(2));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
+//        ll = new LinkedListUtil<>(obj.reverseLinkedListInKGroups(node, 4));
+//        ll.print();
+        //......................................................................
+//        Row: 207, 220
+        System.out.println("Lowest common ancestor of two given node/ node values for binary tree and binary search tree both");
+        TreeNode<Integer> root1 = new TreeNode<>(5);
+        root1.setLeft(new TreeNode(2));
+        root1.getLeft().setLeft(new TreeNode<>(3));
+        root1.getLeft().setRight(new TreeNode<>(4));
+        obj.lowestCommonAncestorOfTree(root1, 3, 4);
+        root1 = new TreeNode<>(5);
+        root1.setLeft(new TreeNode(2));
+        root1.getLeft().setLeft(new TreeNode<>(3));
+        root1.getLeft().setRight(new TreeNode<>(4));
+        root1.setRight(new TreeNode<>(6));
+        obj.lowestCommonAncestorOfTree(root1, 3, 6);
+        //CASE OF BST
+        root1 = new TreeNode<>(6);
+        root1.setLeft(new TreeNode(2));
+        root1.getLeft().setLeft(new TreeNode(0));
+        root1.getLeft().setRight(new TreeNode(4));
+        root1.getLeft().getRight().setLeft(new TreeNode(3));
+        root1.getLeft().getRight().setRight(new TreeNode(5));
+        root1.setRight(new TreeNode(8));
+        root1.getRight().setLeft(new TreeNode(7));
+        root1.getRight().setRight(new TreeNode(9));
+        obj.lowestCommonAncestorOfTree(root1, 0, 5);
+        root1 = new TreeNode<>(5);
+        root1.setLeft(new TreeNode(4));
+        root1.getLeft().setLeft(new TreeNode<>(3));
+        root1.setRight(new TreeNode(6));
+        root1.getRight().setRight(new TreeNode(7));
+        root1.getRight().getRight().setRight(new TreeNode(8));
+        obj.lowestCommonAncestorOfTree(root1, 7, 8);
     }
 
 }

@@ -1413,7 +1413,7 @@ public class SomePracticeQuestion {
 
     }
 
-    public static void waterBetweenTower(int[] towerHeight) {
+    public static void rainWaterTrapping(int[] towerHeight) {
 
         int waterCapacity = 0;
 
@@ -1449,6 +1449,81 @@ public class SomePracticeQuestion {
 
         System.out.println("Water capacity " + waterCapacity);
 
+    }
+    
+    public static void rainWaterTrappingUsingStack(int[] height){
+        
+        //https://leetcode.com/problems/trapping-rain-water/solution/
+        
+        //..................T: O(N)
+        //..................S: O(N)
+        
+        int ans = 0;
+        int current = 0;
+        int N = height.length;
+        Stack<Integer> s = new Stack<>();
+        while(current < N){
+            
+            while(!s.isEmpty() && height[current] > height[s.peek()]){
+                
+                int top = s.pop();
+                if(s.isEmpty()){
+                    break;
+                }
+                
+                int distance = current - s.peek() - 1;
+                int boundedHeight = Math.min(height[current], height[s.peek()]) - height[top];
+                ans += distance * boundedHeight;
+                
+            }
+            
+            s.push(current++);
+        }
+        
+        //output
+        System.out.println("Rain water trapping using stack: "+ans);
+        
+    }
+    
+    public static void rainWaterTrappingUsingTwoPointers(int[] height){
+        
+        //https://leetcode.com/problems/trapping-rain-water/solution/
+        
+        //OPTIMISED than stack
+        //..................T: O(N)
+        //..................S: O(1)
+        
+        int left = 0;
+        int right = height.length - 1;
+        int ans = 0;
+        int leftMax = 0;
+        int rightMax = 0;
+        while(left < right){
+            if (height[left] < height[right]) {
+                
+                if(height[left] >= leftMax){
+                    leftMax = height[left];
+                }else {
+                    ans += (leftMax - height[left]);
+                }
+                
+                ++left;
+            }
+            else {
+                
+                if(height[right] >= rightMax){
+                    rightMax = height[right];
+                }else {
+                    ans += (rightMax - height[right]);
+                }
+                
+                --right;
+            }
+        }
+        
+        //output
+        System.out.println("Rain water trapping using tow pointers: "+ans);
+        
     }
 
     private static int findMax(int[] a, int i, int j) {
@@ -3082,11 +3157,8 @@ public class SomePracticeQuestion {
     }
 
     public static Node<Integer> reverseLinkedListInKGroups_1(Node<Integer> head, int k) {
-        
+
         //https://www.geeksforgeeks.org/reverse-a-list-in-groups-of-given-size/
-        
-        //EXACT EFFICIENT
-        //much better explanation
         Node<Integer> current = head;
         Node<Integer> next = null;
         Node<Integer> prev = null;
@@ -3111,6 +3183,38 @@ public class SomePracticeQuestion {
 
         // prev is now head of input list 
         return prev;
+    }
+
+    public static Node<Integer> reverseLinkedListInKGroups_2(Node<Integer> head, int k) {
+
+        //https://leetcode.com/problems/reverse-nodes-in-k-group/
+        Node<Integer> node = head;
+        int count = 0;
+        while (count < k) {
+
+            if (node == null) {
+                return head;
+            }
+
+            node = node.getNext();
+            count++;
+
+        }
+
+        Node<Integer> pre = reverseLinkedListInKGroups_2(node, k);
+
+        while (count > 0) {
+
+            Node<Integer> next = head.getNext();
+            head.setNext(pre);
+            pre = head;
+            head = next;
+            count--;
+
+        }
+
+        return pre;
+
     }
 
     public static int stiklerThief(int[] houses, int n) {
@@ -5840,6 +5944,46 @@ public class SomePracticeQuestion {
 
     }
 
+    public static int lastOccurence(int arr[], int low, int high, int x, int n){
+        if (high >= low) {
+            int mid = low + (high - low) / 2;
+            if ((mid == n - 1 || x < arr[mid + 1]) && arr[mid] == x)
+                return mid;
+            else if (x < arr[mid])
+                return lastOccurence(arr, low, (mid - 1), x, n);
+            else
+                return lastOccurence(arr, (mid + 1), high, x, n);
+        }
+        return -1;
+    }
+    
+    public static int firstOccurence(int arr[], int low, int high, int x, int n){
+        if (high >= low) {
+            int mid = low + (high - low) / 2;
+            if ((mid == 0 || x > arr[mid - 1]) && arr[mid] == x)
+                return mid;
+            else if (x > arr[mid])
+                return firstOccurence(arr, (mid + 1), high, x, n);
+            else
+                return firstOccurence(arr, low, (mid - 1), x, n);
+        }
+        return -1;
+    }
+    
+    public static void firstAndLastOccurenceInSortedArray(int[] nums, int target) {
+        
+        int N = nums.length;
+        int f = 0;
+        int l = nums.length;
+        int[] result = {-1, -1};
+        
+        result[0] = firstOccurence(nums, f, l-1, target, N);
+        result[1] = lastOccurence(nums, f, l-1, target, N);
+        
+        System.out.println("First and last: "+result[0]+" "+result[1]);
+        
+    }
+    
     public static int longestCommonSubsequence_Recursive(String a, String b, int aLen, int bLen) {
 
         //least end point when we reach to 0 index of string
@@ -7837,11 +7981,21 @@ public class SomePracticeQuestion {
 //                + "The width of every tower is 1. "
 //                + "It starts raining. How much water is collected between the towers");
 //        //geeksforgeeks.org/amazon-interview-set-41-campus/
-//        waterBetweenTower(new int[]{1, 5, 2, 7, 3});
-//        waterBetweenTower(new int[]{8, 2, 4, 6, 8});
-//        waterBetweenTower(new int[]{1, 3, 6, 3, 1});
-//        waterBetweenTower(new int[]{1, 0, 1});
-//        waterBetweenTower(new int[]{ 0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1});
+//        rainWaterTrapping(new int[]{1, 5, 2, 7, 3});
+//        rainWaterTrappingUsingStack(new int[]{1, 5, 2, 7, 3});
+//        rainWaterTrappingUsingTwoPointers(new int[]{1, 5, 2, 7, 3});
+//        rainWaterTrapping(new int[]{8, 2, 4, 6, 8});
+//        rainWaterTrappingUsingStack(new int[]{8, 2, 4, 6, 8});
+//        rainWaterTrappingUsingTwoPointers(new int[]{8, 2, 4, 6, 8});
+//        rainWaterTrapping(new int[]{1, 3, 6, 3, 1}); //WRONG ANS
+//        rainWaterTrappingUsingStack(new int[]{1, 3, 6, 3, 1}); //RIGHT ANS
+//        rainWaterTrappingUsingTwoPointers(new int[]{1, 3, 6, 3, 1}); ////RIGHT ANS
+//        rainWaterTrapping(new int[]{1, 0, 1});
+//        rainWaterTrappingUsingStack(new int[]{1, 0, 1});
+//        rainWaterTrappingUsingTwoPointers(new int[]{1, 0, 1});
+//        rainWaterTrapping(new int[]{ 0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1});
+//        rainWaterTrappingUsingStack(new int[]{ 0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1});
+//        rainWaterTrappingUsingTwoPointers(new int[]{ 0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1});
 //..............................................................................
 //        System.out.println("3) Given an array and a fixed window size X, "
 //                + "you have to find out the minimum value "
@@ -8491,7 +8645,6 @@ public class SomePracticeQuestion {
 //        System.out.println("Reverse a Linked List in groups of given size");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-sde1/?ref=rp
 //        //https://practice.geeksforgeeks.org/problems/reverse-a-linked-list-in-groups-of-given-size/1
-//        //https://leetcode.com/problems/reverse-nodes-in-k-group/
 //        //https://www.geeksforgeeks.org/reverse-a-list-in-groups-of-given-size/
 //        Node<Integer> head1 = new Node<>(1);
 //        head1.setNext(new Node<>(2));
@@ -8507,6 +8660,23 @@ public class SomePracticeQuestion {
 //        head1.getNext().getNext().getNext().setNext(new Node<>(5));
 //        head1.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
 //        ll = new LinkedListUtil<>(reverseLinkedListInKGroups_1(head1, 4)); //EXACT
+//        ll.print();
+//        //different approach different question
+//        //https://leetcode.com/problems/reverse-nodes-in-k-group/
+//        head1 = new Node<>(1);
+//        head1.setNext(new Node<>(2));
+//        head1.getNext().setNext(new Node<>(3));
+//        head1.getNext().getNext().setNext(new Node<>(4));
+//        head1.getNext().getNext().getNext().setNext(new Node<>(5));
+//        ll = new LinkedListUtil<>(reverseLinkedListInKGroups_2(head1, 2));
+//        ll.print();
+//        head1 = new Node<>(3);
+//        head1.setNext(new Node<>(8));
+//        head1.getNext().setNext(new Node<>(7));
+//        head1.getNext().getNext().setNext(new Node<>(2));
+//        head1.getNext().getNext().getNext().setNext(new Node<>(5));
+//        head1.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
+//        ll = new LinkedListUtil<>(reverseLinkedListInKGroups_2(head1, 4)); //EXACT
 //        ll.print();
 //..............................................................................
 //        System.out.println("Maximum sum such that no two elements are adjacent");
@@ -9522,6 +9692,13 @@ public class SomePracticeQuestion {
 //        calculateAngleBetweenHourAndMin(9, 60);
 //        calculateAngleBetweenHourAndMin(3, 30);
 //        calculateAngleBetweenHourAndMin(3, 15);
+//..............................................................................
+//        System.out.println("Find given no first and last occurence in the sorted array");
+//        //https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/
+//        //https://www.geeksforgeeks.org/find-first-and-last-positions-of-an-element-in-a-sorted-array/
+//        //BINARY SEARCH
+//        firstAndLastOccurenceInSortedArray(new int[]{5,7,7,8,8,10}, 8);
+//        firstAndLastOccurenceInSortedArray(new int[]{5,7,7,8,8,10}, 3);
 //..............................................................................
 //        System.out.println("longest common subsequence 3 ways");
 //        String a = "abcdefg";
