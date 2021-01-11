@@ -626,6 +626,28 @@ public class DSA450Questions {
         System.out.println("Longest common prefix in list of strings: " + (prefix.length() >= minLenPrefix ? prefix.substring(0, minLenPrefix) : ""));
 
     }
+    
+    public void secondMostOccuringWordInStringList(String[] list){
+        
+        Map<String, Integer> map = new HashMap<>();
+        for(String s: list){
+            map.put(s, map.getOrDefault(s, 0)+1);
+        }
+        
+        PriorityQueue<Map.Entry<String, Integer>> minHeap = new PriorityQueue<>(
+                (e1, e2) -> e1.getValue() - e2.getValue()
+        );
+        
+        for(Map.Entry<String, Integer> e: map.entrySet()){
+            minHeap.add(e);
+            if(minHeap.size() > 2){
+                minHeap.poll();
+            }
+        }
+        
+        System.out.println("Second most occuring word: "+minHeap.poll().getKey());
+        
+    }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
         System.out.println("Reverse linked list iterative");
@@ -1934,6 +1956,42 @@ public class DSA450Questions {
         System.out.println();
 
     }
+    
+    private int findFirstOccurenceKInSortedArray(int[] arr, int K, int low, int high, int N){
+        if (high >= low) {
+            int mid = low + (high - low) / 2;
+            if ((mid == 0 || K > arr[mid - 1]) && arr[mid] == K)
+                return mid;
+            else if (K > arr[mid])
+                return findFirstOccurenceKInSortedArray(arr, K, (mid + 1), high, N);
+            else
+                return findFirstOccurenceKInSortedArray(arr, K, low, (mid - 1), N);
+        }
+        return -1;
+    }
+    
+    private int findLastOccurenceKInSortedArray(int[] arr, int K, int low, int high, int N){
+        if (high >= low) {
+            int mid = low + (high - low) / 2;
+            if ((mid == N - 1 || K < arr[mid + 1]) && arr[mid] == K)
+                return mid;
+            else if (K < arr[mid])
+                return findLastOccurenceKInSortedArray(arr, K, low, (mid - 1), N);
+            else
+                return findLastOccurenceKInSortedArray(arr, K, (mid + 1), high, N);
+        }
+        return -1;
+    }
+    
+    public void findFirstAndLastOccurenceOfKInSortedArray(int[] arr, int K){
+        
+        int N = arr.length;
+        int first = findFirstOccurenceKInSortedArray(arr, K, 0, N-1, N);
+        int last = findLastOccurenceKInSortedArray(arr, K, 0, N-1, N);
+        
+        System.out.println(K+" first and last occurence: "+first+" "+last);
+        
+    }
 
     private int[] KMP_PatternMatching_Algorithm_LPSArray(String pattern, int size) {
 
@@ -2004,6 +2062,67 @@ public class DSA450Questions {
 
         }
 
+    }
+    
+    public int editDistance_Recursion(String s1, String s2, int m, int n){
+        
+        //https://www.geeksforgeeks.org/edit-distance-dp-5/
+        
+        //if s1 is empty then whole s2 is to be inserted to coonert s1 to s2
+        if(m == 0){
+            return n;
+        }
+        
+        //if s2 is empty then whole s1 is to be deleted to convert s1 to s2
+        if(n == 0){
+            return m;
+        }
+        
+        //if last char of two strings matches then just move ahead one char in both
+        if(s1.charAt(m-1) == s2.charAt(n-1)){
+            return editDistance_Recursion(s1, s2, m-1, n-1);
+        }
+        
+        //if the char doesn't matches then take the min of below 3
+        return Math.min(editDistance_Recursion(s1, s2, m, n-1), //insert
+                Math.min(editDistance_Recursion(s1, s2, m-1, n), //delete
+                editDistance_Recursion(s1, s2, m-1, n-1)))   // replace
+                + 1;
+        
+    }
+    
+    public int editDistance_DP_Memoization(String s1, String s2){
+        
+        //https://www.geeksforgeeks.org/edit-distance-dp-5/
+        
+        int m = s1.length();
+        int n = s2.length();
+        int[][] memo = new int[m+1][n+1];
+        
+        //base cond
+        for(int x = 0; x<m+1; x++){
+            for(int y = 0; y<n+1; y++){
+                if(x == 0){
+                    memo[x][y] = y;
+                }else if(y == 0){
+                    memo[x][y] = x;
+                }
+            }
+        }
+        
+        for(int x = 1; x<m+1; x++){
+            for(int y = 1; y<n+1; y++){
+                if(s1.charAt(x-1) == s2.charAt(y-1)){
+                    memo[x][y] = memo[x-1][y-1];
+                }else {
+                    memo[x][y] = 1 + Math.min(memo[x][y-1], Math.min(memo[x-1][y], memo[x-1][y-1]));
+                }
+                
+            }
+        }
+        
+        return memo[m][n];
+        
     }
 
     public static void main(String[] args) {
@@ -2527,6 +2646,7 @@ public class DSA450Questions {
 //        obj.removeConsecutiveDuplicateInString("xyzpqrs");
 //        obj.removeConsecutiveDuplicateInString("abcppqrspplmn");
 //        obj.removeConsecutiveDuplicateInString("abcdlllllmmmmm");
+//        obj.removeConsecutiveDuplicateInString("aaaaaaaaaaaa");
         //......................................................................
 //        Row: 108
 //        System.out.println("Majority Element");
@@ -2636,36 +2756,52 @@ public class DSA450Questions {
 //        ll.print();
         //......................................................................
 //        Row: 207, 220
-        System.out.println("Lowest common ancestor of two given node/ node values for binary tree and binary search tree both");
-        TreeNode<Integer> root1 = new TreeNode<>(5);
-        root1.setLeft(new TreeNode(2));
-        root1.getLeft().setLeft(new TreeNode<>(3));
-        root1.getLeft().setRight(new TreeNode<>(4));
-        obj.lowestCommonAncestorOfTree(root1, 3, 4);
-        root1 = new TreeNode<>(5);
-        root1.setLeft(new TreeNode(2));
-        root1.getLeft().setLeft(new TreeNode<>(3));
-        root1.getLeft().setRight(new TreeNode<>(4));
-        root1.setRight(new TreeNode<>(6));
-        obj.lowestCommonAncestorOfTree(root1, 3, 6);
-        //CASE OF BST
-        root1 = new TreeNode<>(6);
-        root1.setLeft(new TreeNode(2));
-        root1.getLeft().setLeft(new TreeNode(0));
-        root1.getLeft().setRight(new TreeNode(4));
-        root1.getLeft().getRight().setLeft(new TreeNode(3));
-        root1.getLeft().getRight().setRight(new TreeNode(5));
-        root1.setRight(new TreeNode(8));
-        root1.getRight().setLeft(new TreeNode(7));
-        root1.getRight().setRight(new TreeNode(9));
-        obj.lowestCommonAncestorOfTree(root1, 0, 5);
-        root1 = new TreeNode<>(5);
-        root1.setLeft(new TreeNode(4));
-        root1.getLeft().setLeft(new TreeNode<>(3));
-        root1.setRight(new TreeNode(6));
-        root1.getRight().setRight(new TreeNode(7));
-        root1.getRight().getRight().setRight(new TreeNode(8));
-        obj.lowestCommonAncestorOfTree(root1, 7, 8);
+//        System.out.println("Lowest common ancestor of two given node/ node values for binary tree and binary search tree both");
+//        TreeNode<Integer> root1 = new TreeNode<>(5);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode<>(3));
+//        root1.getLeft().setRight(new TreeNode<>(4));
+//        obj.lowestCommonAncestorOfTree(root1, 3, 4);
+//        root1 = new TreeNode<>(5);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode<>(3));
+//        root1.getLeft().setRight(new TreeNode<>(4));
+//        root1.setRight(new TreeNode<>(6));
+//        obj.lowestCommonAncestorOfTree(root1, 3, 6);
+//        //CASE OF BST
+//        root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.lowestCommonAncestorOfTree(root1, 0, 5);
+//        root1 = new TreeNode<>(5);
+//        root1.setLeft(new TreeNode(4));
+//        root1.getLeft().setLeft(new TreeNode<>(3));
+//        root1.setRight(new TreeNode(6));
+//        root1.getRight().setRight(new TreeNode(7));
+//        root1.getRight().getRight().setRight(new TreeNode(8));
+//        obj.lowestCommonAncestorOfTree(root1, 7, 8);
+        //......................................................................
+//        Row: 69
+//        System.out.println("Edit distance recursion/ DP memoization");
+//        String s1 = "sunday";
+//        String s2 = "saturday";
+//        System.out.println("Edit distance recursion: "+obj.editDistance_Recursion(s1, s2, s1.length(), s2.length()));
+//        System.out.println("Edit distance dp memoization: "+obj.editDistance_DP_Memoization(s1, s2));
+        //......................................................................
+//        Row: 84
+//        System.out.println("Second most occuring word in list");
+//        obj.secondMostOccuringWordInStringList(new String[]{"aaa", "bbb", "ccc", "bbb", "aaa", "aaa"});
+        //......................................................................
+//        Row: 101
+        System.out.println("Find first and last occurence of K in sorted array");
+        obj.findFirstAndLastOccurenceOfKInSortedArray(new int[]{1, 3, 5, 5, 5, 5, 67, 123, 125}, 5);
+        obj.findFirstAndLastOccurenceOfKInSortedArray(new int[]{1, 3, 5, 5, 5, 5, 67, 123, 125}, 9);
     }
 
 }
