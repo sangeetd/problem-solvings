@@ -937,6 +937,170 @@ public class DSA450Questions {
         return prev;
 
     }
+    
+    public boolean detectLoopCycleInLinkedList_HashBased(Node node){
+        
+        //......................T: O(N)
+        //......................S: O(N)
+        
+        Set<Node> set = new HashSet<>();
+        Node temp = node;
+        while(temp != null){
+            
+            if(set.contains(temp)){
+                System.out.println("Hash Based Cycle at: "+temp.getData());
+                return true;
+            }
+            
+            set.add(temp);
+            temp = temp.getNext();
+        }
+        
+        System.out.println("Hash Based No cycle found");
+        return false;
+        
+    }
+    
+    public boolean detectLoopCycleInLinkedList_Iterative(Node node){
+        
+        //......................T: O(N)
+        //......................S: O(1)
+        
+        Node slow = node;
+        Node fast = node.getNext();
+        while(slow != null && fast != null && fast.getNext() != null){
+            
+            if(slow == fast){
+                System.out.println("Iterative approach Cycle at: "+fast.getData());
+                return true;
+            }
+            
+            slow = slow.getNext();
+            fast = fast.getNext().getNext();
+            
+        }
+        
+        System.out.println("Iterative approach No cycle found");
+        return false;
+        
+    }
+    
+    public void detectAndRemoveLoopCycleInLinkedList_HashBased(Node node){
+        
+        //......................T: O(N)
+        //......................S: O(N)
+        
+        Set<Node> set = new HashSet<>();
+        Node loopEnd = null;
+        Node temp = node;
+        while(temp != null){
+            
+            if(set.contains(temp)){
+                loopEnd.setNext(null);
+                break;
+            }
+            
+            set.add(temp);
+            loopEnd = temp;
+            temp = temp.getNext();
+            
+        }
+        
+        //output;
+        System.out.println("Hash Based approach detect and remove a loop cycle in linked list output:");
+        new LinkedListUtil(node).print();
+        
+    }
+    
+    public void detectAndRemoveLoopCycleInLinkedList_Iterative(Node node){
+        
+        //......................T: O(N)
+        //......................S: O(1)
+        
+        Node slow = node;
+        Node fast = node.getNext();
+        while(slow != null && fast != null && fast.getNext() != null){
+            
+            if(slow == fast){
+                break;
+            }
+            
+            slow = slow.getNext();
+            fast = fast.getNext().getNext();
+            
+        }
+        
+        //if there is a loop in linked list
+        if(slow == fast){
+            
+            slow = node;
+            while(slow != fast.getNext()){
+                slow = slow.getNext();
+                fast = fast.getNext();
+            }
+            
+            fast.setNext(null);
+            
+        }
+        
+        //output
+        System.out.println("Iterative approach detect and remove a loop cycle in linked list output:");
+        new LinkedListUtil(node).print();
+        
+    }
+    
+    public void removeDuplicatesFromUnSortedLinkedListOnlyConsecutive(Node<Integer> node){
+        
+        //...............................T: O(N)
+        //...............................S: O(1)
+        
+        Node<Integer> curr = node;
+        Node<Integer> temp = node.getNext();
+        while(temp != null){
+            
+            if(curr.getData() != temp.getData()){
+                curr.setNext(temp);
+                curr = temp;
+            }
+            
+            temp = temp.getNext();
+            
+        }
+        
+        curr.setNext(temp);
+        
+        //output
+        System.out.println("Remove duplicates that are consecutive in lisnked list output:");
+        new LinkedListUtil<>(node).print();
+        
+    }
+    
+    public void removeDuplicatesFromUnSortedLinkedListAllExtraOccuernce(Node<Integer> node){
+        
+        //...............................T: O(N)
+        //...............................S: O(N)
+        Set<Integer> set = new HashSet<>();
+        Node<Integer> curr = node;
+        Node<Integer> temp = node.getNext();
+        set.add(curr.getData());
+        while(temp != null){
+            
+            if(curr.getData() != temp.getData() && !set.contains(temp.getData())){
+                curr.setNext(temp);
+                curr = temp;
+            }
+            set.add(temp.getData());
+            temp = temp.getNext();
+            
+        }
+        
+        curr.setNext(temp);
+        
+        //output
+        System.out.println("Remove duplicates all extra occuernce in lisnked list output:");
+        new LinkedListUtil<>(node).print();
+        
+    }
 
     public void levelOrderTraversal_Iterative(TreeNode root) {
 
@@ -2698,11 +2862,13 @@ public class DSA450Questions {
 //        System.out.println("Min cost to combine ropes of diff lengths into one big rope");
 //        obj.minCostOfRope(new int[]{4, 3, 2, 6});
         //......................................................................
-//        Row: 344
+//        Row: 344, 89
 //        System.out.println("Reorganise string");
 //        //https://leetcode.com/problems/reorganize-string/
 //        System.out.println("Reorganise string output: "+obj.reorganizeString("aab"));
 //        System.out.println("Reorganise string output: "+obj.reorganizeString("aaab"));
+//        System.out.println("Reorganise string output: "+obj.reorganizeString("bbbbb"));
+//        System.out.println("Reorganise string output: "+obj.reorganizeString("geeksforgeeks"));
         //......................................................................
 //        Row: 98
 //        System.out.println("Print all sentences that can be formed from list/array of words");
@@ -2799,9 +2965,58 @@ public class DSA450Questions {
 //        obj.secondMostOccuringWordInStringList(new String[]{"aaa", "bbb", "ccc", "bbb", "aaa", "aaa"});
         //......................................................................
 //        Row: 101
-        System.out.println("Find first and last occurence of K in sorted array");
-        obj.findFirstAndLastOccurenceOfKInSortedArray(new int[]{1, 3, 5, 5, 5, 5, 67, 123, 125}, 5);
-        obj.findFirstAndLastOccurenceOfKInSortedArray(new int[]{1, 3, 5, 5, 5, 5, 67, 123, 125}, 9);
+//        System.out.println("Find first and last occurence of K in sorted array");
+//        obj.findFirstAndLastOccurenceOfKInSortedArray(new int[]{1, 3, 5, 5, 5, 5, 67, 123, 125}, 5);
+//        obj.findFirstAndLastOccurenceOfKInSortedArray(new int[]{1, 3, 5, 5, 5, 5, 67, 123, 125}, 9);
+        //......................................................................
+//        Row: 141, 143
+//        System.out.println("Detect and print starting node of a loop cycle in linked list 2 approaches");
+//        Node<Integer> node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext()); //Node 5 connects to Node 3
+//        System.out.println("Is there a loop in linked list: "+obj.detectLoopCycleInLinkedList_HashBased(node));
+//        System.out.println("Is there a loop in linked list: "+obj.detectLoopCycleInLinkedList_Iterative(node)); //T: O(N), S: O(1) //OPTIMISED
+        //......................................................................
+//        Row: 142
+//        System.out.println("Detect and remove loop cycle in linked list 2 approaches");
+//        Node<Integer> node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext()); //Node 5 connects to Node 3
+//        obj.detectAndRemoveLoopCycleInLinkedList_HashBased(node);
+//        node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext()); //Node 5 connects to Node 3
+//        obj.detectAndRemoveLoopCycleInLinkedList_Iterative(node); //OPTIMISED
+        //......................................................................
+//        Row: 145
+        System.out.println("Remove duplicates element in linked list 2 different outputs");
+        Node<Integer> node = new Node<>(3);
+        node.setNext(new Node<>(4));
+        node.getNext().setNext(new Node<>(5));
+        node.getNext().getNext().setNext(new Node<>(5));
+        node.getNext().getNext().getNext().setNext(new Node<>(5));
+        node.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
+        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+        node.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+        obj.removeDuplicatesFromUnSortedLinkedListOnlyConsecutive(node);
+        node = new Node<>(3);
+        node.setNext(new Node<>(4));
+        node.getNext().setNext(new Node<>(5));
+        node.getNext().getNext().setNext(new Node<>(5));
+        node.getNext().getNext().getNext().setNext(new Node<>(5));
+        node.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
+        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+        node.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+        obj.removeDuplicatesFromUnSortedLinkedListAllExtraOccuernce(node);
     }
 
 }

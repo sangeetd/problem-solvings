@@ -4862,15 +4862,13 @@ public class SomePracticeQuestion {
             return;
         }
 
-        Node slow = node, fast = node;
-
         // Move slow and fast 1 and 2 steps 
         // ahead respectively. 
-        slow = slow.getNext();
-        fast = fast.getNext().getNext();
+        Node slow = node;
+        Node fast = node.getNext();
 //        System.out.println(slow.getData() + "#" + fast.getData());
         // Search for loop using slow and fast pointers 
-        while (fast != null && fast.getNext() != null) {
+        while (slow != null && fast != null && fast.getNext() != null) {
             if (slow == fast) {
                 break;
             }
@@ -4884,7 +4882,7 @@ public class SomePracticeQuestion {
         if (slow == fast) {
             slow = node;
 //            System.out.println(slow.getData()+"|"+fast.getData());
-            while (slow.getNext() != fast.getNext()) {
+            while (slow != fast.getNext()) {
                 slow = slow.getNext();
                 fast = fast.getNext();
 //                System.out.println(slow.getData()+"-"+fast.getData());
