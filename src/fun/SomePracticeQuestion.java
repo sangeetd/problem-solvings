@@ -4800,13 +4800,25 @@ public class SomePracticeQuestion {
             //debugg
 //            System.out.println("Slow: "+slow.getData()+" fast: "+fast.getData());
             if (slow == fast) {
-                System.out.println("Cycle found at " + slow.getData());
-                return;
+                break;
             }
 
             slow = slow.getNext();
             fast = fast.getNext().getNext();
 
+        }
+        
+        /* If loop exists */
+        if (slow == fast) {
+            slow = node;
+            while (slow != fast.getNext()) {
+                slow = slow.getNext();
+                fast = fast.getNext();
+            }
+
+            /* since fast->next is the looping point */
+            System.out.println("Cycle found at " + fast.getNext().getData());
+            return;
         }
 
         //no cycle found
@@ -4944,6 +4956,40 @@ public class SomePracticeQuestion {
 
         System.out.println();
 
+    }
+    
+    public static Node removeNthFromEnd(Node head, int n) {
+        
+        if(head == null || head.getNext() == null && n == 1){
+            return null;
+        }
+        
+        Node ref = head;
+        Node main = head;
+        Node prevMain = null;
+        while(n-- != 0){
+            ref = ref.getNext();
+            if(ref == null){
+                ref = head;
+            }
+            
+        }
+        
+        if(ref == main){
+            return head = head.getNext();
+        }
+        
+        while(ref != null){
+            prevMain = main;
+            main = main.getNext();
+            ref = ref.getNext();
+        }
+        
+        prevMain.setNext(main.getNext());
+        
+//         System.out.println(prevMain.val);
+        return head;
+        
     }
 
     public static boolean childrenSumPropertyOfTree(TreeNode<Integer> node) {
@@ -9427,6 +9473,27 @@ public class SomePracticeQuestion {
 //        int[] a2 = {2,21,43,38,0,42,33,7,24,13,12,27,12,24,5,23,29,48,30,31};
 //        int[] b2 = {2,42,38,0,43,21};
 //        sortAListInRelativeOrderOfBList(a2, b2);
+//..............................................................................
+//        System.out.println("Remove the Nth node from end in linked list");
+//        //https://leetcode.com/problems/remove-nth-node-from-end-of-list/
+//        Node<Integer> node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        new LinkedListUtil<Integer>(removeNthFromEnd(node, 3)).print();
+//        node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        new LinkedListUtil<Integer>(removeNthFromEnd(node, 5)).print();
+//        node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        new LinkedListUtil<Integer>(removeNthFromEnd(node, 1)).print();
 //..............................................................................
 //        System.out.println("Children sum property of tree");
 //        //https://www.geeksforgeeks.org/amazon-interview-experience-set-213-off-campus-for-sde1/?ref=rp

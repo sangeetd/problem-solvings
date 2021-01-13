@@ -626,27 +626,27 @@ public class DSA450Questions {
         System.out.println("Longest common prefix in list of strings: " + (prefix.length() >= minLenPrefix ? prefix.substring(0, minLenPrefix) : ""));
 
     }
-    
-    public void secondMostOccuringWordInStringList(String[] list){
-        
+
+    public void secondMostOccuringWordInStringList(String[] list) {
+
         Map<String, Integer> map = new HashMap<>();
-        for(String s: list){
-            map.put(s, map.getOrDefault(s, 0)+1);
+        for (String s : list) {
+            map.put(s, map.getOrDefault(s, 0) + 1);
         }
-        
+
         PriorityQueue<Map.Entry<String, Integer>> minHeap = new PriorityQueue<>(
                 (e1, e2) -> e1.getValue() - e2.getValue()
         );
-        
-        for(Map.Entry<String, Integer> e: map.entrySet()){
+
+        for (Map.Entry<String, Integer> e : map.entrySet()) {
             minHeap.add(e);
-            if(minHeap.size() > 2){
+            if (minHeap.size() > 2) {
                 minHeap.poll();
             }
         }
-        
-        System.out.println("Second most occuring word: "+minHeap.poll().getKey());
-        
+
+        System.out.println("Second most occuring word: " + minHeap.poll().getKey());
+
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -937,169 +937,234 @@ public class DSA450Questions {
         return prev;
 
     }
-    
-    public boolean detectLoopCycleInLinkedList_HashBased(Node node){
-        
+
+    public boolean detectLoopCycleInLinkedList_HashBased(Node node) {
+
         //......................T: O(N)
         //......................S: O(N)
-        
         Set<Node> set = new HashSet<>();
         Node temp = node;
-        while(temp != null){
-            
-            if(set.contains(temp)){
-                System.out.println("Hash Based Cycle at: "+temp.getData());
+        while (temp != null) {
+
+            if (set.contains(temp)) {
+                System.out.println("Hash Based Cycle at: " + temp.getData());
                 return true;
             }
-            
+
             set.add(temp);
             temp = temp.getNext();
         }
-        
+
         System.out.println("Hash Based No cycle found");
         return false;
-        
+
     }
-    
-    public boolean detectLoopCycleInLinkedList_Iterative(Node node){
-        
+
+    public boolean detectLoopCycleInLinkedList_Iterative(Node node) {
+
         //......................T: O(N)
         //......................S: O(1)
-        
         Node slow = node;
         Node fast = node.getNext();
-        while(slow != null && fast != null && fast.getNext() != null){
-            
-            if(slow == fast){
-                System.out.println("Iterative approach Cycle at: "+fast.getData());
-                return true;
-            }
-            
-            slow = slow.getNext();
-            fast = fast.getNext().getNext();
-            
-        }
-        
-        System.out.println("Iterative approach No cycle found");
-        return false;
-        
-    }
-    
-    public void detectAndRemoveLoopCycleInLinkedList_HashBased(Node node){
-        
-        //......................T: O(N)
-        //......................S: O(N)
-        
-        Set<Node> set = new HashSet<>();
-        Node loopEnd = null;
-        Node temp = node;
-        while(temp != null){
-            
-            if(set.contains(temp)){
-                loopEnd.setNext(null);
+        while (slow != null && fast != null && fast.getNext() != null) {
+
+            if (slow == fast) {
                 break;
             }
-            
-            set.add(temp);
-            loopEnd = temp;
-            temp = temp.getNext();
-            
-        }
-        
-        //output;
-        System.out.println("Hash Based approach detect and remove a loop cycle in linked list output:");
-        new LinkedListUtil(node).print();
-        
-    }
-    
-    public void detectAndRemoveLoopCycleInLinkedList_Iterative(Node node){
-        
-        //......................T: O(N)
-        //......................S: O(1)
-        
-        Node slow = node;
-        Node fast = node.getNext();
-        while(slow != null && fast != null && fast.getNext() != null){
-            
-            if(slow == fast){
-                break;
-            }
-            
+
             slow = slow.getNext();
             fast = fast.getNext().getNext();
-            
+
         }
-        
-        //if there is a loop in linked list
-        if(slow == fast){
-            
+
+        if (slow == fast) {
             slow = node;
-            while(slow != fast.getNext()){
+            while (slow != fast.getNext()) {
                 slow = slow.getNext();
                 fast = fast.getNext();
             }
-            
-            fast.setNext(null);
-            
+
+            //fast.next is where the loop starts...
+            System.out.println("Iterative approach Cycle at: " + fast.getNext().getData());
+            return true;
         }
-        
+
+        System.out.println("Iterative approach No cycle found");
+        return false;
+
+    }
+
+    public void detectAndRemoveLoopCycleInLinkedList_HashBased(Node node) {
+
+        //......................T: O(N)
+        //......................S: O(N)
+        Set<Node> set = new HashSet<>();
+        Node loopEnd = null;
+        Node temp = node;
+        while (temp != null) {
+
+            if (set.contains(temp)) {
+                loopEnd.setNext(null);
+                break;
+            }
+
+            set.add(temp);
+            loopEnd = temp;
+            temp = temp.getNext();
+
+        }
+
+        //output;
+        System.out.println("Hash Based approach detect and remove a loop cycle in linked list output:");
+        new LinkedListUtil(node).print();
+
+    }
+
+    public void detectAndRemoveLoopCycleInLinkedList_Iterative(Node node) {
+
+        //......................T: O(N)
+        //......................S: O(1)
+        Node slow = node;
+        Node fast = node.getNext();
+        while (slow != null && fast != null && fast.getNext() != null) {
+
+            if (slow == fast) {
+                break;
+            }
+
+            slow = slow.getNext();
+            fast = fast.getNext().getNext();
+
+        }
+
+        //if there is a loop in linked list
+        if (slow == fast) {
+
+            slow = node;
+            while (slow != fast.getNext()) {
+                slow = slow.getNext();
+                fast = fast.getNext();
+            }
+
+            //fast is the node where it should end the loop
+            fast.setNext(null);
+
+        }
+
         //output
         System.out.println("Iterative approach detect and remove a loop cycle in linked list output:");
         new LinkedListUtil(node).print();
-        
+
     }
-    
-    public void removeDuplicatesFromUnSortedLinkedListOnlyConsecutive(Node<Integer> node){
-        
+
+    public void removeDuplicatesFromUnSortedLinkedListOnlyConsecutive(Node<Integer> node) {
+
         //...............................T: O(N)
         //...............................S: O(1)
-        
         Node<Integer> curr = node;
         Node<Integer> temp = node.getNext();
-        while(temp != null){
-            
-            if(curr.getData() != temp.getData()){
+        while (temp != null) {
+
+            if (curr.getData() != temp.getData()) {
                 curr.setNext(temp);
                 curr = temp;
             }
-            
+
             temp = temp.getNext();
-            
+
         }
-        
+
         curr.setNext(temp);
-        
+
         //output
         System.out.println("Remove duplicates that are consecutive in lisnked list output:");
         new LinkedListUtil<>(node).print();
-        
+
     }
-    
-    public void removeDuplicatesFromUnSortedLinkedListAllExtraOccuernce(Node<Integer> node){
-        
+
+    public void removeDuplicatesFromUnSortedLinkedListAllExtraOccuernce(Node<Integer> node) {
+
         //...............................T: O(N)
         //...............................S: O(N)
         Set<Integer> set = new HashSet<>();
         Node<Integer> curr = node;
         Node<Integer> temp = node.getNext();
         set.add(curr.getData());
-        while(temp != null){
-            
-            if(curr.getData() != temp.getData() && !set.contains(temp.getData())){
+        while (temp != null) {
+
+            if (curr.getData() != temp.getData() && !set.contains(temp.getData())) {
                 curr.setNext(temp);
                 curr = temp;
             }
             set.add(temp.getData());
             temp = temp.getNext();
-            
+
         }
-        
+
         curr.setNext(temp);
-        
+
         //output
         System.out.println("Remove duplicates all extra occuernce in lisnked list output:");
         new LinkedListUtil<>(node).print();
-        
+
+    }
+
+    public Node<Integer> findMiddleNodeOfLinkedList(Node<Integer> node) {
+
+        if (node == null || node.getNext() == null) {
+            return node;
+        }
+
+        Node<Integer> slow = node;
+        Node<Integer> fast = node.getNext();
+        while (fast != null && fast.getNext() != null) {
+
+            slow = slow.getNext();
+            fast = fast.getNext().getNext();
+
+        }
+
+        //middle node = slow
+        return slow;
+
+    }
+
+    public Node<Integer> mergeSortInLinkedList_Recursion(Node<Integer> n1, Node<Integer> n2) {
+
+        if (n1 == null) {
+            return n2;
+        }
+
+        if (n2 == null) {
+            return n1;
+        }
+
+        if (n1.getData() <= n2.getData()) {
+            Node<Integer> a = mergeSortInLinkedList_Recursion(n1.getNext(), n2);
+            n1.setNext(a);
+            return n1;
+        } else {
+            Node<Integer> b = mergeSortInLinkedList_Recursion(n1, n2.getNext());
+            n2.setNext(b);
+            return n2;
+        }
+
+    }
+
+    public Node<Integer> mergeSortDivideAndMerge(Node<Integer> node) {
+
+        if (node == null || node.getNext() == null) {
+            return node;
+        }
+
+        Node<Integer> middle = findMiddleNodeOfLinkedList(node);
+        Node<Integer> secondHalf = middle.getNext();
+        //from node to middle is first half, so middle.next = null 
+        //splites as 1. node -> middle.next->NULL 2. middle.next -> tail.next->NULL
+        middle.setNext(null);
+
+        return mergeSortInLinkedList_Recursion(mergeSortDivideAndMerge(node),
+                mergeSortDivideAndMerge(secondHalf));
     }
 
     public void levelOrderTraversal_Iterative(TreeNode root) {
@@ -1894,30 +1959,63 @@ public class DSA450Questions {
         printKSumPathAnyNodeTopToDown_PathList = new ArrayList<>();
         printKSumPathAnyNodeTopToDown_Helper(root, K);
     }
-    
-    private TreeNode<Integer> lowestCommonAncestorOfTree_Helper(TreeNode<Integer> root, int N1, int N2){
-        
-        if(root == null){
+
+    private TreeNode<Integer> lowestCommonAncestorOfTree_Helper(TreeNode<Integer> root, int N1, int N2) {
+
+        if (root == null) {
             return null;
         }
-        
-        if(N1 == root.getData() || N2 == root.getData()){
+
+        if (N1 == root.getData() || N2 == root.getData()) {
             return root;
         }
-        
+
         TreeNode<Integer> leftNode = lowestCommonAncestorOfTree_Helper(root.getLeft(), N1, N2);
         TreeNode<Integer> rightNode = lowestCommonAncestorOfTree_Helper(root.getRight(), N1, N2);
-        
-        if(leftNode != null && rightNode != null){
+
+        if (leftNode != null && rightNode != null) {
             return root;
         }
-        
+
         return leftNode == null ? rightNode : leftNode;
-        
+
+    }
+
+    public void lowestCommonAncestorOfTree(TreeNode<Integer> root, int N1, int N2) {
+        System.out.println("Lowest common ancestor of " + N1 + " " + N2 + ": " + lowestCommonAncestorOfTree_Helper(root, N1, N2));
+    }
+
+    class CheckTreeIsSumTree { /*Helper class for checkTreeIsSumTree_Helper method*/ int data = 0; }
+
+    public boolean checkTreeIsSumTree_Helper(TreeNode<Integer> root, CheckTreeIsSumTree obj) {
+
+        if (root == null) {
+            obj.data = 0;
+            return true;
+        }
+
+        CheckTreeIsSumTree leftSubTreeSum = new CheckTreeIsSumTree();
+        CheckTreeIsSumTree rightSubTreeSum = new CheckTreeIsSumTree();
+
+        boolean isLeftSubTreeSumTree = checkTreeIsSumTree_Helper(root.getLeft(), leftSubTreeSum);
+        boolean isRightSubTreeSumTree = checkTreeIsSumTree_Helper(root.getRight(), rightSubTreeSum);
+
+        //calculating data for the current root node itself
+        obj.data = root.getData() + leftSubTreeSum.data + rightSubTreeSum.data;
+
+        //current root node should not be be leaf
+        if (!(root.getLeft() == null && root.getRight() == null)
+                && //current root is not equal to the sum of left and rigth sub tree 
+                (root.getData() != leftSubTreeSum.data + rightSubTreeSum.data)) {
+            return false;
+        }
+
+        return isLeftSubTreeSumTree && isRightSubTreeSumTree;
+
     }
     
-    public void lowestCommonAncestorOfTree(TreeNode<Integer> root, int N1, int N2){
-        System.out.println("Lowest common ancestor of "+N1+" "+N2+": "+lowestCommonAncestorOfTree_Helper(root, N1, N2));
+    public void checkTreeIsSumTree(TreeNode<Integer> root){
+        System.out.println("Check if a tree is sum tree: "+checkTreeIsSumTree_Helper(root, new CheckTreeIsSumTree()));
     }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
@@ -2120,41 +2218,43 @@ public class DSA450Questions {
         System.out.println();
 
     }
-    
-    private int findFirstOccurenceKInSortedArray(int[] arr, int K, int low, int high, int N){
+
+    private int findFirstOccurenceKInSortedArray(int[] arr, int K, int low, int high, int N) {
         if (high >= low) {
             int mid = low + (high - low) / 2;
-            if ((mid == 0 || K > arr[mid - 1]) && arr[mid] == K)
+            if ((mid == 0 || K > arr[mid - 1]) && arr[mid] == K) {
                 return mid;
-            else if (K > arr[mid])
+            } else if (K > arr[mid]) {
                 return findFirstOccurenceKInSortedArray(arr, K, (mid + 1), high, N);
-            else
+            } else {
                 return findFirstOccurenceKInSortedArray(arr, K, low, (mid - 1), N);
+            }
         }
         return -1;
     }
-    
-    private int findLastOccurenceKInSortedArray(int[] arr, int K, int low, int high, int N){
+
+    private int findLastOccurenceKInSortedArray(int[] arr, int K, int low, int high, int N) {
         if (high >= low) {
             int mid = low + (high - low) / 2;
-            if ((mid == N - 1 || K < arr[mid + 1]) && arr[mid] == K)
+            if ((mid == N - 1 || K < arr[mid + 1]) && arr[mid] == K) {
                 return mid;
-            else if (K < arr[mid])
+            } else if (K < arr[mid]) {
                 return findLastOccurenceKInSortedArray(arr, K, low, (mid - 1), N);
-            else
+            } else {
                 return findLastOccurenceKInSortedArray(arr, K, (mid + 1), high, N);
+            }
         }
         return -1;
     }
-    
-    public void findFirstAndLastOccurenceOfKInSortedArray(int[] arr, int K){
-        
+
+    public void findFirstAndLastOccurenceOfKInSortedArray(int[] arr, int K) {
+
         int N = arr.length;
-        int first = findFirstOccurenceKInSortedArray(arr, K, 0, N-1, N);
-        int last = findLastOccurenceKInSortedArray(arr, K, 0, N-1, N);
-        
-        System.out.println(K+" first and last occurence: "+first+" "+last);
-        
+        int first = findFirstOccurenceKInSortedArray(arr, K, 0, N - 1, N);
+        int last = findLastOccurenceKInSortedArray(arr, K, 0, N - 1, N);
+
+        System.out.println(K + " first and last occurence: " + first + " " + last);
+
     }
 
     private int[] KMP_PatternMatching_Algorithm_LPSArray(String pattern, int size) {
@@ -2227,66 +2327,64 @@ public class DSA450Questions {
         }
 
     }
-    
-    public int editDistance_Recursion(String s1, String s2, int m, int n){
-        
+
+    public int editDistance_Recursion(String s1, String s2, int m, int n) {
+
         //https://www.geeksforgeeks.org/edit-distance-dp-5/
-        
         //if s1 is empty then whole s2 is to be inserted to coonert s1 to s2
-        if(m == 0){
+        if (m == 0) {
             return n;
         }
-        
+
         //if s2 is empty then whole s1 is to be deleted to convert s1 to s2
-        if(n == 0){
+        if (n == 0) {
             return m;
         }
-        
+
         //if last char of two strings matches then just move ahead one char in both
-        if(s1.charAt(m-1) == s2.charAt(n-1)){
-            return editDistance_Recursion(s1, s2, m-1, n-1);
+        if (s1.charAt(m - 1) == s2.charAt(n - 1)) {
+            return editDistance_Recursion(s1, s2, m - 1, n - 1);
         }
-        
+
         //if the char doesn't matches then take the min of below 3
-        return Math.min(editDistance_Recursion(s1, s2, m, n-1), //insert
-                Math.min(editDistance_Recursion(s1, s2, m-1, n), //delete
-                editDistance_Recursion(s1, s2, m-1, n-1)))   // replace
+        return Math.min(editDistance_Recursion(s1, s2, m, n - 1), //insert
+                Math.min(editDistance_Recursion(s1, s2, m - 1, n), //delete
+                        editDistance_Recursion(s1, s2, m - 1, n - 1))) // replace
                 + 1;
-        
+
     }
-    
-    public int editDistance_DP_Memoization(String s1, String s2){
-        
+
+    public int editDistance_DP_Memoization(String s1, String s2) {
+
         //https://www.geeksforgeeks.org/edit-distance-dp-5/
-        
         int m = s1.length();
         int n = s2.length();
-        int[][] memo = new int[m+1][n+1];
-        
+        int[][] memo = new int[m + 1][n + 1];
+
         //base cond
-        for(int x = 0; x<m+1; x++){
-            for(int y = 0; y<n+1; y++){
-                if(x == 0){
+        for (int x = 0; x < m + 1; x++) {
+            for (int y = 0; y < n + 1; y++) {
+                if (x == 0) {
                     memo[x][y] = y;
-                }else if(y == 0){
+                } else if (y == 0) {
                     memo[x][y] = x;
                 }
             }
         }
-        
-        for(int x = 1; x<m+1; x++){
-            for(int y = 1; y<n+1; y++){
-                if(s1.charAt(x-1) == s2.charAt(y-1)){
-                    memo[x][y] = memo[x-1][y-1];
-                }else {
-                    memo[x][y] = 1 + Math.min(memo[x][y-1], Math.min(memo[x-1][y], memo[x-1][y-1]));
+
+        for (int x = 1; x < m + 1; x++) {
+            for (int y = 1; y < n + 1; y++) {
+                if (s1.charAt(x - 1) == s2.charAt(y - 1)) {
+                    memo[x][y] = memo[x - 1][y - 1];
+                } else {
+                    memo[x][y] = 1 + Math.min(memo[x][y - 1], Math.min(memo[x - 1][y], memo[x - 1][y - 1]));
                 }
-                
+
             }
         }
-        
+
         return memo[m][n];
-        
+
     }
 
     public static void main(String[] args) {
@@ -2979,6 +3077,13 @@ public class DSA450Questions {
 //        node.getNext().getNext().getNext().getNext().setNext(node.getNext().getNext()); //Node 5 connects to Node 3
 //        System.out.println("Is there a loop in linked list: "+obj.detectLoopCycleInLinkedList_HashBased(node));
 //        System.out.println("Is there a loop in linked list: "+obj.detectLoopCycleInLinkedList_Iterative(node)); //T: O(N), S: O(1) //OPTIMISED
+//        node = new Node<>(3);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(0));
+//        node.getNext().getNext().setNext(new Node<>(-4));
+//        node.getNext().getNext().getNext().setNext(node.getNext());
+//        System.out.println("Is there a loop in linked list: "+obj.detectLoopCycleInLinkedList_HashBased(node));
+//        System.out.println("Is there a loop in linked list: "+obj.detectLoopCycleInLinkedList_Iterative(node)); //T: O(N), S: O(1) //OPTIMISED
         //......................................................................
 //        Row: 142
 //        System.out.println("Detect and remove loop cycle in linked list 2 approaches");
@@ -2998,25 +3103,73 @@ public class DSA450Questions {
 //        obj.detectAndRemoveLoopCycleInLinkedList_Iterative(node); //OPTIMISED
         //......................................................................
 //        Row: 145
-        System.out.println("Remove duplicates element in linked list 2 different outputs");
-        Node<Integer> node = new Node<>(3);
-        node.setNext(new Node<>(4));
-        node.getNext().setNext(new Node<>(5));
-        node.getNext().getNext().setNext(new Node<>(5));
-        node.getNext().getNext().getNext().setNext(new Node<>(5));
-        node.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
-        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
-        node.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
-        obj.removeDuplicatesFromUnSortedLinkedListOnlyConsecutive(node);
-        node = new Node<>(3);
-        node.setNext(new Node<>(4));
-        node.getNext().setNext(new Node<>(5));
-        node.getNext().getNext().setNext(new Node<>(5));
-        node.getNext().getNext().getNext().setNext(new Node<>(5));
-        node.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
-        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
-        node.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
-        obj.removeDuplicatesFromUnSortedLinkedListAllExtraOccuernce(node);
+//        System.out.println("Remove duplicates element in unsorted linked list 2 different outputs");
+//        Node<Integer> node = new Node<>(3);
+//        node.setNext(new Node<>(4));
+//        node.getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        node.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        obj.removeDuplicatesFromUnSortedLinkedListOnlyConsecutive(node);
+//        node = new Node<>(3);
+//        node.setNext(new Node<>(4));
+//        node.getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        node.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        obj.removeDuplicatesFromUnSortedLinkedListAllExtraOccuernce(node);
+        //......................................................................
+//        Row: 153
+//        System.out.println("Find the middle element of the linked list");
+//        Node<Integer> node = new Node<>(3);
+//        node.setNext(new Node<>(5));
+//        node.getNext().setNext(new Node<>(2));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(7));
+//        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        System.out.println("Middle element: "+obj.findMiddleNodeOfLinkedList(node).getData());
+//        node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        System.out.println("Middle element: "+obj.findMiddleNodeOfLinkedList(node).getData());
+        //......................................................................
+//        Row: 151
+//        System.out.println("Sort linked list using merge sort");
+//        Node<Integer> node = new Node<>(3);
+//        node.setNext(new Node<>(5));
+//        node.getNext().setNext(new Node<>(2));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(7));
+//        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        new LinkedListUtil<Integer>(obj.mergeSortDivideAndMerge(node)).print();
+//        node = new Node<>(3);
+//        node.setNext(new Node<>(3));
+//        node.getNext().setNext(new Node<>(7));
+//        node.getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(5));
+//        new LinkedListUtil<Integer>(obj.mergeSortDivideAndMerge(node)).print();
+        //......................................................................
+//        Row: 198
+        System.out.println("Check if a tree is sum tree");
+        TreeNode<Integer> root = new TreeNode<>(10);
+        root.setLeft(new TreeNode<>(20));
+        root.getLeft().setLeft(new TreeNode<>(10));
+        root.getLeft().setRight(new TreeNode<>(10));
+        root.setRight(new TreeNode<>(30)); //NOT A SUM TREE
+        obj.checkTreeIsSumTree(root);
+        root = new TreeNode<>(3);
+        root.setLeft(new TreeNode<>(2));
+        root.setRight(new TreeNode<>(1)); //SUM TREE
+        obj.checkTreeIsSumTree(root);
     }
 
 }
