@@ -2386,7 +2386,239 @@ public class DSA450Questions {
         return memo[m][n];
 
     }
+    
+    public int coinChange_Recursion(int[] coins, int N, int K){
+        
+        if(K == 0){
+            return 1;
+        }
+        
+        if(K <= 0){
+            return 0;
+        }
+        
+        if(N <= 0 && K>=1){
+            return 0;
+        }
+        
+        return (coinChange_Recursion(coins, N, K - coins[N-1]) + coinChange_Recursion(coins, N-1, K));
+        
+    }
+    
+    public void coinChange_DP_Memoization(int[] coins, int K){
+        
+        int N = coins.length;
+        
+        int[][] memo = new int[N+1][K+1];
+        
+        //base
+        for(int x=0; x<N+1; x++){
+            for(int y=0; y<K+1; y++){
+                if(x == 0){
+                    memo[x][y] = 0;
+                }
+                
+                if(y == 0){
+                    memo[x][y] = 1;
+                }
+            }
+        }
+        
+        for(int x=1; x<N+1; x++){
+            for(int y=1; y<K+1; y++){
+                
+                if(coins[x-1] > y){
+                    memo[x][y] = memo[x-1][y];
+                }else {
+                    memo[x][y] = memo[x][y - coins[x-1]] + memo[x-1][y];
+                }
+                
+            }
+        }
+        
+        System.out.println("Possible ways to make coin change: "+memo[N][K]);
+        
+    }
+    
+    public int knapSack01_Recusrion(int W, int[] weight, int[] value, int N){
+        
+        //if either the value[] is empty(N == 0) we will not be able to make any profit
+        //or the knapSack bag don't have the capacity(W == 0) then in that case profit is 0
+        if(N == 0 || W == 0){
+            return 0;
+        }
+        
+        //if the weight of a product is more than the knapSack capacity(W) then
+        //in that case we have to just ignore that and move to another product
+        if(weight[N-1] > W){
+            return knapSack01_Recusrion(W, weight, value, N-1);
+        }
+        
+        //we now have 2 descision to make, we have to take max of these 2 descision
+        //1. we can pick up a product add its value[product] in our profit 
+        //and adjust knapSack capacity(W - weight[product]) and move to another product(N-1)
+        //2. we can simply ingore this product and just move to another product(N-1)
+        return Math.max(
+                value[N-1] + knapSack01_Recusrion(W - weight[N-1], weight, value, N-1),
+                knapSack01_Recusrion(W, weight, value, N-1));
+        
+    }
+    
+    public void knapSack01_DP_Memoization(int W, int[] weight, int[] value, int N){
+        
+        int[][] memo = new int[N+1][W+1];
+        
+        //base cond
+        for(int x=0; x<N+1; x++){
+            for(int y=0; y<W+1; y++){
+                //No product x == N == 0
+                //No knapSack capacity y == W == 0
+                if(x == 0 || y == 0){
+                    memo[x][y] = 0;
+                }
+            }
+        }
+        
+        for(int x=1; x<N+1; x++){
+            for(int y=1; y<W+1; y++){
+                if(weight[x - 1] > y){
+                    memo[x][y] = memo[x-1][y];
+                }else {
+                    memo[x][y] = Math.max(
+                            value[x-1] + memo[x-1][y - weight[x-1]], 
+                            memo[x-1][y]);
+                }
+            }
+        }
+        
+        System.out.println("The maximum profit with given knap sack: "+memo[N][W]);
+        
+    }
 
+    public boolean subsetSum_Recursion(int[] arr, int sum, int N){
+        
+        //if arr is empty and sum to prove is also 0 then in that case sum = 0 possible
+        //as empty arr denotes empty sub set {}, {} which default sums up as 0
+        if(N == 0 && sum == 0){
+            return true;
+        }
+        
+        //if arr is empty and sum to prove is a non - zero number( >= 1) then in that case this given sum can't have
+        //any sub set from arr as it is already empty
+        if(N == 0 && sum != 0){
+            return false;
+        }
+        
+        //if arr is not empty but the element are greater than sum then that element can't be used as sub set
+        //just move to next element
+        if(arr[N-1] > sum){
+            return subsetSum_Recursion(arr, sum, N-1);
+        }
+        
+        //we now have 2 descision to make, any of the 2 descision makes the subset then pick that(OR operator)
+        //1. we pick an element from arr and assume that it makes the subset then that sum is also to be reduced
+        //to sum - arr[N-1]
+        //2. we just leave this element from the array and move to next element
+        return subsetSum_Recursion(arr, sum - arr[N-1], N-1) || subsetSum_Recursion(arr, sum, N-1);
+        
+    }
+    
+    public void subsetSum_DP_Memoization(int[] arr, int sum, int N){
+        
+        boolean[][] memo = new boolean[N+1][sum+1];
+        
+        //base cond
+        for(int x=0; x<N+1; x++){
+            for(int y=0; y<sum+1; y++){
+                //if array is empty then any given sum is not possible (except sum == 0) 
+                if(x == 0){
+                    memo[x][y] = false;
+                }
+                
+                //if the given sum is just 0 then it can be prove even if the arrays is empty or full
+                if(y == 0){
+                    memo[x][y] = true;
+                }
+            }
+        }
+        
+        for(int x=1; x<N+1; x++){
+            for(int y=1; y<sum+1; y++){
+               if(arr[x-1] > y){
+                   memo[x][y] = memo[x-1][y];
+               }else {
+                   memo[x][y] = memo[x - 1][y - arr[x-1]] || memo[x-1][y];
+               }
+            }
+        }
+        
+        System.out.println("The sub set for the given sum is possible: "+memo[N][sum]);
+        
+    }
+    
+    public void equalsSumPartition_SubsetSum(int[] arr, int N){
+        
+        int arrSum = 0;
+        for(int ele: arr){
+            arrSum += ele;
+        }
+        
+        if(arrSum % 2 == 1){
+            //if odd no equal partition is possble for the given sum
+            //arr = {1,5,5,11} arrSum = 22 == even can be divided into 2 half as {11}, {1,5,5}
+            //if arrSum = 23 == odd no equal partition possible
+            System.out.println("The equal sum partition for the given sum is not possbile as sum of array is odd");
+            return;
+        }
+        
+        System.out.println("The equal sum partition for the given array is possbile: ");
+        //if arrSum == even the if we can prove the sum = arrSum/2 is possible
+        //then other half of the sub set is by default will be eqaul to arrSum/2
+        //arrSum = 22 == sum = arrSum/2 = 11 prove {11} then other half will be {1,5,5}
+        subsetSum_DP_Memoization(arr, arrSum/2, N);
+        
+    }
+    
+    public int longestCommonSubsequence_Recursion(String s1, String s2, int m, int n){
+        
+        if(m == 0 || n == 0){
+            return 0;
+        }
+        
+        if(s1.charAt(m-1) == s2.charAt(n-1)){
+            return longestCommonSubsequence_Recursion(s1, s2, m-1, n-1) + 1;
+        }
+        
+        return Math.max(longestCommonSubsequence_Recursion(s1, s2, m, n-1), 
+                longestCommonSubsequence_Recursion(s1, s2, m-1, n));
+        
+    }
+    
+    public void longestCommonSubsequence_DP_Memoization(String s1, String s2, int m, int n){
+        
+        int[][] memo = new int[m+1][n+1];
+        
+        //base cond
+        //if s1 is empty and s2 is non-empty String no subseq length is possible
+        //if s2 is empty and s2 is non-empty Strng no subseq length is possible
+        for(int[] r: memo){
+            Arrays.fill(r, 0);
+        }
+        
+        for(int x=1; x<m+1; x++){
+            for(int y=1; y<n+1; y++){
+                if(s1.charAt(x-1) == s2.charAt(y-1)){
+                    memo[x][y] = memo[x-1][y-1] + 1;
+                }else{
+                    memo[x][y] = Math.max(memo[x][y-1], memo[x-1][y]);
+                }
+            }
+        }
+        
+        System.out.println("The longest common subsequence length for the giventwo string is: "+memo[m][n]);
+        
+    }
+    
     public static void main(String[] args) {
 
         //Object to access method
@@ -3051,7 +3283,7 @@ public class DSA450Questions {
 //        root1.getRight().getRight().setRight(new TreeNode(8));
 //        obj.lowestCommonAncestorOfTree(root1, 7, 8);
         //......................................................................
-//        Row: 69
+//        Row: 69, 416
 //        System.out.println("Edit distance recursion/ DP memoization");
 //        String s1 = "sunday";
 //        String s2 = "saturday";
@@ -3159,17 +3391,66 @@ public class DSA450Questions {
 //        new LinkedListUtil<Integer>(obj.mergeSortDivideAndMerge(node)).print();
         //......................................................................
 //        Row: 198
-        System.out.println("Check if a tree is sum tree");
-        TreeNode<Integer> root = new TreeNode<>(10);
-        root.setLeft(new TreeNode<>(20));
-        root.getLeft().setLeft(new TreeNode<>(10));
-        root.getLeft().setRight(new TreeNode<>(10));
-        root.setRight(new TreeNode<>(30)); //NOT A SUM TREE
-        obj.checkTreeIsSumTree(root);
-        root = new TreeNode<>(3);
-        root.setLeft(new TreeNode<>(2));
-        root.setRight(new TreeNode<>(1)); //SUM TREE
-        obj.checkTreeIsSumTree(root);
+//        System.out.println("Check if a tree is sum tree");
+//        TreeNode<Integer> root = new TreeNode<>(10);
+//        root.setLeft(new TreeNode<>(20));
+//        root.getLeft().setLeft(new TreeNode<>(10));
+//        root.getLeft().setRight(new TreeNode<>(10));
+//        root.setRight(new TreeNode<>(30)); //NOT A SUM TREE
+//        obj.checkTreeIsSumTree(root);
+//        root = new TreeNode<>(3);
+//        root.setLeft(new TreeNode<>(2));
+//        root.setRight(new TreeNode<>(1)); //SUM TREE
+//        obj.checkTreeIsSumTree(root);
+        //......................................................................
+//        Row: 410
+//        System.out.println("Coin change DP problem");
+//        int[] coins = {1, 2, 3};
+//        int N = coins.length;
+//        int K = 4;
+//        System.out.println("Possible ways to make change using recursion: "+obj.coinChange_Recursion(coins, N, K));
+//        obj.coinChange_DP_Memoization(coins, K);
+        //......................................................................
+//        Row: 411
+//        System.out.println("0-1 knap sack DP problem");
+//        int[] weight = {4,5,1};
+//        int[] value = {1,2,3};
+//        int N = value.length;
+//        int W = 4;
+//        System.out.println("The maximum profit can be made with given knap sack using recursion: "+obj.knapSack01_Recusrion(W, weight, value, N));
+//        obj.knapSack01_DP_Memoization(W, weight, value, N);
+//        weight = new int[]{4,5,6};
+//        value = new int[]{1,2,3};
+//        N = value.length;
+//        W = 3;
+//        System.out.println("The maximum profit can be made with given knap sack using recursion: "+obj.knapSack01_Recusrion(W, weight, value, N));
+//        obj.knapSack01_DP_Memoization(W, weight, value, N);
+        //......................................................................
+//        Row: 417
+//        System.out.println("Subset sum");
+//        int[] arr = new int[]{1, 5, 5, 11};
+//        int N = arr.length;
+//        int sum = 11;
+//        System.out.println("The sub set for the given sum is possible: "+obj.subsetSum_Recursion(arr, sum, N));
+//        obj.subsetSum_DP_Memoization(arr, sum, N);
+//        System.out.println("Equal sum partition for the given array is possible or not");
+//        obj.equalsSumPartition_SubsetSum(arr, N);
+//        //arr to be different
+//        arr = new int[]{1,5,5,12};
+//        obj.equalsSumPartition_SubsetSum(arr, N);
+        //......................................................................
+//        Row: 423
+        System.out.println("Longest common sub sequence of 2 strings");
+        String s1 = "ABCDGH";
+        String s2 = "AEDFHR";
+        System.out.println("The longest common sub sequence length for the given 2 strings: "+obj.longestCommonSubsequence_Recursion(s1, s2, s1.length(), s2.length()));
+        obj.longestCommonSubsequence_DP_Memoization(s1, s2, s1.length(), s2.length());
+        s1 = "ABCDGH";
+        s2 = "";
+        System.out.println("The longest common sub sequence length for the given 2 strings: "+obj.longestCommonSubsequence_Recursion(s1, s2, s1.length(), s2.length()));
+        obj.longestCommonSubsequence_DP_Memoization(s1, s2, s1.length(), s2.length());
+        
+        
     }
 
 }
