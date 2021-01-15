@@ -649,6 +649,85 @@ public class DSA450Questions {
 
     }
 
+    public boolean checkIsomorphicStrings(String s1, String s2) {
+
+        int m = s1.length();
+        int n = s2.length();
+
+        if (m != n) {
+            System.out.println("Not isomorphic strings");
+            return false;
+        }
+
+        int SIZE = 256; //to handle numric & alphabetic ascii ranges
+        boolean[] marked = new boolean[SIZE];
+        int[] map = new int[SIZE];
+        Arrays.fill(map, -1);
+
+        for (int i = 0; i < m; i++) {
+            if (map[s1.charAt(i)] == -1) {
+
+                if (marked[s2.charAt(i)] == true) {
+                    return false;
+                }
+
+                marked[s2.charAt(i)] = true;
+                map[s1.charAt(i)] = s2.charAt(i);
+
+            } else if (map[s1.charAt(i)] != (s2.charAt(i))) {
+                return false;
+            }
+        }
+
+        return true;
+
+    }
+
+    public int transformOneStringToAnotherWithMinOprn(String src, String target) {
+
+        //count if two strings are same length or not
+        int m = src.length();
+        int n = target.length();
+
+        if (m != n) {
+            //if length are not same, strings can't be transformed
+            return -1;
+        }
+
+        //check if the two strings contain same char and their count should also be same
+        int[] charCount = new int[256];
+        for (int i = 0; i < m; i++) {
+
+            charCount[src.charAt(i)]++;
+            charCount[target.charAt(i)]--;
+
+        }
+
+        //if same char are there and count are equal then charCount shoul have been balanced out to 0
+        for (int count : charCount) {
+            if (count != 0) {
+                return -1;
+            }
+        }
+
+        int i = m - 1;
+        int j = n - 1;
+        int result = 0;
+        while (i >= 0) {
+
+            if (src.charAt(i) != target.charAt(j)) {
+                result++;
+            } else {
+                j--;
+            }
+
+            i--;
+
+        }
+
+        return result;
+    }
+
     public void reverseLinkedList_Iterative(Node<Integer> node) {
         System.out.println("Reverse linked list iterative");
         //actual
@@ -1129,7 +1208,7 @@ public class DSA450Questions {
 
     }
 
-    public Node<Integer> mergeSortInLinkedList_Recursion(Node<Integer> n1, Node<Integer> n2) {
+    public Node<Integer> mergeSortInLinkedList_Asc_Recursion(Node<Integer> n1, Node<Integer> n2) {
 
         if (n1 == null) {
             return n2;
@@ -1140,11 +1219,11 @@ public class DSA450Questions {
         }
 
         if (n1.getData() <= n2.getData()) {
-            Node<Integer> a = mergeSortInLinkedList_Recursion(n1.getNext(), n2);
+            Node<Integer> a = mergeSortInLinkedList_Asc_Recursion(n1.getNext(), n2);
             n1.setNext(a);
             return n1;
         } else {
-            Node<Integer> b = mergeSortInLinkedList_Recursion(n1, n2.getNext());
+            Node<Integer> b = mergeSortInLinkedList_Asc_Recursion(n1, n2.getNext());
             n2.setNext(b);
             return n2;
         }
@@ -1163,8 +1242,87 @@ public class DSA450Questions {
         //splites as 1. node -> middle.next->NULL 2. middle.next -> tail.next->NULL
         middle.setNext(null);
 
-        return mergeSortInLinkedList_Recursion(mergeSortDivideAndMerge(node),
+        return mergeSortInLinkedList_Asc_Recursion(mergeSortDivideAndMerge(node),
                 mergeSortDivideAndMerge(secondHalf));
+    }
+
+    public boolean checkIfLinkedListIsCircularLinkedList(Node node) {
+
+        if (node == null || node.getNext() == node) {
+            return true;
+        }
+
+        Node headRef = node;
+        Node temp = node;
+        while (temp.getNext() != headRef && temp.getNext() != null) {
+            temp = temp.getNext();
+        }
+        return temp.getNext() == headRef;
+    }
+
+    private int quickSortInLinkedList_Partition(List<Integer> arr, int low, int high) {
+
+        int pivot = arr.get(high);
+        int i = low - 1;
+        for (int j = low; j < high; j++) {
+            if (arr.get(j) < pivot) {
+
+                i++;
+                //swap
+                int temp = arr.get(i);
+                arr.set(i, arr.get(j));
+                arr.set(j, temp);
+
+            }
+        }
+
+        int temp = arr.get(i + 1);
+        arr.set(i + 1, arr.get(high));
+        arr.set(high, temp);
+
+        return i + 1;
+
+    }
+
+    private void quickSortInLinkedList_Helper(List<Integer> arr, int low, int high) {
+
+        if (high >= low) {
+
+            int pivotIndex = quickSortInLinkedList_Partition(arr, low, high);
+            quickSortInLinkedList_Helper(arr, low, pivotIndex - 1);
+            quickSortInLinkedList_Helper(arr, pivotIndex + 1, high);
+        }
+
+    }
+
+    public void quickSortInLinkedList(Node<Integer> node) {
+        
+        if(node == null || node.getNext() == null){
+            new LinkedListUtil<Integer>(node).print();
+            return;
+        }
+        
+        List<Integer> intArr = new ArrayList<>();
+        Node<Integer> temp = node;
+        while (temp != null) {
+            intArr.add(temp.getData());
+            temp = temp.getNext();
+        }
+
+        quickSortInLinkedList_Helper(intArr, 0, intArr.size() - 1);
+
+        // System.out.println(intArr);
+        temp = node;
+        for (int x : intArr) {
+
+            temp.setData(x);
+            temp = temp.getNext();
+
+        }
+
+        //output
+        new LinkedListUtil<Integer>(node).print();
+
     }
 
     public void levelOrderTraversal_Iterative(TreeNode root) {
@@ -1985,7 +2143,8 @@ public class DSA450Questions {
         System.out.println("Lowest common ancestor of " + N1 + " " + N2 + ": " + lowestCommonAncestorOfTree_Helper(root, N1, N2));
     }
 
-    class CheckTreeIsSumTree { /*Helper class for checkTreeIsSumTree_Helper method*/ int data = 0; }
+    class CheckTreeIsSumTree { /*Helper class for checkTreeIsSumTree_Helper method*/ int data = 0;
+    }
 
     public boolean checkTreeIsSumTree_Helper(TreeNode<Integer> root, CheckTreeIsSumTree obj) {
 
@@ -2013,9 +2172,9 @@ public class DSA450Questions {
         return isLeftSubTreeSumTree && isRightSubTreeSumTree;
 
     }
-    
-    public void checkTreeIsSumTree(TreeNode<Integer> root){
-        System.out.println("Check if a tree is sum tree: "+checkTreeIsSumTree_Helper(root, new CheckTreeIsSumTree()));
+
+    public void checkTreeIsSumTree(TreeNode<Integer> root) {
+        System.out.println("Check if a tree is sum tree: " + checkTreeIsSumTree_Helper(root, new CheckTreeIsSumTree()));
     }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
@@ -2098,6 +2257,33 @@ public class DSA450Questions {
         reserveStack_Recursion(stack);
         System.out.println("output: " + stack);
     }
+    
+    public void nextGreaterElementInRightInArray(int[] arr){
+        
+        Stack<Integer> st = new Stack<>();
+        int[] result = new int[arr.length];
+        int index = arr.length - 1;
+        for(int i =arr.length -1; i>=0; i--){
+            
+            while(!st.isEmpty() && st.peek() < arr[i]){
+                st.pop();
+            }
+            
+            if(st.isEmpty()){
+                result[index--] = -1;
+            }else{
+                result[index--] = st.peek();
+            }
+            st.push(arr[i]);
+        }
+        
+        //output
+        for(int x: result){
+            System.out.print(x+" ");
+        }
+        System.out.println();
+        
+    }
 
     public void minCostOfRope(int[] a) {
 
@@ -2124,6 +2310,32 @@ public class DSA450Questions {
         //output
         System.out.println("Min cost to combine all rpes into one rope: " + cost);
 
+    }
+    
+    public void kLargestElementInArray(int[] arr, int K){
+        
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>((o1, o2) -> o1.compareTo(o2));
+        for(int x: arr){
+            minHeap.add(x);
+            if(minHeap.size() > K){
+                minHeap.poll();
+            }
+        }
+        
+        int[] result = new int[minHeap.size()];
+        int index = minHeap.size() -1;
+        while(!minHeap.isEmpty()){
+            
+            result[index--] = minHeap.poll();
+            
+        }
+        
+        //output
+        for(int x: result){
+            System.out.print(x+" ");
+        }
+        
+        System.out.println();
     }
 
     public void majorityElement_1(int[] a) {
@@ -2386,239 +2598,239 @@ public class DSA450Questions {
         return memo[m][n];
 
     }
-    
-    public int coinChange_Recursion(int[] coins, int N, int K){
-        
-        if(K == 0){
+
+    public int coinChange_Recursion(int[] coins, int N, int K) {
+
+        if (K == 0) {
             return 1;
         }
-        
-        if(K <= 0){
+
+        if (K <= 0) {
             return 0;
         }
-        
-        if(N <= 0 && K>=1){
+
+        if (N <= 0 && K >= 1) {
             return 0;
         }
-        
-        return (coinChange_Recursion(coins, N, K - coins[N-1]) + coinChange_Recursion(coins, N-1, K));
-        
+
+        return (coinChange_Recursion(coins, N, K - coins[N - 1]) + coinChange_Recursion(coins, N - 1, K));
+
     }
-    
-    public void coinChange_DP_Memoization(int[] coins, int K){
-        
+
+    public void coinChange_DP_Memoization(int[] coins, int K) {
+
         int N = coins.length;
-        
-        int[][] memo = new int[N+1][K+1];
-        
+
+        int[][] memo = new int[N + 1][K + 1];
+
         //base
-        for(int x=0; x<N+1; x++){
-            for(int y=0; y<K+1; y++){
-                if(x == 0){
+        for (int x = 0; x < N + 1; x++) {
+            for (int y = 0; y < K + 1; y++) {
+                if (x == 0) {
                     memo[x][y] = 0;
                 }
-                
-                if(y == 0){
+
+                if (y == 0) {
                     memo[x][y] = 1;
                 }
             }
         }
-        
-        for(int x=1; x<N+1; x++){
-            for(int y=1; y<K+1; y++){
-                
-                if(coins[x-1] > y){
-                    memo[x][y] = memo[x-1][y];
-                }else {
-                    memo[x][y] = memo[x][y - coins[x-1]] + memo[x-1][y];
+
+        for (int x = 1; x < N + 1; x++) {
+            for (int y = 1; y < K + 1; y++) {
+
+                if (coins[x - 1] > y) {
+                    memo[x][y] = memo[x - 1][y];
+                } else {
+                    memo[x][y] = memo[x][y - coins[x - 1]] + memo[x - 1][y];
                 }
-                
+
             }
         }
-        
-        System.out.println("Possible ways to make coin change: "+memo[N][K]);
-        
+
+        System.out.println("Possible ways to make coin change: " + memo[N][K]);
+
     }
-    
-    public int knapSack01_Recusrion(int W, int[] weight, int[] value, int N){
-        
+
+    public int knapSack01_Recusrion(int W, int[] weight, int[] value, int N) {
+
         //if either the value[] is empty(N == 0) we will not be able to make any profit
         //or the knapSack bag don't have the capacity(W == 0) then in that case profit is 0
-        if(N == 0 || W == 0){
+        if (N == 0 || W == 0) {
             return 0;
         }
-        
+
         //if the weight of a product is more than the knapSack capacity(W) then
         //in that case we have to just ignore that and move to another product
-        if(weight[N-1] > W){
-            return knapSack01_Recusrion(W, weight, value, N-1);
+        if (weight[N - 1] > W) {
+            return knapSack01_Recusrion(W, weight, value, N - 1);
         }
-        
+
         //we now have 2 descision to make, we have to take max of these 2 descision
         //1. we can pick up a product add its value[product] in our profit 
         //and adjust knapSack capacity(W - weight[product]) and move to another product(N-1)
         //2. we can simply ingore this product and just move to another product(N-1)
         return Math.max(
-                value[N-1] + knapSack01_Recusrion(W - weight[N-1], weight, value, N-1),
-                knapSack01_Recusrion(W, weight, value, N-1));
-        
+                value[N - 1] + knapSack01_Recusrion(W - weight[N - 1], weight, value, N - 1),
+                knapSack01_Recusrion(W, weight, value, N - 1));
+
     }
-    
-    public void knapSack01_DP_Memoization(int W, int[] weight, int[] value, int N){
-        
-        int[][] memo = new int[N+1][W+1];
-        
+
+    public void knapSack01_DP_Memoization(int W, int[] weight, int[] value, int N) {
+
+        int[][] memo = new int[N + 1][W + 1];
+
         //base cond
-        for(int x=0; x<N+1; x++){
-            for(int y=0; y<W+1; y++){
+        for (int x = 0; x < N + 1; x++) {
+            for (int y = 0; y < W + 1; y++) {
                 //No product x == N == 0
                 //No knapSack capacity y == W == 0
-                if(x == 0 || y == 0){
+                if (x == 0 || y == 0) {
                     memo[x][y] = 0;
                 }
             }
         }
-        
-        for(int x=1; x<N+1; x++){
-            for(int y=1; y<W+1; y++){
-                if(weight[x - 1] > y){
-                    memo[x][y] = memo[x-1][y];
-                }else {
+
+        for (int x = 1; x < N + 1; x++) {
+            for (int y = 1; y < W + 1; y++) {
+                if (weight[x - 1] > y) {
+                    memo[x][y] = memo[x - 1][y];
+                } else {
                     memo[x][y] = Math.max(
-                            value[x-1] + memo[x-1][y - weight[x-1]], 
-                            memo[x-1][y]);
+                            value[x - 1] + memo[x - 1][y - weight[x - 1]],
+                            memo[x - 1][y]);
                 }
             }
         }
-        
-        System.out.println("The maximum profit with given knap sack: "+memo[N][W]);
-        
+
+        System.out.println("The maximum profit with given knap sack: " + memo[N][W]);
+
     }
 
-    public boolean subsetSum_Recursion(int[] arr, int sum, int N){
-        
+    public boolean subsetSum_Recursion(int[] arr, int sum, int N) {
+
         //if arr is empty and sum to prove is also 0 then in that case sum = 0 possible
         //as empty arr denotes empty sub set {}, {} which default sums up as 0
-        if(N == 0 && sum == 0){
+        if (N == 0 && sum == 0) {
             return true;
         }
-        
+
         //if arr is empty and sum to prove is a non - zero number( >= 1) then in that case this given sum can't have
         //any sub set from arr as it is already empty
-        if(N == 0 && sum != 0){
+        if (N == 0 && sum != 0) {
             return false;
         }
-        
+
         //if arr is not empty but the element are greater than sum then that element can't be used as sub set
         //just move to next element
-        if(arr[N-1] > sum){
-            return subsetSum_Recursion(arr, sum, N-1);
+        if (arr[N - 1] > sum) {
+            return subsetSum_Recursion(arr, sum, N - 1);
         }
-        
+
         //we now have 2 descision to make, any of the 2 descision makes the subset then pick that(OR operator)
         //1. we pick an element from arr and assume that it makes the subset then that sum is also to be reduced
         //to sum - arr[N-1]
         //2. we just leave this element from the array and move to next element
-        return subsetSum_Recursion(arr, sum - arr[N-1], N-1) || subsetSum_Recursion(arr, sum, N-1);
-        
+        return subsetSum_Recursion(arr, sum - arr[N - 1], N - 1) || subsetSum_Recursion(arr, sum, N - 1);
+
     }
-    
-    public void subsetSum_DP_Memoization(int[] arr, int sum, int N){
-        
-        boolean[][] memo = new boolean[N+1][sum+1];
-        
+
+    public void subsetSum_DP_Memoization(int[] arr, int sum, int N) {
+
+        boolean[][] memo = new boolean[N + 1][sum + 1];
+
         //base cond
-        for(int x=0; x<N+1; x++){
-            for(int y=0; y<sum+1; y++){
+        for (int x = 0; x < N + 1; x++) {
+            for (int y = 0; y < sum + 1; y++) {
                 //if array is empty then any given sum is not possible (except sum == 0) 
-                if(x == 0){
+                if (x == 0) {
                     memo[x][y] = false;
                 }
-                
+
                 //if the given sum is just 0 then it can be prove even if the arrays is empty or full
-                if(y == 0){
+                if (y == 0) {
                     memo[x][y] = true;
                 }
             }
         }
-        
-        for(int x=1; x<N+1; x++){
-            for(int y=1; y<sum+1; y++){
-               if(arr[x-1] > y){
-                   memo[x][y] = memo[x-1][y];
-               }else {
-                   memo[x][y] = memo[x - 1][y - arr[x-1]] || memo[x-1][y];
-               }
+
+        for (int x = 1; x < N + 1; x++) {
+            for (int y = 1; y < sum + 1; y++) {
+                if (arr[x - 1] > y) {
+                    memo[x][y] = memo[x - 1][y];
+                } else {
+                    memo[x][y] = memo[x - 1][y - arr[x - 1]] || memo[x - 1][y];
+                }
             }
         }
-        
-        System.out.println("The sub set for the given sum is possible: "+memo[N][sum]);
-        
+
+        System.out.println("The sub set for the given sum is possible: " + memo[N][sum]);
+
     }
-    
-    public void equalsSumPartition_SubsetSum(int[] arr, int N){
-        
+
+    public void equalsSumPartition_SubsetSum(int[] arr, int N) {
+
         int arrSum = 0;
-        for(int ele: arr){
+        for (int ele : arr) {
             arrSum += ele;
         }
-        
-        if(arrSum % 2 == 1){
+
+        if (arrSum % 2 == 1) {
             //if odd no equal partition is possble for the given sum
             //arr = {1,5,5,11} arrSum = 22 == even can be divided into 2 half as {11}, {1,5,5}
             //if arrSum = 23 == odd no equal partition possible
             System.out.println("The equal sum partition for the given sum is not possbile as sum of array is odd");
             return;
         }
-        
+
         System.out.println("The equal sum partition for the given array is possbile: ");
         //if arrSum == even the if we can prove the sum = arrSum/2 is possible
         //then other half of the sub set is by default will be eqaul to arrSum/2
         //arrSum = 22 == sum = arrSum/2 = 11 prove {11} then other half will be {1,5,5}
-        subsetSum_DP_Memoization(arr, arrSum/2, N);
-        
+        subsetSum_DP_Memoization(arr, arrSum / 2, N);
+
     }
-    
-    public int longestCommonSubsequence_Recursion(String s1, String s2, int m, int n){
-        
-        if(m == 0 || n == 0){
+
+    public int longestCommonSubsequence_Recursion(String s1, String s2, int m, int n) {
+
+        if (m == 0 || n == 0) {
             return 0;
         }
-        
-        if(s1.charAt(m-1) == s2.charAt(n-1)){
-            return longestCommonSubsequence_Recursion(s1, s2, m-1, n-1) + 1;
+
+        if (s1.charAt(m - 1) == s2.charAt(n - 1)) {
+            return longestCommonSubsequence_Recursion(s1, s2, m - 1, n - 1) + 1;
         }
-        
-        return Math.max(longestCommonSubsequence_Recursion(s1, s2, m, n-1), 
-                longestCommonSubsequence_Recursion(s1, s2, m-1, n));
-        
+
+        return Math.max(longestCommonSubsequence_Recursion(s1, s2, m, n - 1),
+                longestCommonSubsequence_Recursion(s1, s2, m - 1, n));
+
     }
-    
-    public void longestCommonSubsequence_DP_Memoization(String s1, String s2, int m, int n){
-        
-        int[][] memo = new int[m+1][n+1];
-        
+
+    public void longestCommonSubsequence_DP_Memoization(String s1, String s2, int m, int n) {
+
+        int[][] memo = new int[m + 1][n + 1];
+
         //base cond
         //if s1 is empty and s2 is non-empty String no subseq length is possible
         //if s2 is empty and s2 is non-empty Strng no subseq length is possible
-        for(int[] r: memo){
+        for (int[] r : memo) {
             Arrays.fill(r, 0);
         }
-        
-        for(int x=1; x<m+1; x++){
-            for(int y=1; y<n+1; y++){
-                if(s1.charAt(x-1) == s2.charAt(y-1)){
-                    memo[x][y] = memo[x-1][y-1] + 1;
-                }else{
-                    memo[x][y] = Math.max(memo[x][y-1], memo[x-1][y]);
+
+        for (int x = 1; x < m + 1; x++) {
+            for (int y = 1; y < n + 1; y++) {
+                if (s1.charAt(x - 1) == s2.charAt(y - 1)) {
+                    memo[x][y] = memo[x - 1][y - 1] + 1;
+                } else {
+                    memo[x][y] = Math.max(memo[x][y - 1], memo[x - 1][y]);
                 }
             }
         }
-        
-        System.out.println("The longest common subsequence length for the giventwo string is: "+memo[m][n]);
-        
+
+        System.out.println("The longest common subsequence length for the giventwo string is: " + memo[m][n]);
+
     }
-    
+
     public static void main(String[] args) {
 
         //Object to access method
@@ -3427,7 +3639,7 @@ public class DSA450Questions {
 //        obj.knapSack01_DP_Memoization(W, weight, value, N);
         //......................................................................
 //        Row: 417
-//        System.out.println("Subset sum");
+//        System.out.println("Subset sum DP problem");
 //        int[] arr = new int[]{1, 5, 5, 11};
 //        int N = arr.length;
 //        int sum = 11;
@@ -3440,15 +3652,74 @@ public class DSA450Questions {
 //        obj.equalsSumPartition_SubsetSum(arr, N);
         //......................................................................
 //        Row: 423
-        System.out.println("Longest common sub sequence of 2 strings");
-        String s1 = "ABCDGH";
-        String s2 = "AEDFHR";
-        System.out.println("The longest common sub sequence length for the given 2 strings: "+obj.longestCommonSubsequence_Recursion(s1, s2, s1.length(), s2.length()));
-        obj.longestCommonSubsequence_DP_Memoization(s1, s2, s1.length(), s2.length());
-        s1 = "ABCDGH";
-        s2 = "";
-        System.out.println("The longest common sub sequence length for the given 2 strings: "+obj.longestCommonSubsequence_Recursion(s1, s2, s1.length(), s2.length()));
-        obj.longestCommonSubsequence_DP_Memoization(s1, s2, s1.length(), s2.length());
+//        System.out.println("Longest common sub sequence of 2 strings DP problem");
+//        String s1 = "ABCDGH";
+//        String s2 = "AEDFHR";
+//        System.out.println("The longest common sub sequence length for the given 2 strings: "+obj.longestCommonSubsequence_Recursion(s1, s2, s1.length(), s2.length()));
+//        obj.longestCommonSubsequence_DP_Memoization(s1, s2, s1.length(), s2.length());
+//        s1 = "ABCDGH";
+//        s2 = "";
+//        System.out.println("The longest common sub sequence length for the given 2 strings: "+obj.longestCommonSubsequence_Recursion(s1, s2, s1.length(), s2.length()));
+//        obj.longestCommonSubsequence_DP_Memoization(s1, s2, s1.length(), s2.length());
+        //......................................................................
+//        Row: 97
+//        System.out.println("Check two strings are isomorphic or not");
+//        //https://www.geeksforgeeks.org/check-if-two-given-strings-are-isomorphic-to-each-other/
+//        String s1 = "aab";
+//        String s2 = "xxy";
+//        System.out.println("Is isomorphic strings: "+obj.checkIsomorphicStrings(s1, s2));
+//        s1 = "aab";
+//        s2 = "xyz";
+//        System.out.println("Is isomorphic strings: "+obj.checkIsomorphicStrings(s1, s2));
+//        s1 = "13";
+//        s2 = "42";
+//        System.out.println("Is isomorphic strings: "+obj.checkIsomorphicStrings(s1, s2));
+        //......................................................................
+//        Row: 96
+//        System.out.println("Transform one string to another with min gievn no of operations");
+//        //https://www.geeksforgeeks.org/transform-one-string-to-another-using-minimum-number-of-given-operation/
+//        System.out.println("Transform operations required: " + obj.transformOneStringToAnotherWithMinOprn("EACBD", "EABCD"));
+//        System.out.println("Transform operations required: " + obj.transformOneStringToAnotherWithMinOprn("EACcD", "EABCD"));
+        //......................................................................
+//        Row: 154
+//        System.out.println("Check if a linked list is circular linked list");
+//        Node<Integer> node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        node.getNext().getNext().getNext().getNext().getNext().setNext(node); //CIRCULAR 6 -> 1
+//        System.out.println("Check if given linked list is circular linked list: " + obj.checkIfLinkedListIsCircularLinkedList(node));
+//        node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(6)); //NOT CIRCULAR 6 -> NULL
+//        System.out.println("Check if given linked list is circular linked list: " + obj.checkIfLinkedListIsCircularLinkedList(node));
+        //......................................................................
+//        Row: 152
+//        System.out.println("Quick sort in linked list");
+//        //https://www.geeksforgeeks.org/quick-sort/
+//        Node<Integer> node = new Node<>(10);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        obj.quickSortInLinkedList(node);
+        //......................................................................
+//        Row: 304
+//        System.out.println("Find next greater element");
+//        obj.nextGreaterElementInRightInArray(new int[]{1,3,2,4});
+//        obj.nextGreaterElementInRightInArray(new int[]{1,2,3,4,5}); //STACK WILL HOLD N ELEMENT S: O(N)
+//        obj.nextGreaterElementInRightInArray(new int[]{5,4,3,2,1}); //STACK WILL NOT HOLD N ELEMENT S: O(1)
+        //......................................................................
+//        Row: 339
+        System.out.println("First K largest element in array");
+        obj.kLargestElementInArray(new int[]{12, 5, 787, 1, 23}, 2);
+        obj.kLargestElementInArray(new int[]{1, 23, 12, 9, 30, 2, 50}, 3);
         
         
     }
