@@ -232,6 +232,129 @@ public class DSA450Questions {
 
     }
 
+    private void nextPermutation_Print(int[] nums){
+        for(int x: nums){
+            System.out.print(x);
+        }
+        System.out.println();
+    }
+    
+    public void nextPermutation(int[] nums) {
+
+        int N = nums.length;
+
+        //length == 1
+        if (N == 1) {
+            //output:
+            nextPermutation_Print(nums);
+            return;
+        }
+
+        //check if asc sorted
+        boolean ascSorted = false;
+        for (int i = 0; i < N - 1; i++) {
+            if (nums[i] < nums[i + 1]) {
+                ascSorted = true;
+            } else {
+                ascSorted = false;
+                break;
+            }
+        }
+
+        if (ascSorted) {
+            //swap only last 2 digit
+            swapIntArray(nums, N - 1, N - 2);
+            
+            //output:
+            nextPermutation_Print(nums);
+            return;
+        }
+
+        //check if desc sorted
+        boolean descSorted = false;
+        for (int i = 0; i < N - 1; i++) {
+            if (nums[i] > nums[i + 1]) {
+                descSorted = true;
+            } else {
+                descSorted = false;
+                break;
+            }
+        }
+
+        if (descSorted) {
+            //just reverse the num
+            for (int i = 0; i < N / 2; i++) {
+                swapIntArray(nums, i, N - i - 1);
+            }
+            
+            //output:
+            nextPermutation_Print(nums);
+            return;
+        }
+
+        //any other cases
+        int firstDecValueFromRight = nums[N - 1];
+        int index = 0;
+        for (int i = N - 2; i >= 0; i--) {
+            if (nums[i] < firstDecValueFromRight) {
+                index = i;
+                break;
+            } else {
+                firstDecValueFromRight = nums[i];
+            }
+        }
+
+        int justLargerNumFromFirstDecValue = nums[index + 1] - nums[index];
+        int swapWith = index + 1;
+        for (int i = index + 2; i < N; i++) {
+            if ((nums[i] - nums[index] > 0) && nums[i] - nums[index] < justLargerNumFromFirstDecValue) {
+                justLargerNumFromFirstDecValue = nums[i] - nums[index];
+                swapWith = i;
+            }
+        }
+
+        swapIntArray(nums, index, swapWith);
+        Arrays.sort(nums, index + 1, N);
+        
+        //output:
+        nextPermutation_Print(nums);
+    }
+    
+    private int factorialLargeNumber_Multiply(int x, int[] res, int resSize){
+        
+        int carry = 0;
+        for(int i=0; i<resSize; i++){
+            int prod = res[i]*x + carry;
+            res[i] = prod % 10;
+            carry = prod/10;
+        }
+        
+        while(carry != 0){
+            
+            res[resSize] = carry %10;
+            carry = carry /10;
+            resSize++;
+        }
+        
+        return resSize;
+    }
+    
+    public void factorialLargeNumber(int N){
+        int[] res = new int[Integer.MAX_VALUE/200];
+        res[0] = 1;
+        
+        int resSize = 1;
+        for(int x=2; x<=N; x++){
+            resSize = factorialLargeNumber_Multiply(x, res, resSize);
+        }
+        
+        //output
+        for(int i = resSize-1; i>=0; i--){
+            System.out.print(res[i]);
+        }
+        System.out.println();
+    }
+
     public void rotateMatrixClockWise90Deg(int[][] mat) {
 
         int row = mat.length;
@@ -1296,12 +1419,12 @@ public class DSA450Questions {
     }
 
     public void quickSortInLinkedList(Node<Integer> node) {
-        
-        if(node == null || node.getNext() == null){
+
+        if (node == null || node.getNext() == null) {
             new LinkedListUtil<Integer>(node).print();
             return;
         }
-        
+
         List<Integer> intArr = new ArrayList<>();
         Node<Integer> temp = node;
         while (temp != null) {
@@ -2257,32 +2380,32 @@ public class DSA450Questions {
         reserveStack_Recursion(stack);
         System.out.println("output: " + stack);
     }
-    
-    public void nextGreaterElementInRightInArray(int[] arr){
-        
+
+    public void nextGreaterElementInRightInArray(int[] arr) {
+
         Stack<Integer> st = new Stack<>();
         int[] result = new int[arr.length];
         int index = arr.length - 1;
-        for(int i =arr.length -1; i>=0; i--){
-            
-            while(!st.isEmpty() && st.peek() < arr[i]){
+        for (int i = arr.length - 1; i >= 0; i--) {
+
+            while (!st.isEmpty() && st.peek() < arr[i]) {
                 st.pop();
             }
-            
-            if(st.isEmpty()){
+
+            if (st.isEmpty()) {
                 result[index--] = -1;
-            }else{
+            } else {
                 result[index--] = st.peek();
             }
             st.push(arr[i]);
         }
-        
+
         //output
-        for(int x: result){
-            System.out.print(x+" ");
+        for (int x : result) {
+            System.out.print(x + " ");
         }
         System.out.println();
-        
+
     }
 
     public void minCostOfRope(int[] a) {
@@ -2311,30 +2434,30 @@ public class DSA450Questions {
         System.out.println("Min cost to combine all rpes into one rope: " + cost);
 
     }
-    
-    public void kLargestElementInArray(int[] arr, int K){
-        
+
+    public void kLargestElementInArray(int[] arr, int K) {
+
         PriorityQueue<Integer> minHeap = new PriorityQueue<>((o1, o2) -> o1.compareTo(o2));
-        for(int x: arr){
+        for (int x : arr) {
             minHeap.add(x);
-            if(minHeap.size() > K){
+            if (minHeap.size() > K) {
                 minHeap.poll();
             }
         }
-        
+
         int[] result = new int[minHeap.size()];
-        int index = minHeap.size() -1;
-        while(!minHeap.isEmpty()){
-            
+        int index = minHeap.size() - 1;
+        while (!minHeap.isEmpty()) {
+
             result[index--] = minHeap.poll();
-            
+
         }
-        
+
         //output
-        for(int x: result){
-            System.out.print(x+" ");
+        for (int x : result) {
+            System.out.print(x + " ");
         }
-        
+
         System.out.println();
     }
 
@@ -2812,7 +2935,7 @@ public class DSA450Questions {
 
         //base cond
         //if s1 is empty and s2 is non-empty String no subseq length is possible
-        //if s2 is empty and s2 is non-empty Strng no subseq length is possible
+        //if s2 is empty and s1 is non-empty Strng no subseq length is possible
         for (int[] r : memo) {
             Arrays.fill(r, 0);
         }
@@ -2827,7 +2950,7 @@ public class DSA450Questions {
             }
         }
 
-        System.out.println("The longest common subsequence length for the giventwo string is: " + memo[m][n]);
+        System.out.println("The longest common subsequence length for the given two string is: " + memo[m][n]);
 
     }
 
@@ -3717,11 +3840,25 @@ public class DSA450Questions {
 //        obj.nextGreaterElementInRightInArray(new int[]{5,4,3,2,1}); //STACK WILL NOT HOLD N ELEMENT S: O(1)
         //......................................................................
 //        Row: 339
-        System.out.println("First K largest element in array");
-        obj.kLargestElementInArray(new int[]{12, 5, 787, 1, 23}, 2);
-        obj.kLargestElementInArray(new int[]{1, 23, 12, 9, 30, 2, 50}, 3);
-        
-        
+//        System.out.println("First K largest element in array");
+//        obj.kLargestElementInArray(new int[]{12, 5, 787, 1, 23}, 2);
+//        obj.kLargestElementInArray(new int[]{1, 23, 12, 9, 30, 2, 50}, 3);
+        //......................................................................
+//        Row: 20
+//        System.out.println("Next permutation");
+//        //https://leetcode.com/problems/next-permutation/solution/
+//        obj.nextPermutation(new int[]{1,2,3});
+//        obj.nextPermutation(new int[]{4,3,2,1});
+//        obj.nextPermutation(new int[]{1,3,1,4,7,6,2});
+//        obj.nextPermutation(new int[]{2,7,4,3,2});
+        //......................................................................
+//        Row: 27
+        System.out.println("Factorial of large number");
+        //https://www.geeksforgeeks.org/factorial-large-number/
+        obj.factorialLargeNumber(1);
+        obj.factorialLargeNumber(5);
+        obj.factorialLargeNumber(10);
+        obj.factorialLargeNumber(897);
     }
 
 }
