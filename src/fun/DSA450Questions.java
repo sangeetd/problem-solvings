@@ -232,13 +232,13 @@ public class DSA450Questions {
 
     }
 
-    private void nextPermutation_Print(int[] nums){
-        for(int x: nums){
+    private void nextPermutation_Print(int[] nums) {
+        for (int x : nums) {
             System.out.print(x);
         }
         System.out.println();
     }
-    
+
     public void nextPermutation(int[] nums) {
 
         int N = nums.length;
@@ -264,7 +264,7 @@ public class DSA450Questions {
         if (ascSorted) {
             //swap only last 2 digit
             swapIntArray(nums, N - 1, N - 2);
-            
+
             //output:
             nextPermutation_Print(nums);
             return;
@@ -286,7 +286,7 @@ public class DSA450Questions {
             for (int i = 0; i < N / 2; i++) {
                 swapIntArray(nums, i, N - i - 1);
             }
-            
+
             //output:
             nextPermutation_Print(nums);
             return;
@@ -315,41 +315,41 @@ public class DSA450Questions {
 
         swapIntArray(nums, index, swapWith);
         Arrays.sort(nums, index + 1, N);
-        
+
         //output:
         nextPermutation_Print(nums);
     }
-    
-    private int factorialLargeNumber_Multiply(int x, int[] res, int resSize){
-        
+
+    private int factorialLargeNumber_Multiply(int x, int[] res, int resSize) {
+
         int carry = 0;
-        for(int i=0; i<resSize; i++){
-            int prod = res[i]*x + carry;
+        for (int i = 0; i < resSize; i++) {
+            int prod = res[i] * x + carry;
             res[i] = prod % 10;
-            carry = prod/10;
+            carry = prod / 10;
         }
-        
-        while(carry != 0){
-            
-            res[resSize] = carry %10;
-            carry = carry /10;
+
+        while (carry != 0) {
+
+            res[resSize] = carry % 10;
+            carry = carry / 10;
             resSize++;
         }
-        
+
         return resSize;
     }
-    
-    public void factorialLargeNumber(int N){
-        int[] res = new int[Integer.MAX_VALUE/200];
+
+    public void factorialLargeNumber(int N) {
+        int[] res = new int[Integer.MAX_VALUE / 200];
         res[0] = 1;
-        
+
         int resSize = 1;
-        for(int x=2; x<=N; x++){
+        for (int x = 2; x <= N; x++) {
             resSize = factorialLargeNumber_Multiply(x, res, resSize);
         }
-        
+
         //output
-        for(int i = resSize-1; i>=0; i--){
+        for (int i = resSize - 1; i >= 0; i--) {
             System.out.print(res[i]);
         }
         System.out.println();
@@ -1448,6 +1448,90 @@ public class DSA450Questions {
 
     }
 
+    public void moveLastNodeToFrontOfLinkedList(Node<Integer> node) {
+
+        Node curr = node;
+        Node prev = null;
+
+        while (curr.getNext() != null) {
+            prev = curr;
+            curr = curr.getNext();
+        }
+
+        prev.setNext(curr.getNext());
+        curr.setNext(node);
+        node = curr;
+
+        //output:
+        new LinkedListUtil<Integer>(node).print();
+
+    }
+
+    private int addOneToLinkedList_Helper(Node<Integer> node) {
+
+        if (node.getNext() == null) {
+            int sum = node.getData() + 1; //adding 1 to very last node(or last digit of number in linkedlist form)
+            node.setData(sum % 10);
+            return sum / 10;
+        }
+
+        int carry = addOneToLinkedList_Helper(node.getNext());
+        int sum = carry + node.getData();
+        node.setData(sum % 10);
+        return sum / 10;
+
+    }
+
+    public void addOneToLinkedList(Node<Integer> head) {
+
+        if (head == null) {
+            return;
+        }
+
+        int carry = addOneToLinkedList_Helper(head);
+        if(carry > 0){
+            Node<Integer> newHead = new Node<>(carry);
+            newHead.setNext(head);
+            head = newHead;
+        }
+        
+        //output
+        new LinkedListUtil<Integer>(head).print();
+
+    }
+
+    public void sortLinkedListOf012_2(Node<Integer> node){
+        
+        //approach 1 is just using merger sort on linked list. 
+        //merge sort method is already been implemented
+        
+        //approach 2 will be similar to my approach of solving
+        //sortArrayOf012_1()
+        
+        int[] count = new int[3]; //we just have 3 digits (0, 1, 2)
+        Node<Integer> curr = node;
+        while(curr != null){
+            count[curr.getData()]++;
+            curr = curr.getNext();
+        }
+        
+        //manipulate the linked list 
+        curr = node;
+        for(int i=0; i<3; i++){ //O(3)
+            
+            while(count[i]-- != 0){ 
+                //O(N) as N = count[0]+count[1]+cout[3] == total no of node already in the linked list
+                curr.setData(i);
+                curr = curr.getNext();
+            }
+            
+        }
+        
+        //output:
+        new LinkedListUtil<Integer>(node).print();
+        
+    }
+    
     public void levelOrderTraversal_Iterative(TreeNode root) {
 
         if (root == null) {
@@ -2295,6 +2379,45 @@ public class DSA450Questions {
         return isLeftSubTreeSumTree && isRightSubTreeSumTree;
 
     }
+    
+    class TreeLongestPathNodeSum{
+        
+        /*Helper class for longestPathNodeSum method*/
+        
+        List<Integer> path = new ArrayList<>();
+        int maxPathLength = path.size();
+        int longestPathSum = 0;
+        int maxSumOfAnyPath = 0;
+    }
+    
+    private void longestPathNodeSum_Helper(TreeNode<Integer> root, TreeLongestPathNodeSum obj){
+        
+        if(root == null){
+            return;
+        }
+        obj.path.add(root.getData());
+        longestPathNodeSum_Helper(root.getLeft(), obj);
+        longestPathNodeSum_Helper(root.getRight(), obj);
+        
+        int pathSum = 0;
+        for(int nodes: obj.path){
+            pathSum += nodes;
+        }
+        if(obj.path.size() > obj.maxPathLength){
+            obj.longestPathSum = pathSum;
+        }
+        obj.maxSumOfAnyPath = Math.max(obj.maxSumOfAnyPath, pathSum);
+        obj.maxPathLength = Math.max(obj.maxPathLength, obj.path.size());
+        
+        //remove the last added node
+        obj.path.remove(obj.path.size() - 1);
+    }
+    
+    public void longestPathNodeSum(TreeNode<Integer> root){
+        TreeLongestPathNodeSum obj = new TreeLongestPathNodeSum();
+        longestPathNodeSum_Helper(root, obj);
+        System.out.println("The sum of nodes of longest path of tree: "+obj.longestPathSum);
+    }
 
     public void checkTreeIsSumTree(TreeNode<Integer> root) {
         System.out.println("Check if a tree is sum tree: " + checkTreeIsSumTree_Helper(root, new CheckTreeIsSumTree()));
@@ -2589,6 +2712,42 @@ public class DSA450Questions {
         int last = findLastOccurenceKInSortedArray(arr, K, 0, N - 1, N);
 
         System.out.println(K + " first and last occurence: " + first + " " + last);
+
+    }
+
+    public int searchInRotatedSortedArray(int[] arr, int K) {
+
+        int f = 0;
+        int l = arr.length - 1;
+        int N = arr.length;
+        int mid = -1;
+
+        while (l >= f) {
+
+            mid = f + (l - f) / 2;
+            if (arr[mid] == K) {
+                return mid;
+            }
+
+            if (arr[f] <= arr[mid]) {
+
+                if (K >= arr[f] && K < arr[mid]) {
+                    l = mid - 1;
+                } else {
+                    f = mid + 1;
+                }
+
+            } else {
+                if (K > arr[mid] && K <= arr[l]) {
+                    f = mid + 1;
+                } else {
+                    l = mid - 1;
+                }
+            }
+
+        }
+
+        return -1;
 
     }
 
@@ -3523,7 +3682,7 @@ public class DSA450Questions {
 //        root1.getRight().getRight().setRight(new TreeNode(6));
 //        obj.printKSumPathAnyNodeTopToDown(root1, 5);
         //......................................................................
-//        Row: 349
+//        Row: 349, 269
 //        System.out.println("Min cost to combine ropes of diff lengths into one big rope");
 //        obj.minCostOfRope(new int[]{4, 3, 2, 6});
         //......................................................................
@@ -3853,12 +4012,78 @@ public class DSA450Questions {
 //        obj.nextPermutation(new int[]{2,7,4,3,2});
         //......................................................................
 //        Row: 27
-        System.out.println("Factorial of large number");
-        //https://www.geeksforgeeks.org/factorial-large-number/
-        obj.factorialLargeNumber(1);
-        obj.factorialLargeNumber(5);
-        obj.factorialLargeNumber(10);
-        obj.factorialLargeNumber(897);
+//        System.out.println("Factorial of large number");
+//        //https://www.geeksforgeeks.org/factorial-large-number/
+//        obj.factorialLargeNumber(1);
+//        obj.factorialLargeNumber(5);
+//        obj.factorialLargeNumber(10);
+//        obj.factorialLargeNumber(897);
+        //......................................................................
+//        Row: 103
+//        System.out.println("Search in rotated sorted array");
+//        System.out.println("The target is found at location: "+ obj.searchInRotatedSortedArray(new int[]{4,5,6,7,0,1,2}, 0));
+//        System.out.println("The target is found at location: "+ obj.searchInRotatedSortedArray(new int[]{4,5,6,7,0,1,2}, 4));
+//        System.out.println("The target is found at location: "+ obj.searchInRotatedSortedArray(new int[]{4,5,6,7,0,1,2}, 3));
+        //......................................................................
+//        Row: 146
+//        System.out.println("Move last node of linked list to front");
+//        Node<Integer> node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        obj.moveLastNodeToFrontOfLinkedList(node);
+        //......................................................................
+//        Row: 147
+//        System.out.println("Add 1 to linked list");
+//        Node<Integer> node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        obj.addOneToLinkedList(node);
+//        node = new Node<>(9); //COND WHEN METHOD WILL CREATE NEWHEAD TO STORE EXTRA CARRY IN THE SUM RECURSION
+//        node.setNext(new Node<>(9));
+//        node.getNext().setNext(new Node<>(9));
+//        node.getNext().getNext().setNext(new Node<>(9));
+//        obj.addOneToLinkedList(node);
+        //......................................................................
+//        Row: 167
+//        System.out.println("Sort linked list of 0s, 1s, 2s using 2 approaches");
+//        //https://www.geeksforgeeks.org/sort-a-linked-list-of-0s-1s-or-2s/
+//        Node<Integer> node = new Node<>(0);
+//        node.setNext(new Node<>(1));
+//        node.getNext().setNext(new Node<>(0));
+//        node.getNext().getNext().setNext(new Node<>(2));
+//        node.getNext().getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        node.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        new LinkedListUtil<>(obj.mergeSortDivideAndMerge(node)).print(); //SIMPLE MERGE SORT APPROACH T: O(N.LogN)
+//        node = new Node<>(0);
+//        node.setNext(new Node<>(1));
+//        node.getNext().setNext(new Node<>(0));
+//        node.getNext().getNext().setNext(new Node<>(2));
+//        node.getNext().getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        node.getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(1));
+//        node.getNext().getNext().getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        obj.sortLinkedListOf012_2(node); //SIMPLE MANIPULATION OF NODE T: O(N)
+        //......................................................................
+//        Row: 202
+        System.out.println("Sum of node on the longest path of tree from root to leaf");
+        TreeNode<Integer> root = new TreeNode<>(4);
+        root.setLeft(new TreeNode<>(2));
+        root.getLeft().setLeft(new TreeNode<>(7));
+        root.getLeft().setRight(new TreeNode<>(1));
+        root.getLeft().getRight().setLeft(new TreeNode<>(6)); //LONGEST PATH
+        root.setRight(new TreeNode<>(5));
+        root.getRight().setLeft(new TreeNode<>(2));
+        root.getRight().setRight(new TreeNode<>(3));
+        obj.longestPathNodeSum(root);
+        
     }
 
 }
