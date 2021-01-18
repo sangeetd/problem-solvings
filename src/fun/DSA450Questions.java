@@ -355,6 +355,103 @@ public class DSA450Questions {
         System.out.println();
     }
 
+    public void rainWaterTrappingUsingStack(int[] height) {
+
+        //https://leetcode.com/problems/trapping-rain-water/solution/
+        //..................T: O(N)
+        //..................S: O(N)
+        int ans = 0;
+        int current = 0;
+        int N = height.length;
+        Stack<Integer> s = new Stack<>();
+        while (current < N) {
+
+            while (!s.isEmpty() && height[current] > height[s.peek()]) {
+
+                int top = s.pop();
+                if (s.isEmpty()) {
+                    break;
+                }
+
+                int distance = current - s.peek() - 1;
+                int boundedHeight = Math.min(height[current], height[s.peek()]) - height[top];
+                ans += distance * boundedHeight;
+
+            }
+
+            s.push(current++);
+        }
+
+        //output
+        System.out.println("Rain water trapping using stack: " + ans);
+
+    }
+
+    public void rainWaterTrappingUsingTwoPointers(int[] height) {
+
+        //https://leetcode.com/problems/trapping-rain-water/solution/
+        //OPTIMISED than stack
+        //..................T: O(N)
+        //..................S: O(1)
+        int left = 0;
+        int right = height.length - 1;
+        int ans = 0;
+        int leftMax = 0;
+        int rightMax = 0;
+        while (left < right) {
+            if (height[left] < height[right]) {
+
+                if (height[left] >= leftMax) {
+                    leftMax = height[left];
+                } else {
+                    ans += (leftMax - height[left]);
+                }
+
+                ++left;
+            } else {
+
+                if (height[right] >= rightMax) {
+                    rightMax = height[right];
+                } else {
+                    ans += (rightMax - height[right]);
+                }
+
+                --right;
+            }
+        }
+
+        //output
+        System.out.println("Rain water trapping using tow pointers: " + ans);
+
+    }
+
+    public void findMaximumProductSubarray(int[] arr) {
+
+        //Explanation: https://www.youtube.com/watch?v=lXVy6YWFcRM
+        int result = arr[0];
+        int currMax = 1;
+        int currMin = 1;
+        for (int i = 0; i < arr.length; i++) {
+
+            if (arr[i] == 0) {
+                //just reset
+                currMax = 1;
+                currMin = 1;
+                result = Math.max(arr[i], result);
+                continue;
+            }
+
+            int tempCurrMax = arr[i] * currMax;
+            currMax = Math.max(Math.max(arr[i] * currMax, arr[i] * currMin), arr[i]);
+            currMin = Math.min(Math.min(tempCurrMax, arr[i] * currMin), arr[i]);
+            result = Math.max(currMax, result);
+        }
+
+        //output:
+        System.out.println("Maximum product subarray: " + result);
+
+    }
+
     public void rotateMatrixClockWise90Deg(int[][] mat) {
 
         int row = mat.length;
@@ -772,7 +869,7 @@ public class DSA450Questions {
 
     }
 
-    public boolean checkIsomorphicStrings(String s1, String s2) {
+    public boolean checkIsomorphicStrings_1(String s1, String s2) {
 
         int m = s1.length();
         int n = s2.length();
@@ -800,6 +897,49 @@ public class DSA450Questions {
             } else if (map[s1.charAt(i)] != (s2.charAt(i))) {
                 return false;
             }
+        }
+
+        return true;
+
+    }
+
+    public boolean checkIsomorphicStrings_2(String s1, String s2) {
+
+        //........................T: O(N)
+        //EASIER EXPLAINATION
+        int m = s1.length();
+        int n = s2.length();
+
+        if (m != n) {
+            System.out.println("Not isomorphic strings");
+            return false;
+        }
+
+        Map<Character, Character> map = new HashMap<>();
+        for (int i = 0; i < m; i++) {
+            char sChar = s1.charAt(i);
+            char tChar = s2.charAt(i);
+
+            if (map.containsKey(sChar) && map.get(sChar) != tChar) {
+                return false;
+            }
+
+            map.put(sChar, tChar);
+
+        }
+
+        map.clear();
+
+        for (int i = 0; i < m; i++) {
+            char sChar = s1.charAt(i);
+            char tChar = s2.charAt(i);
+
+            if (map.containsKey(tChar) && map.get(tChar) != sChar) {
+                return false;
+            }
+
+            map.put(tChar, sChar);
+
         }
 
         return true;
@@ -1489,49 +1629,49 @@ public class DSA450Questions {
         }
 
         int carry = addOneToLinkedList_Helper(head);
-        if(carry > 0){
+        //edge case for L [9 -> 9 -> 9 -> NULL] + 1 = [1 -> 0 -> 0 -> 0 -> NULL]
+        //extra 1 is the newHead in this case...
+        if (carry > 0) {
             Node<Integer> newHead = new Node<>(carry);
             newHead.setNext(head);
             head = newHead;
         }
-        
+
         //output
         new LinkedListUtil<Integer>(head).print();
 
     }
 
-    public void sortLinkedListOf012_2(Node<Integer> node){
-        
+    public void sortLinkedListOf012_2(Node<Integer> node) {
+
         //approach 1 is just using merger sort on linked list. 
         //merge sort method is already been implemented
-        
         //approach 2 will be similar to my approach of solving
         //sortArrayOf012_1()
-        
         int[] count = new int[3]; //we just have 3 digits (0, 1, 2)
         Node<Integer> curr = node;
-        while(curr != null){
+        while (curr != null) {
             count[curr.getData()]++;
             curr = curr.getNext();
         }
-        
+
         //manipulate the linked list 
         curr = node;
-        for(int i=0; i<3; i++){ //O(3)
-            
-            while(count[i]-- != 0){ 
+        for (int i = 0; i < 3; i++) { //O(3)
+
+            while (count[i]-- != 0) {
                 //O(N) as N = count[0]+count[1]+cout[3] == total no of node already in the linked list
                 curr.setData(i);
                 curr = curr.getNext();
             }
-            
+
         }
-        
+
         //output:
         new LinkedListUtil<Integer>(node).print();
-        
+
     }
-    
+
     public void levelOrderTraversal_Iterative(TreeNode root) {
 
         if (root == null) {
@@ -2379,48 +2519,104 @@ public class DSA450Questions {
         return isLeftSubTreeSumTree && isRightSubTreeSumTree;
 
     }
-    
-    class TreeLongestPathNodeSum{
-        
+
+    class TreeLongestPathNodeSum {
+
         /*Helper class for longestPathNodeSum method*/
-        
         List<Integer> path = new ArrayList<>();
         int maxPathLength = path.size();
         int longestPathSum = 0;
         int maxSumOfAnyPath = 0;
     }
-    
-    private void longestPathNodeSum_Helper(TreeNode<Integer> root, TreeLongestPathNodeSum obj){
-        
-        if(root == null){
+
+    private void longestPathNodeSum_Helper(TreeNode<Integer> root, TreeLongestPathNodeSum obj) {
+
+        if (root == null) {
             return;
         }
         obj.path.add(root.getData());
         longestPathNodeSum_Helper(root.getLeft(), obj);
         longestPathNodeSum_Helper(root.getRight(), obj);
-        
+
         int pathSum = 0;
-        for(int nodes: obj.path){
+        for (int nodes : obj.path) {
             pathSum += nodes;
         }
-        if(obj.path.size() > obj.maxPathLength){
+        if (obj.path.size() > obj.maxPathLength) {
             obj.longestPathSum = pathSum;
         }
         obj.maxSumOfAnyPath = Math.max(obj.maxSumOfAnyPath, pathSum);
         obj.maxPathLength = Math.max(obj.maxPathLength, obj.path.size());
-        
+
         //remove the last added node
         obj.path.remove(obj.path.size() - 1);
     }
-    
-    public void longestPathNodeSum(TreeNode<Integer> root){
+
+    public void longestPathNodeSum(TreeNode<Integer> root) {
         TreeLongestPathNodeSum obj = new TreeLongestPathNodeSum();
         longestPathNodeSum_Helper(root, obj);
-        System.out.println("The sum of nodes of longest path of tree: "+obj.longestPathSum);
+        System.out.println("The sum of nodes of longest path of tree: " + obj.longestPathSum);
     }
 
     public void checkTreeIsSumTree(TreeNode<Integer> root) {
         System.out.println("Check if a tree is sum tree: " + checkTreeIsSumTree_Helper(root, new CheckTreeIsSumTree()));
+    }
+
+    private void findPredecessorAndSuccessorInBST_Helper(TreeNode<Integer> root, int key, TreeNode<Integer>[] result) {
+
+        if (root == null) {
+            return;
+        }
+
+        if (root.getData() == key) {
+
+            if (root.getLeft() != null) {
+                //predecessor : rightmost node in the left subtree
+                TreeNode<Integer> pred = root.getLeft();
+                while (pred.getRight() != null) {
+                    pred = pred.getRight();
+                }
+
+                result[0] = pred;
+            }
+
+            if (root.getRight() != null) {
+                //successor : leftmost node in the right subtree
+                TreeNode<Integer> succ = root.getRight();
+                while (succ.getLeft() != null) {
+                    succ = succ.getLeft();
+                }
+
+                result[1] = succ;
+            }
+
+            return;
+
+        }
+
+        //key is less than root data so move to whole left sub tree
+        if (root.getData() > key) {
+            result[1] = root;
+            findPredecessorAndSuccessorInBST_Helper(root.getLeft(), key, result);
+        } else {
+            //else move to whole right sub tree
+            result[0] = root;
+            findPredecessorAndSuccessorInBST_Helper(root.getRight(), key, result);
+        }
+
+    }
+
+    public void findPredecessorAndSuccessorInBST(TreeNode<Integer> root, int key) {
+        
+        //can use list also
+        //[0] : predecessor, [1] : successor
+        TreeNode<Integer>[] result = new TreeNode[2];
+        findPredecessorAndSuccessorInBST_Helper(root, key, result);
+        System.out.println("Predecessor and successor of BST: "
+                +(result[0] != null? result[0].getData() : "null")+" "+
+                (result[1] != null? result[1].getData() : "null"));
+        
+        
     }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
@@ -3949,19 +4145,22 @@ public class DSA450Questions {
 //        //https://www.geeksforgeeks.org/check-if-two-given-strings-are-isomorphic-to-each-other/
 //        String s1 = "aab";
 //        String s2 = "xxy";
-//        System.out.println("Is isomorphic strings: "+obj.checkIsomorphicStrings(s1, s2));
+//        System.out.println("Is isomorphic strings 1: "+obj.checkIsomorphicStrings_1(s1, s2));
+//        System.out.println("Is isomorphic strings 2: "+obj.checkIsomorphicStrings_2(s1, s2));
 //        s1 = "aab";
 //        s2 = "xyz";
-//        System.out.println("Is isomorphic strings: "+obj.checkIsomorphicStrings(s1, s2));
+//        System.out.println("Is isomorphic strings 1: "+obj.checkIsomorphicStrings_1(s1, s2));
+//        System.out.println("Is isomorphic strings 2: "+obj.checkIsomorphicStrings_2(s1, s2));
 //        s1 = "13";
 //        s2 = "42";
-//        System.out.println("Is isomorphic strings: "+obj.checkIsomorphicStrings(s1, s2));
+//        System.out.println("Is isomorphic strings 1: "+obj.checkIsomorphicStrings_1(s1, s2));
+//        System.out.println("Is isomorphic strings 2: "+obj.checkIsomorphicStrings_2(s1, s2));
         //......................................................................
 //        Row: 96
 //        System.out.println("Transform one string to another with min gievn no of operations");
 //        //https://www.geeksforgeeks.org/transform-one-string-to-another-using-minimum-number-of-given-operation/
 //        System.out.println("Transform operations required: " + obj.transformOneStringToAnotherWithMinOprn("EACBD", "EABCD"));
-//        System.out.println("Transform operations required: " + obj.transformOneStringToAnotherWithMinOprn("EACcD", "EABCD"));
+//        System.out.println("Transform operations required: " + obj.transformOneStringToAnotherWithMinOprn("EACCD", "EABCD"));
         //......................................................................
 //        Row: 154
 //        System.out.println("Check if a linked list is circular linked list");
@@ -4073,17 +4272,51 @@ public class DSA450Questions {
 //        obj.sortLinkedListOf012_2(node); //SIMPLE MANIPULATION OF NODE T: O(N)
         //......................................................................
 //        Row: 202
-        System.out.println("Sum of node on the longest path of tree from root to leaf");
-        TreeNode<Integer> root = new TreeNode<>(4);
-        root.setLeft(new TreeNode<>(2));
-        root.getLeft().setLeft(new TreeNode<>(7));
-        root.getLeft().setRight(new TreeNode<>(1));
-        root.getLeft().getRight().setLeft(new TreeNode<>(6)); //LONGEST PATH
-        root.setRight(new TreeNode<>(5));
-        root.getRight().setLeft(new TreeNode<>(2));
-        root.getRight().setRight(new TreeNode<>(3));
-        obj.longestPathNodeSum(root);
-        
+//        System.out.println("Sum of node on the longest path of tree from root to leaf");
+//        TreeNode<Integer> root = new TreeNode<>(4);
+//        root.setLeft(new TreeNode<>(2));
+//        root.getLeft().setLeft(new TreeNode<>(7));
+//        root.getLeft().setRight(new TreeNode<>(1));
+//        root.getLeft().getRight().setLeft(new TreeNode<>(6)); //LONGEST PATH
+//        root.setRight(new TreeNode<>(5));
+//        root.getRight().setLeft(new TreeNode<>(2));
+//        root.getRight().setRight(new TreeNode<>(3));
+//        obj.longestPathNodeSum(root);
+        //......................................................................
+//        Row: 34
+//        System.out.println("Rain water trapping 2 approaches");
+//        obj.rainWaterTrappingUsingStack(new int[]{3,0,0,2,0,4});
+//        obj.rainWaterTrappingUsingTwoPointers(new int[]{3,0,0,2,0,4});
+//        obj.rainWaterTrappingUsingStack(new int[]{6,9,9});
+//        obj.rainWaterTrappingUsingTwoPointers(new int[]{6,9,9});
+//        obj.rainWaterTrappingUsingStack(new int[]{7,4,0,9});
+//        obj.rainWaterTrappingUsingTwoPointers(new int[]{7,4,0,9});
+        //......................................................................
+//        Row: 28
+//        System.out.println("Find maximum product subarray");
+//        obj.findMaximumProductSubarray(new int[]{2,3,-2,4});
+//        obj.findMaximumProductSubarray(new int[]{-2,0,-1});
+        //......................................................................
+//        Row: 217
+        System.out.println("Find predecessor and successor of given node in BST");
+        //https://www.geeksforgeeks.org/inorder-predecessor-successor-given-key-bst/
+        //predecessors and successor can be found when we do the inorder traversal of tree
+        //inorder traversal of BST is sorted list of node data
+        //for below BST inorder list [0,2,3,4,5,6,7,8,9]
+        TreeNode<Integer> root1 = new TreeNode<>(6);
+        root1.setLeft(new TreeNode(2));
+        root1.getLeft().setLeft(new TreeNode(0));
+        root1.getLeft().setRight(new TreeNode(4));
+        root1.getLeft().getRight().setLeft(new TreeNode(3));
+        root1.getLeft().getRight().setRight(new TreeNode(5));
+        root1.setRight(new TreeNode(8));
+        root1.getRight().setLeft(new TreeNode(7));
+        root1.getRight().setRight(new TreeNode(9));
+        obj.findPredecessorAndSuccessorInBST(root1, 6);
+        obj.findPredecessorAndSuccessorInBST(root1, 2);
+        obj.findPredecessorAndSuccessorInBST(root1, 5);
+        obj.findPredecessorAndSuccessorInBST(root1, 10); //ONLY PREDECESSOR IS POSSIBLE
+        obj.findPredecessorAndSuccessorInBST(root1, -1); //ONLY SUCCESSOR IS POSSIBLE
     }
 
 }
