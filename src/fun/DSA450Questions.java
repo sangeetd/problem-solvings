@@ -2607,16 +2607,15 @@ public class DSA450Questions {
     }
 
     public void findPredecessorAndSuccessorInBST(TreeNode<Integer> root, int key) {
-        
+
         //can use list also
         //[0] : predecessor, [1] : successor
         TreeNode<Integer>[] result = new TreeNode[2];
         findPredecessorAndSuccessorInBST_Helper(root, key, result);
         System.out.println("Predecessor and successor of BST: "
-                +(result[0] != null? result[0].getData() : "null")+" "+
-                (result[1] != null? result[1].getData() : "null"));
-        
-        
+                + (result[0] != null ? result[0].getData() : "null") + " "
+                + (result[1] != null ? result[1].getData() : "null"));
+
     }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
@@ -3308,6 +3307,179 @@ public class DSA450Questions {
         System.out.println("The longest common subsequence length for the given two string is: " + memo[m][n]);
 
     }
+
+    private int longestRepeatingSubsequence_Recursion_Helper(String a, String b, int m, int n) {
+
+        if (m == 0 || n == 0) {
+            return 0;
+        } else if (a.charAt(m - 1) == b.charAt(n - 1) && m != n) {
+            return longestRepeatingSubsequence_Recursion_Helper(a, b, m - 1, n - 1) + 1;
+        }
+
+        return Math.max(longestRepeatingSubsequence_Recursion_Helper(a, b, m, n - 1),
+                longestRepeatingSubsequence_Recursion_Helper(a, b, m - 1, n));
+    }
+
+    public int longestRepeatingSubsequence_Recursion(String str, int N) {
+        return longestRepeatingSubsequence_Recursion_Helper(str, str, N, N);
+    }
+
+    public void longestRepeatingSubsequence_DP_Memoization(String str) {
+
+        int N = str.length();
+        int[][] memo = new int[N + 1][N + 1];
+
+        //base cond
+        //if string length is 0 then no subseq is possible
+        //here there is only one string so mem[x][y] where x == 0 OR y == 0 memo[x][y] = 0
+        for (int x = 1; x < N + 1; x++) {
+            for (int y = 1; y < N + 1; y++) {
+                if (str.charAt(x - 1) == str.charAt(y - 1) && x != y) {
+                    memo[x][y] = memo[x - 1][y - 1] + 1;
+                } else {
+                    memo[x][y] = Math.max(memo[x][y - 1], memo[x - 1][y]);
+                }
+            }
+        }
+
+        //output:
+        System.out.println("Longest repeating subsequence: " + memo[N][N]);
+
+    }
+
+    public void longestCommonSubstring_DP_Memoization(String a, String b) {
+
+        int m = a.length();
+        int n = b.length();
+
+        int[][] memo = new int[m + 1][n + 1];
+
+        //base cond: if any of the string is empty then common subtring is not possible
+        //x == 0 OR y == 0 : memo[0][0] = 0
+        int maxLenSubstring = 0;
+        for (int x = 1; x < m + 1; x++) {
+            for (int y = 1; y < n + 1; y++) {
+                if (a.charAt(x - 1) == b.charAt(y - 1)) {
+                    memo[x][y] = memo[x - 1][y - 1] + 1;
+                    maxLenSubstring = Math.max(maxLenSubstring, memo[x][y]);
+                } else {
+                    memo[x][y] = 0;
+                }
+            }
+        }
+
+        //output:
+        System.out.println("Longest common substring: " + maxLenSubstring);
+
+    }
+
+    public int maximumLengthOfPairChain_DP_Approach(int[][] pairs) {
+
+        //https://leetcode.com/problems/maximum-length-of-pair-chain/solution/
+        //.......................T: O(N^2)
+        //.......................S: O(N)
+        
+        Arrays.sort(pairs, (a, b) -> a[0] - b[0]); //T: O(N.LogN)
+        int N = pairs.length;
+        int[] dp = new int[N];
+        Arrays.fill(dp, 1);
+
+        //T: O(N^2)
+        for (int i = 1; i < N; i++) {
+            for (int j = 0; j < i; j++) {
+                if (pairs[j][1] < pairs[i][0]) {
+                    dp[i] = Math.max(dp[i], dp[j] + 1);
+                }
+            }
+        }
+
+        int ans = 0;
+        for (int x : dp) {
+            ans = Math.max(ans, x);
+        }
+        
+        //overall T: O(N^2) as, N^2 > N.LogN
+        
+        return ans;
+
+    }
+    
+    public int maximumLengthOfPairChain_Greedy_Approach(int[][] pairs){
+        
+        //OPTIMISED
+        //https://leetcode.com/problems/maximum-length-of-pair-chain/solution/
+        //........................T: O(N.LogN)
+        //........................S: O(1)
+        
+        Arrays.sort(pairs, (a, b) -> a[1] - b[1]); //T: O(N.LogN)
+        int curr = Integer.MIN_VALUE;
+        int ans = 0;
+        for(int[] pair: pairs){ //T: O(N)
+            
+            if(curr < pair[0]){
+                curr = pair[1];
+                ans++;
+            }
+            
+        }
+        
+        //overall T: O(N.LogN) as, N.LogN > N
+        
+        return ans;
+        
+    }
+    
+    public int findBinomialCoefficient_Recursion(int n, int r){
+        
+        //https://www.geeksforgeeks.org/binomial-coefficient-dp-9/
+        //this approach have overlapping subproblems
+        
+        
+        //Binomial coefficient : nCr formula = n!/r!(n - r)!
+        //if r = 0 OR r = n, ans: 1 as, 
+        //r == 0: n!/0!.(n - 0)! => n!/n! => 1
+        //r == n: n!/n!.(n - n)! => n!/n! => 1
+        //0! = 1
+        
+        if(r > n){
+            return 0;
+        }
+        
+        if(r == 0 || r == n){
+            return 1;
+        }
+        
+        return findBinomialCoefficient_Recursion(n-1, r-1) + findBinomialCoefficient_Recursion(n-1, r);
+        
+    }
+    
+    public void findBinomialCoefficient_DP_Memoization(int n, int r){
+        
+        int[][] memo = new int[n+1][r+1]; 
+        //base cond
+        for(int x=0; x<n+1; x++){
+            for(int y=0; y<r+1; y++){
+                
+                if(y > x){
+                    memo[x][y] = 0;
+                }else if(y == 0 || y == x){
+                    memo[x][y] = 1;
+                }
+                
+            }
+        }
+        
+        for(int x=1; x<n+1; x++){
+            for(int y=1; y<r+1; y++){
+                memo[x][y] = memo[x-1][y-1] + memo[x-1][y];
+            }
+        }
+        
+        //output:
+        System.out.println("Binomial coefficient (nCr) DP way: "+memo[n][r]);
+        
+    }
+    
 
     public static void main(String[] args) {
 
@@ -4298,25 +4470,62 @@ public class DSA450Questions {
 //        obj.findMaximumProductSubarray(new int[]{-2,0,-1});
         //......................................................................
 //        Row: 217
-        System.out.println("Find predecessor and successor of given node in BST");
-        //https://www.geeksforgeeks.org/inorder-predecessor-successor-given-key-bst/
-        //predecessors and successor can be found when we do the inorder traversal of tree
-        //inorder traversal of BST is sorted list of node data
-        //for below BST inorder list [0,2,3,4,5,6,7,8,9]
-        TreeNode<Integer> root1 = new TreeNode<>(6);
-        root1.setLeft(new TreeNode(2));
-        root1.getLeft().setLeft(new TreeNode(0));
-        root1.getLeft().setRight(new TreeNode(4));
-        root1.getLeft().getRight().setLeft(new TreeNode(3));
-        root1.getLeft().getRight().setRight(new TreeNode(5));
-        root1.setRight(new TreeNode(8));
-        root1.getRight().setLeft(new TreeNode(7));
-        root1.getRight().setRight(new TreeNode(9));
-        obj.findPredecessorAndSuccessorInBST(root1, 6);
-        obj.findPredecessorAndSuccessorInBST(root1, 2);
-        obj.findPredecessorAndSuccessorInBST(root1, 5);
-        obj.findPredecessorAndSuccessorInBST(root1, 10); //ONLY PREDECESSOR IS POSSIBLE
-        obj.findPredecessorAndSuccessorInBST(root1, -1); //ONLY SUCCESSOR IS POSSIBLE
+//        System.out.println("Find predecessor and successor of given node in BST");
+//        //https://www.geeksforgeeks.org/inorder-predecessor-successor-given-key-bst/
+//        //predecessors and successor can be found when we do the inorder traversal of tree
+//        //inorder traversal of BST is sorted list of node data
+//        //for below BST inorder list [0,2,3,4,5,6,7,8,9]
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.findPredecessorAndSuccessorInBST(root1, 6);
+//        obj.findPredecessorAndSuccessorInBST(root1, 2);
+//        obj.findPredecessorAndSuccessorInBST(root1, 5);
+//        obj.findPredecessorAndSuccessorInBST(root1, 10); //ONLY PREDECESSOR IS POSSIBLE
+//        obj.findPredecessorAndSuccessorInBST(root1, -1); //ONLY SUCCESSOR IS POSSIBLE
+        //......................................................................
+//        Row: 424
+//        System.out.println("Longest Repeating Subsequence DP problem");
+//        System.out.println("Longest repeating subsequence: "+obj.longestRepeatingSubsequence_Recursion("axxxy", 5)); //xx, xx
+//        obj.longestRepeatingSubsequence_DP_Memoization("axxxy"); //xx, xx
+        //......................................................................
+//        Row: 441
+//        System.out.println("Longest common substring DP problem");
+//        obj.longestCommonSubstring_DP_Memoization("ABCDGH", "ACDGHR");
+        //......................................................................
+//        Row: 441
+//        System.out.println("Maximum length of pair chain 2 approaches");
+//        //https://leetcode.com/problems/maximum-length-of-pair-chain/
+//        System.out.println("maximum length of pair chain DP approach: "+
+//                obj.maximumLengthOfPairChain_DP_Approach(new int[][]{
+//                    {1,2},
+//                    {3,4},
+//                    {2,3}
+//                }));
+//        System.out.println("maximum length of pair chain Greedy approach: "+
+//                obj.maximumLengthOfPairChain_Greedy_Approach(new int[][]{
+//                    {1,2},
+//                    {3,4},
+//                    {2,3}
+//                }));
+        //......................................................................
+//        Row: 412
+        System.out.println("Binomial coefficient DP problem");
+        //https://www.geeksforgeeks.org/binomial-coefficient-dp-9/
+        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 2));
+        obj.findBinomialCoefficient_DP_Memoization(5, 2);
+        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 6));
+        obj.findBinomialCoefficient_DP_Memoization(5, 6);
+        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 5));
+        obj.findBinomialCoefficient_DP_Memoization(5, 5);
+        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 0));
+        obj.findBinomialCoefficient_DP_Memoization(5, 0);
     }
 
 }
