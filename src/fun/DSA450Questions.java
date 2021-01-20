@@ -5,9 +5,11 @@
  */
 package fun;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -450,6 +452,53 @@ public class DSA450Questions {
         //output:
         System.out.println("Maximum product subarray: " + result);
 
+    }
+
+    public void kadaneAlgorithm(int[] arr) {
+
+        //for finding maximum sum subarray
+        int maxSum = arr[0];
+        int currMaxSum = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            currMaxSum = Math.max(arr[i], currMaxSum + arr[i]);
+            maxSum = Math.max(maxSum, currMaxSum);
+        }
+
+        //output
+        System.out.println("Max sum subarray: " + maxSum);
+
+    }
+    
+    public void kadaneAlgorithm_PointingIndexes(int[] arr){
+        
+        int maxSum = arr[0];
+        int currMaxSum = arr[0];
+        
+        int start = 0;
+        int end = 0;
+        int index = 0;
+        for(int i=1; i<arr.length; i++){
+            
+            currMaxSum += arr[i];
+            if(maxSum < currMaxSum){
+                
+                maxSum = currMaxSum;
+                start = index;
+                end = i;
+                
+            }
+            
+            if(currMaxSum < 0){
+                currMaxSum = 0;
+                index = i+1;
+            }
+            
+        }
+        
+        
+        //output:
+        System.out.println("Max sum subarray with start & end: "+maxSum+ " Start: "+start+" end: "+end);
+        
     }
 
     public void rotateMatrixClockWise90Deg(int[][] mat) {
@@ -1672,6 +1721,30 @@ public class DSA450Questions {
 
     }
 
+    public void reverseDoublyLinkedList(Node node) {
+
+        //actual
+        new LinkedListUtil(node).print();
+
+        Node curr = node;
+        Node nextToCurr = null;
+        Node prevToCurr = null;
+        while (curr != null) {
+
+            nextToCurr = curr.getNext();
+            curr.setNext(prevToCurr);
+            curr.setPrevious(nextToCurr);
+            prevToCurr = curr;
+            curr = nextToCurr;
+
+        }
+
+        //output:
+        //new head will pre prevToCurr
+        new LinkedListUtil(prevToCurr).print();
+
+    }
+
     public void levelOrderTraversal_Iterative(TreeNode root) {
 
         if (root == null) {
@@ -2618,6 +2691,82 @@ public class DSA450Questions {
 
     }
 
+    private int countNodesThatLieInGivenRange_Count = 0;
+
+    private void countNodesThatLieInGivenRange_Helper(TreeNode<Integer> root, int low, int high) {
+
+        if (root == null) {
+            return;
+        }
+
+        if (root.getData() >= low && root.getData() <= high) {
+            countNodesThatLieInGivenRange_Count++;
+        }
+
+        countNodesThatLieInGivenRange_Helper(root.getLeft(), low, high);
+        countNodesThatLieInGivenRange_Helper(root.getRight(), low, high);
+
+    }
+
+    public void countNodesThatLieInGivenRange(TreeNode<Integer> root, int low, int high) {
+        countNodesThatLieInGivenRange_Count = 0;
+        countNodesThatLieInGivenRange_Helper(root, low, high);
+        System.out.println("No. of nodes that lie in given range: " + countNodesThatLieInGivenRange_Count);
+    }
+
+    public void flattenBSTToLinkedList(TreeNode root) {
+
+        if (root == null) {
+            return;
+        }
+
+        /*Deque<TreeNode> dQueue = new ArrayDeque<>();
+         dQueue.add(root);
+
+         while (!dQueue.isEmpty()) {
+
+         TreeNode curr = dQueue.removeFirst();
+
+         if (curr.getRight() != null) {
+         dQueue.addFirst(curr.getRight());
+         }
+
+         if (curr.getLeft() != null) {
+         dQueue.addFirst(curr.getLeft());
+         }
+
+         if (!dQueue.isEmpty()) {
+         curr.setRight(dQueue.peek());
+         curr.setLeft(null);
+         }
+
+         }*/
+        List<TreeNode> q = new ArrayList<>();
+        q.add(root);
+        while (!q.isEmpty()) {
+
+            TreeNode curr = q.remove(0);
+
+            if (curr.getRight() != null) {
+                q.add(0, curr.getRight());
+            }
+
+            if (curr.getLeft() != null) {
+                q.add(0, curr.getLeft());
+            }
+
+            if (!q.isEmpty()) {
+                curr.setRight(q.get(0));
+                curr.setLeft(null);
+            }
+
+        }
+        //output:
+        new BinaryTree(root).treeBFS();
+        System.out.println();
+
+    }
+
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
     private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
@@ -3378,7 +3527,6 @@ public class DSA450Questions {
         //https://leetcode.com/problems/maximum-length-of-pair-chain/solution/
         //.......................T: O(N^2)
         //.......................S: O(N)
-        
         Arrays.sort(pairs, (a, b) -> a[0] - b[0]); //T: O(N.LogN)
         int N = pairs.length;
         int[] dp = new int[N];
@@ -3397,89 +3545,82 @@ public class DSA450Questions {
         for (int x : dp) {
             ans = Math.max(ans, x);
         }
-        
+
         //overall T: O(N^2) as, N^2 > N.LogN
-        
         return ans;
 
     }
-    
-    public int maximumLengthOfPairChain_Greedy_Approach(int[][] pairs){
-        
+
+    public int maximumLengthOfPairChain_Greedy_Approach(int[][] pairs) {
+
         //OPTIMISED
         //https://leetcode.com/problems/maximum-length-of-pair-chain/solution/
         //........................T: O(N.LogN)
         //........................S: O(1)
-        
         Arrays.sort(pairs, (a, b) -> a[1] - b[1]); //T: O(N.LogN)
         int curr = Integer.MIN_VALUE;
         int ans = 0;
-        for(int[] pair: pairs){ //T: O(N)
-            
-            if(curr < pair[0]){
+        for (int[] pair : pairs) { //T: O(N)
+
+            if (curr < pair[0]) {
                 curr = pair[1];
                 ans++;
             }
-            
+
         }
-        
+
         //overall T: O(N.LogN) as, N.LogN > N
-        
         return ans;
-        
+
     }
-    
-    public int findBinomialCoefficient_Recursion(int n, int r){
-        
+
+    public int findBinomialCoefficient_Recursion(int n, int r) {
+
         //https://www.geeksforgeeks.org/binomial-coefficient-dp-9/
         //this approach have overlapping subproblems
-        
-        
         //Binomial coefficient : nCr formula = n!/r!(n - r)!
         //if r = 0 OR r = n, ans: 1 as, 
         //r == 0: n!/0!.(n - 0)! => n!/n! => 1
         //r == n: n!/n!.(n - n)! => n!/n! => 1
         //0! = 1
-        
-        if(r > n){
+        if (r > n) {
             return 0;
         }
-        
-        if(r == 0 || r == n){
+
+        if (r == 0 || r == n) {
             return 1;
         }
-        
-        return findBinomialCoefficient_Recursion(n-1, r-1) + findBinomialCoefficient_Recursion(n-1, r);
-        
+
+        return findBinomialCoefficient_Recursion(n - 1, r - 1) + findBinomialCoefficient_Recursion(n - 1, r);
+
     }
-    
-    public void findBinomialCoefficient_DP_Memoization(int n, int r){
-        
-        int[][] memo = new int[n+1][r+1]; 
+
+    public void findBinomialCoefficient_DP_Memoization(int n, int r) {
+
+        int[][] memo = new int[n + 1][r + 1];
         //base cond
-        for(int x=0; x<n+1; x++){
-            for(int y=0; y<r+1; y++){
-                
-                if(y > x){
+        for (int x = 0; x < n + 1; x++) {
+            for (int y = 0; y < r + 1; y++) {
+
+                if (y > x) {
                     memo[x][y] = 0;
-                }else if(y == 0 || y == x){
+                } else if (y == 0 || y == x) {
                     memo[x][y] = 1;
                 }
-                
+
             }
         }
-        
-        for(int x=1; x<n+1; x++){
-            for(int y=1; y<r+1; y++){
-                memo[x][y] = memo[x-1][y-1] + memo[x-1][y];
+
+        for (int x = 1; x < n + 1; x++) {
+            for (int y = 1; y < r + 1; y++) {
+                memo[x][y] = memo[x - 1][y - 1] + memo[x - 1][y];
             }
         }
-        
+
         //output:
-        System.out.println("Binomial coefficient (nCr) DP way: "+memo[n][r]);
-        
+        System.out.println("Binomial coefficient (nCr) DP way: " + memo[n][r]);
+
     }
-    
 
     public static void main(String[] args) {
 
@@ -4516,16 +4657,61 @@ public class DSA450Questions {
 //                }));
         //......................................................................
 //        Row: 412
-        System.out.println("Binomial coefficient DP problem");
-        //https://www.geeksforgeeks.org/binomial-coefficient-dp-9/
-        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 2));
-        obj.findBinomialCoefficient_DP_Memoization(5, 2);
-        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 6));
-        obj.findBinomialCoefficient_DP_Memoization(5, 6);
-        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 5));
-        obj.findBinomialCoefficient_DP_Memoization(5, 5);
-        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 0));
-        obj.findBinomialCoefficient_DP_Memoization(5, 0);
+//        System.out.println("Binomial coefficient DP problem");
+//        //https://www.geeksforgeeks.org/binomial-coefficient-dp-9/
+//        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 2));
+//        obj.findBinomialCoefficient_DP_Memoization(5, 2);
+//        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 6));
+//        obj.findBinomialCoefficient_DP_Memoization(5, 6);
+//        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 5));
+//        obj.findBinomialCoefficient_DP_Memoization(5, 5);
+//        System.out.println("Binomial coefficient recursive way: "+obj.findBinomialCoefficient_Recursion(5, 0));
+//        obj.findBinomialCoefficient_DP_Memoization(5, 0);
+        //......................................................................
+//        Row: 229
+//        System.out.println("Count BST nodes that lie in the given range");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.countNodesThatLieInGivenRange(root1, 1, 4);
+//        obj.countNodesThatLieInGivenRange(root1, 6, 9);
+        //......................................................................
+//        Row: 235
+//        System.out.println("Flatten BST to linked list (skewed tree)");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.flattenBSTToLinkedList(root1);
+        //......................................................................
+//        Row: 158
+//        System.out.println("Reverse a dubly linked list");
+//        Node<Integer> node = new Node<>(3);
+//        Node<Integer> next = new Node<>(4);
+//        node.setNext(next);
+//        next.setPrevious(node);
+//        Node<Integer> nextToNext = new Node<>(5);
+//        next.setNext(nextToNext);
+//        nextToNext.setPrevious(next);
+//        obj.reverseDoublyLinkedList(node);
+        //......................................................................
+//        Row: 18, 13
+        System.out.println("Kaden's algorithm approaches");
+        //https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/
+        int a[] = {-2, -3, 4, -1, -2, 1, 5, -3};
+        obj.kadaneAlgorithm(a);
+        obj.kadaneAlgorithm_PointingIndexes(a);
     }
 
 }
