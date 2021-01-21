@@ -468,36 +468,207 @@ public class DSA450Questions {
         System.out.println("Max sum subarray: " + maxSum);
 
     }
-    
-    public void kadaneAlgorithm_PointingIndexes(int[] arr){
-        
+
+    public void kadaneAlgorithm_PointingIndexes(int[] arr) {
+
         int maxSum = arr[0];
         int currMaxSum = arr[0];
-        
+
         int start = 0;
         int end = 0;
         int index = 0;
-        for(int i=1; i<arr.length; i++){
-            
+        for (int i = 1; i < arr.length; i++) {
+
             currMaxSum += arr[i];
-            if(maxSum < currMaxSum){
-                
+            if (maxSum < currMaxSum) {
+
                 maxSum = currMaxSum;
                 start = index;
                 end = i;
-                
+
             }
-            
-            if(currMaxSum < 0){
+
+            if (currMaxSum < 0) {
                 currMaxSum = 0;
-                index = i+1;
+                index = i + 1;
             }
-            
+
         }
-        
-        
+
         //output:
-        System.out.println("Max sum subarray with start & end: "+maxSum+ " Start: "+start+" end: "+end);
+        System.out.println("Max sum subarray with start & end: " + maxSum + " Start: " + start + " end: " + end);
+
+    }
+
+    public void moveNegativeElementsToOneSideOfArray(int[] arr) {
+
+        //Two pointer approach
+        //...........................T: O(N)
+        //actual:
+        for (int x : arr) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+
+        int f = 0;
+        int h = arr.length - 1;
+
+        while (h > f) {
+
+            //as we are planning to shift all the -ve elements to left side of array
+            //so cond. check that any +ve element (arr[f] > 0) in left side AND any -ve element(arr[h] <0)
+            //on right side should be swapped 
+            if ((arr[f] > 0 && arr[h] < 0)) {
+//                System.out.println(arr[f]+" "+arr[h]+" : "+f+" "+h);
+                swapIntArray(arr, f, h);
+                f++;
+                h--;
+            }
+
+            //if any element in left side id already a -ve then that element should be taken into consideration
+            //move to next element
+            if (arr[f] < 0) {
+                f++;
+            }
+
+            //same way any +ve no on the right side should not be counted and move to next element
+            if (arr[h] > 0) {
+                h--;
+            }
+
+        }
+
+        //output:
+        for (int x : arr) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+    }
+
+    public void findUnionAndIntersectionOfTwoArrays(int[] a, int[] b) {
+
+        int m = a.length;
+        int n = b.length;
+        int maxLen = Math.max(m, n);
+        Set<Integer> unionSet = new HashSet<>();
+        for (int i = 0; i < maxLen; i++) {
+
+            if (i < m) {
+                unionSet.add(a[i]);
+            }
+
+            if (i < n) {
+                unionSet.add(b[i]);
+            }
+
+        }
+
+        //output
+        System.out.println("No of union element: " + unionSet.size() + " elements: " + unionSet);
+
+        //finding intersection of two array
+        Set<Integer> aSet = new HashSet<>();
+        Set<Integer> bSet = new HashSet<>();
+        for (int x : a) {
+            aSet.add(x);
+        }
+        for (int x : b) {
+            bSet.add(x);
+        }
+
+        Set<Integer> intersectionSet = new HashSet<>();
+        for (int i = 0; i < maxLen; i++) {
+
+            if (i < m) {
+                if (aSet.contains(a[i]) && bSet.contains(a[i])) {
+                    intersectionSet.add(a[i]);
+                }
+            }
+
+            if (i < n) {
+                if (aSet.contains(b[i]) && bSet.contains(b[i])) {
+                    intersectionSet.add(b[i]);
+                }
+            }
+
+        }
+
+        //output
+        System.out.println("No of intersection element: " + intersectionSet.size() + " elements: " + intersectionSet);
+
+    }
+
+    public void rotateArrayByK(int[] arr, int k) {
+
+        //actual:
+        for (int x : arr) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+
+        int n = arr.length;
+
+        while (k-- != 0) {
+            int last = arr[n - 1];
+            for (int i = n - 1; i >= 1; i--) {
+                arr[i] = arr[i - 1];
+            }
+
+            arr[0] = last;
+        }
+
+        //output:
+        for (int x : arr) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+    }
+
+    public void minimizeDifferenceBetweenHeights(int[] arr, int k) {
+
+        //problem statement: https://practice.geeksforgeeks.org/problems/minimize-the-heights3351/1
+        //sol: https://www.geeksforgeeks.org/minimize-the-maximum-difference-between-the-heights/
+        int n = arr.length;
+
+        Arrays.sort(arr);
+         
+        int ans = arr[n-1] - arr[0];
+        
+        int big = arr[0] + k;
+        int small = arr[n - 1] - k;
+
+        int temp = big;
+        big = Math.max(big, small);
+        small = Math.min(temp, small);
+
+        //all in between a[0] to a[n-1] i.e, a[1] -> a[n-2]
+        for (int i = 1; i < n - 1; i++) {
+
+            int subtract = arr[i] - k;
+            int add = arr[i] + k;
+
+            // If both subtraction and addition 
+            // do not change diff 
+            if (subtract >= small || add <= big) {
+                continue;
+            }
+
+            // Either subtraction causes a smaller 
+            // number or addition causes a greater 
+            // number. Update small or big using 
+            // greedy approach (If big - subtract 
+            // causes smaller diff, update small 
+            // Else update big) 
+            if (big - subtract <= add - small) {
+                small = subtract;
+            } else {
+                big = add;
+            }
+
+        }
+
+        //output:
+        System.out.println("Min height: "+Math.min(ans, big - small));
         
     }
 
@@ -4707,11 +4878,36 @@ public class DSA450Questions {
 //        obj.reverseDoublyLinkedList(node);
         //......................................................................
 //        Row: 18, 13
-        System.out.println("Kaden's algorithm approaches");
-        //https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/
-        int a[] = {-2, -3, 4, -1, -2, 1, 5, -3};
-        obj.kadaneAlgorithm(a);
-        obj.kadaneAlgorithm_PointingIndexes(a);
+//        System.out.println("Kaden's algorithm approaches");
+//        //https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/
+//        int a[] = {-2, -3, 4, -1, -2, 1, 5, -3};
+//        obj.kadaneAlgorithm(a);
+//        obj.kadaneAlgorithm_PointingIndexes(a);
+        //......................................................................
+//        Row: 10
+//        System.out.println("Move all negative elements to one side of array");
+//        obj.moveNegativeElementsToOneSideOfArray(new int[]{-12, 11, -13, -5, 6, -7, 5, -3, -6});
+//        obj.moveNegativeElementsToOneSideOfArray(new int[]{ -1, 2, -3, 4, 5, 6, -7, 8, 9});
+//        obj.moveNegativeElementsToOneSideOfArray(new int[]{ -1, -2, -3, -1, -10, -7});
+//        obj.moveNegativeElementsToOneSideOfArray(new int[]{ 1, 2, 3, 1, 10, 7});
+//        obj.moveNegativeElementsToOneSideOfArray(new int[]{ 1, -2, -3, -1, -10, -7});
+        //......................................................................
+//        Row: 11
+//        System.out.println("Find union and intersection of two arrays");
+//        obj.findUnionAndIntersectionOfTwoArrays(new int[]{1,2,3,4,5}, new int[]{1,2,3});
+//        obj.findUnionAndIntersectionOfTwoArrays(new int[]{4,9,5}, new int[]{9,4,9,8,4});
+        //......................................................................
+//        Row: 12
+//        System.out.println("Cyclically rotate element in array by 1");
+//        obj.rotateArrayByK(new int[]{1, 2, 3, 4, 5}, 1);
+//        obj.rotateArrayByK(new int[]{1, 2, 3, 4, 5}, 4);
+        //......................................................................
+//        Row: 14
+        System.out.println("Minimize the difference between the heights");
+        //https://www.geeksforgeeks.org/minimize-the-maximum-difference-between-the-heights/
+        obj.minimizeDifferenceBetweenHeights(new int[]{1, 5, 8, 10}, 2);
+        obj.minimizeDifferenceBetweenHeights(new int[]{4, 6}, 10);
+        
     }
 
 }
