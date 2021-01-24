@@ -631,9 +631,9 @@ public class DSA450Questions {
         int n = arr.length;
 
         Arrays.sort(arr);
-         
-        int ans = arr[n-1] - arr[0];
-        
+
+        int ans = arr[n - 1] - arr[0];
+
         int big = arr[0] + k;
         int small = arr[n - 1] - k;
 
@@ -668,8 +668,8 @@ public class DSA450Questions {
         }
 
         //output:
-        System.out.println("Min height: "+Math.min(ans, big - small));
-        
+        System.out.println("Min height: " + Math.min(ans, big - small));
+
     }
 
     public void rotateMatrixClockWise90Deg(int[][] mat) {
@@ -1955,8 +1955,40 @@ public class DSA450Questions {
         }
 
         //output
-        System.out.println();
+        System.out.println("Level order iterative: ");
         for (List l : levels) {
+            System.out.println(l);
+        }
+
+    }
+
+    public void levelOrderTraversal_Recursive_Helper(TreeNode<Integer> root, int level,
+            Map<Integer, List<Integer>> levelOrder) {
+
+        if (root == null) {
+            return;
+        }
+
+        if (levelOrder.containsKey(level)) {
+            levelOrder.get(level).add(root.getData());
+        } else {
+            List<Integer> nodeAtLevel = new ArrayList<>();
+            nodeAtLevel.add(root.getData());
+            levelOrder.put(level, nodeAtLevel);
+        }
+
+        levelOrderTraversal_Recursive_Helper(root.getLeft(), level + 1, levelOrder);
+        levelOrderTraversal_Recursive_Helper(root.getRight(), level + 1, levelOrder);
+
+    }
+
+    public void levelOrderTraversal_Recursive(TreeNode<Integer> root) {
+        Map<Integer, List<Integer>> levelOrder = new TreeMap<>();
+        levelOrderTraversal_Recursive_Helper(root, 0, levelOrder);
+
+        //output:
+        System.out.println("Level order recursive: ");
+        for (List l : levelOrder.values()) {
             System.out.println(l);
         }
 
@@ -2764,6 +2796,10 @@ public class DSA450Questions {
 
     }
 
+    public void checkTreeIsSumTree(TreeNode<Integer> root) {
+        System.out.println("Check if a tree is sum tree: " + checkTreeIsSumTree_Helper(root, new CheckTreeIsSumTree()));
+    }
+
     class TreeLongestPathNodeSum {
 
         /*Helper class for longestPathNodeSum method*/
@@ -2800,10 +2836,6 @@ public class DSA450Questions {
         TreeLongestPathNodeSum obj = new TreeLongestPathNodeSum();
         longestPathNodeSum_Helper(root, obj);
         System.out.println("The sum of nodes of longest path of tree: " + obj.longestPathSum);
-    }
-
-    public void checkTreeIsSumTree(TreeNode<Integer> root) {
-        System.out.println("Check if a tree is sum tree: " + checkTreeIsSumTree_Helper(root, new CheckTreeIsSumTree()));
     }
 
     private void findPredecessorAndSuccessorInBST_Helper(TreeNode<Integer> root, int key, TreeNode<Integer>[] result) {
@@ -2936,6 +2968,65 @@ public class DSA450Questions {
         new BinaryTree(root).treeBFS();
         System.out.println();
 
+    }
+
+    private void diagonalTraversalOfTree_Helper(TreeNode<Integer> root, int level, Map<Integer, List<Integer>> result) {
+
+        if (root == null) {
+            return;
+        }
+
+        List<Integer> listAtLevel = result.get(level);
+
+        if (listAtLevel == null) {
+            listAtLevel = new ArrayList<>();
+            listAtLevel.add(root.getData());
+        } else {
+            listAtLevel.add(root.getData());
+        }
+
+        result.put(level, listAtLevel);
+
+        diagonalTraversalOfTree_Helper(root.getLeft(), level + 1, result);
+        diagonalTraversalOfTree_Helper(root.getRight(), level, result);
+
+    }
+
+    public void diagonalTraversalOfTree(TreeNode<Integer> root) {
+
+        Map<Integer, List<Integer>> result = new HashMap<>();
+        diagonalTraversalOfTree_Helper(root, 0, result);
+        System.out.println("Diagonal traversal of tree");
+        for (Map.Entry<Integer, List<Integer>> e : result.entrySet()) {
+            System.out.println(e.getValue());
+        }
+    }
+
+    private int diameterOfTree_Helper(TreeNode<Integer> root, Height height) {
+
+        if (root == null) {
+            height.height = 0;
+            return 0;
+        }
+
+        Height leftSubTreeHeight = new Height();
+        Height rightSubTreeHeight = new Height();
+
+        int leftTreeDiameter = diameterOfTree_Helper(root.getLeft(), leftSubTreeHeight);
+        int rightTreeDiameter = diameterOfTree_Helper(root.getRight(), rightSubTreeHeight);
+
+        //current node height
+        height.height = Math.max(leftSubTreeHeight.height, rightSubTreeHeight.height) + 1;
+
+        return Math.max(
+                Math.max(leftTreeDiameter, rightTreeDiameter),
+                leftSubTreeHeight.height + rightSubTreeHeight.height + 1
+        );
+
+    }
+
+    public void diameterOfTree(TreeNode<Integer> root) {
+        System.out.println("Diameter of tree: " + diameterOfTree_Helper(root, new Height()));
     }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
@@ -3793,6 +3884,152 @@ public class DSA450Questions {
 
     }
 
+    public void nMeetingRooms_Greedy(int[] startTime, int[] finishTime) {
+
+        class Meeting {
+
+            int start;
+            int finish;
+            int index;
+
+            public Meeting(int start, int finish, int index) {
+                this.start = start;
+                this.finish = finish;
+                this.index = index;
+            }
+
+        }
+
+        //convert arrays to class
+        List<Meeting> meetings = new ArrayList<>();
+        for (int i = 0; i < startTime.length; i++) {
+            meetings.add(new Meeting(startTime[i], finishTime[i], i));
+        }
+
+        //sort the meetings list in inc order of finish
+        Collections.sort(meetings, (m1, m2) -> {
+
+            if (m1.finish < m2.finish) {
+
+                // Return -1 if second object is
+                // bigger then first
+                return -1;
+            } else if (m1.finish > m2.finish) // Return 1 if second object is
+            // smaller then first
+            {
+                return 1;
+            }
+
+            return 0;
+        }
+        );
+        
+        int meetingsCanBeConducted = 1; //at least one meeting can be held
+        List<Integer> indexOfMeetingTimings = new ArrayList<>(); 
+        indexOfMeetingTimings.add(meetings.get(0).index + 1); // 1 based index
+        int endTime = meetings.get(0).finish;
+        for(int i =1; i<meetings.size(); i++){
+            
+            if(meetings.get(i).start > endTime){
+                meetingsCanBeConducted++;
+                endTime = meetings.get(i).finish;
+                indexOfMeetingTimings.add(meetings.get(i).index + 1);
+            }
+            
+        }
+        
+        System.out.println("No. of meetings can be conducted: "+meetingsCanBeConducted);
+        System.out.println("Index of meetings can be conducted: "+indexOfMeetingTimings);
+        
+
+    }
+
+    public void graphBFSAdjList_Graph(int V, List<List<Integer>> adjList){
+        
+        List<Integer> result = new ArrayList<>();
+        if(adjList == null || adjList.size() == 0){
+            return;
+        }
+        
+        //actual
+        for(int i=0; i<adjList.size(); i++){
+            System.out.print(i+": ");
+            for(int v: adjList.get(i)){
+                System.out.print(v + " " );
+            }
+            System.out.println();
+        }
+        
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(0); //source point
+        boolean[] visited = new boolean[V];
+        while(!queue.isEmpty()){
+            
+            int node = queue.poll();
+            if(visited[node] != true){
+                result.add(node);
+            }
+            visited[node] = true;
+            List<Integer> childrens = adjList.get(node);
+            if(childrens != null && childrens.size() > 0){
+                for(int v: childrens){
+                    if(visited[v] != true){
+                        queue.add(v);
+                    }
+                }
+            }
+            
+        }
+        
+        //output:
+        System.out.println("BFS of graph: "+result);
+        
+    }
+    
+    public void graphDFSAdjList_Graph(int V, List<List<Integer>> adjList){
+        
+        List<Integer> result = new ArrayList<>();
+        if(adjList == null || adjList.size() == 0){
+            return;
+        }
+        
+        //actual
+        for(int i=0; i<adjList.size(); i++){
+            System.out.print(i+": ");
+            for(int v: adjList.get(i)){
+                System.out.print(v + " " );
+            }
+            System.out.println();
+        }
+        
+        Stack<Integer> stack = new Stack<>();
+        stack.add(0); //source point
+        boolean[] visited = new boolean[V];
+        while(!stack.isEmpty()){
+             
+            int node = stack.pop();
+            if(visited[node] != true){
+                result.add(node);
+            }
+            visited[node] = true;
+            List<Integer> childrens = adjList.get(node);
+            if(childrens != null && childrens.size() > 0){
+                
+                for(int v: childrens){
+                    if(visited[v] != true){
+                        stack.push(v);
+                    }
+                }
+                
+            }
+            
+        }
+        
+        //output:
+        System.out.println("DFS of graph: "+result);
+        
+    }
+    
     public static void main(String[] args) {
 
         //Object to access method
@@ -3841,7 +4078,7 @@ public class DSA450Questions {
 //        obj.reverseLinkedList_Recursive(node2);
         //......................................................................
 //        Row: 177
-//        System.out.println("Level order traversal of tree iterative");
+//        System.out.println("Level order traversal of tree iterative & recursive");
 //        TreeNode<Integer> root1 = new TreeNode<>(6);
 //        root1.setLeft(new TreeNode(2));
 //        root1.getLeft().setLeft(new TreeNode(0));
@@ -3852,6 +4089,7 @@ public class DSA450Questions {
 //        root1.getRight().setLeft(new TreeNode(7));
 //        root1.getRight().setRight(new TreeNode(9));
 //        obj.levelOrderTraversal_Iterative(root1);
+//        obj.levelOrderTraversal_Recursive(root1);
         //......................................................................
 //        Row: 179
 //        System.out.println("Height of tree");
@@ -4600,7 +4838,7 @@ public class DSA450Questions {
 //        System.out.println("The maximum profit can be made with given knap sack using recursion: "+obj.knapSack01_Recusrion(W, weight, value, N));
 //        obj.knapSack01_DP_Memoization(W, weight, value, N);
         //......................................................................
-//        Row: 417
+//        Row: 417, 282
 //        System.out.println("Subset sum DP problem");
 //        int[] arr = new int[]{1, 5, 5, 11};
 //        int N = arr.length;
@@ -4903,11 +5141,73 @@ public class DSA450Questions {
 //        obj.rotateArrayByK(new int[]{1, 2, 3, 4, 5}, 4);
         //......................................................................
 //        Row: 14
-        System.out.println("Minimize the difference between the heights");
-        //https://www.geeksforgeeks.org/minimize-the-maximum-difference-between-the-heights/
-        obj.minimizeDifferenceBetweenHeights(new int[]{1, 5, 8, 10}, 2);
-        obj.minimizeDifferenceBetweenHeights(new int[]{4, 6}, 10);
-        
+//        System.out.println("Minimize the difference between the heights");
+//        //https://www.geeksforgeeks.org/minimize-the-maximum-difference-between-the-heights/
+//        obj.minimizeDifferenceBetweenHeights(new int[]{1, 5, 8, 10}, 2);
+//        obj.minimizeDifferenceBetweenHeights(new int[]{4, 6}, 10);
+        //......................................................................
+//        Row: 191
+//        System.out.println("Diagonal traversal of tree");
+//        //https://www.geeksforgeeks.org/diagonal-traversal-of-binary-tree/
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.diagonalTraversalOfTree(root1);
+        //......................................................................
+//        Row: 180
+//        System.out.println("Diameter of tree DP on tree problem");
+//        TreeNode<Integer> root1 = new TreeNode<>(6);
+//        root1.setLeft(new TreeNode(2));
+//        root1.getLeft().setLeft(new TreeNode(0));
+//        root1.getLeft().setRight(new TreeNode(4));
+//        root1.getLeft().getRight().setLeft(new TreeNode(3));
+//        root1.getLeft().getRight().setRight(new TreeNode(5));
+//        root1.setRight(new TreeNode(8));
+//        root1.getRight().setLeft(new TreeNode(7));
+//        root1.getRight().setRight(new TreeNode(9));
+//        obj.diameterOfTree(root1);
+        //......................................................................
+//        Row: 238
+//        System.out.println("N meeting in a room/ Activity selection");
+//        int[] startTime = {1, 3, 0, 5, 8, 5};
+//        int[] finishTime = {2, 4, 6, 7, 9, 9};
+//        obj.nMeetingRooms_Greedy(startTime, finishTime);
+        //......................................................................
+//        Row: 357, 358
+        System.out.println("BFS/DFS graph");
+        List<List<Integer>> adjList = new ArrayList<>();
+        adjList.add(0,Arrays.asList(1,2,3));
+        adjList.add(1,Arrays.asList());
+        adjList.add(2,Arrays.asList(4));
+        adjList.add(3,Arrays.asList());
+        adjList.add(4,Arrays.asList());
+        obj.graphBFSAdjList_Graph(adjList.size(), adjList);
+        obj.graphDFSAdjList_Graph(adjList.size(), adjList);
+        adjList = new ArrayList<>();
+        adjList.add(0,Arrays.asList(1,2,3));
+        adjList.add(1,Arrays.asList(5));
+        adjList.add(2,Arrays.asList(4));
+        adjList.add(3,Arrays.asList());
+        adjList.add(4,Arrays.asList(3));
+        adjList.add(5,Arrays.asList());
+        obj.graphBFSAdjList_Graph(adjList.size(), adjList);
+        obj.graphDFSAdjList_Graph(adjList.size(), adjList);
+        adjList = new ArrayList<>();
+        adjList.add(0,Arrays.asList(1));
+        adjList.add(1,Arrays.asList(2));
+        adjList.add(2,Arrays.asList(3));
+        adjList.add(3,Arrays.asList(4));
+        adjList.add(4,Arrays.asList(5));
+        adjList.add(5,Arrays.asList());
+        obj.graphBFSAdjList_Graph(adjList.size(), adjList);
+        obj.graphDFSAdjList_Graph(adjList.size(), adjList);
+
     }
 
 }
