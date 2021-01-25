@@ -1211,6 +1211,65 @@ public class DSA450Questions {
         return result;
     }
 
+    public void arrangeAllWordsAsTheirAnagrams(List<String> words) {
+
+        Map<String, List<String>> anagramGroups = new HashMap<>();
+        for (String str : words) {
+
+            char[] ch = str.toCharArray();
+            Arrays.sort(ch);
+            String sortedString = String.valueOf(ch);
+
+            anagramGroups.putIfAbsent(sortedString, new ArrayList<>());
+            anagramGroups.get(sortedString).add(str);
+
+        }
+
+        //output:
+        System.out.println("Output: " + anagramGroups);
+
+    }
+
+    public void characterAddedAtFrontToMakeStringPallindrome_1(String str) {
+
+        //https://www.geeksforgeeks.org/minimum-characters-added-front-make-string-palindrome/
+        int charCount = 0;
+        while (str.length() > 0) {
+
+            if (isStringPallindrome(str)) {
+                break;
+            } else {
+                charCount++;
+                //removing 1 char from end until we get a subtring which is pallindrome
+                //the no of char removed (charCount) is the number that needs to be added at front
+                str = str.substring(0, str.length() - 1);
+
+            }
+
+        }
+
+        //output:
+        System.out.println("No. of character to be added at front to make it pallindrome: " + charCount);
+    }
+
+    public void characterAddedAtFrontToMakeStringPallindrome_2(String str) {
+
+        //https://www.geeksforgeeks.org/minimum-characters-added-front-make-string-palindrome/
+        StringBuilder s = new StringBuilder();
+        s.append(str);
+
+        // Get concatenation of string, special character  
+        // and reverse string  
+        String rev = s.reverse().toString();
+        s.reverse().append("$").append(rev);
+
+        // Get LPS array of this concatenated string 
+        int lps[] = KMP_PatternMatching_Algorithm_LPSArray(s.toString(), s.toString().length());
+
+        //output:
+        System.out.println("No. of character to be added at front to make it pallindrome KMP based: " + (str.length() - lps[s.length() - 1]));
+    }
+
     public void reverseLinkedList_Iterative(Node<Integer> node) {
         System.out.println("Reverse linked list iterative");
         //actual
@@ -3029,6 +3088,52 @@ public class DSA450Questions {
         System.out.println("Diameter of tree: " + diameterOfTree_Helper(root, new Height()));
     }
 
+    class CheckIfBinaryTreeIsMaxHeapClass {
+        /*Helper class for checkIfBinaryTreeIsMaxHeap method*/
+
+        int data;
+    }
+
+    private boolean checkIfBinaryTreeIsMaxHeap_Helper(TreeNode<Integer> root, CheckIfBinaryTreeIsMaxHeapClass obj) {
+
+        if (root == null) {
+            obj.data = Integer.MIN_VALUE;
+            return true;
+        }
+
+        CheckIfBinaryTreeIsMaxHeapClass leftSubTree = new CheckIfBinaryTreeIsMaxHeapClass();
+        CheckIfBinaryTreeIsMaxHeapClass rightSubTree = new CheckIfBinaryTreeIsMaxHeapClass();
+
+        boolean isLeftMaxHeap = checkIfBinaryTreeIsMaxHeap_Helper(root.getLeft(), leftSubTree);
+        boolean isRightMaxHeap = checkIfBinaryTreeIsMaxHeap_Helper(root.getRight(), rightSubTree);
+
+        //calculating current node's object
+        obj.data = root.getData();
+
+        //if root is leaf we have to by default return true
+        if (root.getLeft() == null && root.getRight() == null) {
+            return true;
+        }
+
+        //if it is not leaf and root's data is less than its immediate left and right child return false
+        if (!(root.getLeft() == null && root.getRight() == null)
+                && (root.getData() < leftSubTree.data && root.getData() < rightSubTree.data)) {
+            return false;
+        }
+
+        if (root.getLeft() != null && root.getData() < leftSubTree.data) {
+            return false;
+        }
+
+        return isLeftMaxHeap && isRightMaxHeap;
+
+    }
+
+    public void checkIfBinaryTreeIsMaxHeap(TreeNode<Integer> root) {
+        System.out.println("Given binary tree is max heap: "
+                + checkIfBinaryTreeIsMaxHeap_Helper(root, new CheckIfBinaryTreeIsMaxHeapClass()));
+    }
+
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
     private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
@@ -3923,113 +4028,232 @@ public class DSA450Questions {
             return 0;
         }
         );
-        
+
         int meetingsCanBeConducted = 1; //at least one meeting can be held
-        List<Integer> indexOfMeetingTimings = new ArrayList<>(); 
+        List<Integer> indexOfMeetingTimings = new ArrayList<>();
         indexOfMeetingTimings.add(meetings.get(0).index + 1); // 1 based index
         int endTime = meetings.get(0).finish;
-        for(int i =1; i<meetings.size(); i++){
-            
-            if(meetings.get(i).start > endTime){
+        for (int i = 1; i < meetings.size(); i++) {
+
+            if (meetings.get(i).start > endTime) {
                 meetingsCanBeConducted++;
                 endTime = meetings.get(i).finish;
                 indexOfMeetingTimings.add(meetings.get(i).index + 1);
             }
-            
+
         }
-        
-        System.out.println("No. of meetings can be conducted: "+meetingsCanBeConducted);
-        System.out.println("Index of meetings can be conducted: "+indexOfMeetingTimings);
-        
+
+        System.out.println("No. of meetings can be conducted: " + meetingsCanBeConducted);
+        System.out.println("Index of meetings can be conducted: " + indexOfMeetingTimings);
 
     }
 
-    public void graphBFSAdjList_Graph(int V, List<List<Integer>> adjList){
-        
+    public void graphBFSAdjList_Graph(int V, List<List<Integer>> adjList) {
+
         List<Integer> result = new ArrayList<>();
-        if(adjList == null || adjList.size() == 0){
+        if (adjList == null || adjList.size() == 0) {
             return;
         }
-        
+
         //actual
-        for(int i=0; i<adjList.size(); i++){
-            System.out.print(i+": ");
-            for(int v: adjList.get(i)){
-                System.out.print(v + " " );
+        for (int i = 0; i < adjList.size(); i++) {
+            System.out.print(i + ": ");
+            for (int v : adjList.get(i)) {
+                System.out.print(v + " ");
             }
             System.out.println();
         }
-        
+
+        int sourceVertex = 0; // source point
         Queue<Integer> queue = new LinkedList<>();
-        queue.add(0); //source point
+        queue.add(sourceVertex); //source point
         boolean[] visited = new boolean[V];
-        while(!queue.isEmpty()){
-            
+        visited[sourceVertex] = true;
+        while (!queue.isEmpty()) {
+
             int node = queue.poll();
-            if(visited[node] != true){
-                result.add(node);
-            }
-            visited[node] = true;
+            result.add(node);
             List<Integer> childrens = adjList.get(node);
-            if(childrens != null && childrens.size() > 0){
-                for(int v: childrens){
-                    if(visited[v] != true){
-                        queue.add(v);
+            if (childrens != null && childrens.size() > 0) {
+                for (int vertex : childrens) {
+                    if (visited[vertex] != true) {
+                        queue.add(vertex);
+                        visited[vertex] = true;
                     }
                 }
             }
-            
+
         }
-        
+
         //output:
-        System.out.println("BFS of graph: "+result);
-        
+        System.out.println("BFS of graph: " + result);
+
     }
-    
-    public void graphDFSAdjList_Graph(int V, List<List<Integer>> adjList){
-        
+
+    public void graphDFSAdjList_Graph(int V, List<List<Integer>> adjList) {
+
         List<Integer> result = new ArrayList<>();
-        if(adjList == null || adjList.size() == 0){
+        if (adjList == null || adjList.size() == 0) {
             return;
         }
-        
+
         //actual
-        for(int i=0; i<adjList.size(); i++){
-            System.out.print(i+": ");
-            for(int v: adjList.get(i)){
-                System.out.print(v + " " );
+        for (int i = 0; i < adjList.size(); i++) {
+            System.out.print(i + ": ");
+            for (int v : adjList.get(i)) {
+                System.out.print(v + " ");
             }
             System.out.println();
         }
-        
+
+        int sourceVertex = 0; //source point
         Stack<Integer> stack = new Stack<>();
-        stack.add(0); //source point
+        stack.add(sourceVertex); //source point
         boolean[] visited = new boolean[V];
-        while(!stack.isEmpty()){
-             
+        visited[sourceVertex] = true;
+        while (!stack.isEmpty()) {
+
             int node = stack.pop();
-            if(visited[node] != true){
-                result.add(node);
-            }
-            visited[node] = true;
+            result.add(node);
             List<Integer> childrens = adjList.get(node);
-            if(childrens != null && childrens.size() > 0){
-                
-                for(int v: childrens){
-                    if(visited[v] != true){
-                        stack.push(v);
+            if (childrens != null && childrens.size() > 0) {
+                //reverse loop so the first element goes on peek of stack!
+                for (int i = childrens.size() - 1; i >= 0; i--) {
+                    int childVertex = childrens.get(i);
+                    if (visited[childVertex] != true) {
+                        stack.push(childVertex);
+                        visited[childVertex] = true;
                     }
                 }
-                
+
             }
-            
+
         }
-        
+
         //output:
-        System.out.println("DFS of graph: "+result);
-        
+        System.out.println("DFS of graph: " + result);
+
     }
-    
+
+    private void graphDFSAdjList_Recursive_Helper(List<List<Integer>> adjList, int vertex,
+            boolean[] visited, List<Integer> result) {
+
+        if (visited[vertex] != true) {
+            visited[vertex] = true;
+            result.add(vertex);
+            List<Integer> childrens = adjList.get(vertex);
+            for (int childVertex : childrens) {
+                graphDFSAdjList_Recursive_Helper(adjList, childVertex, visited, result);
+            }
+        }
+
+    }
+
+    public void graphDFSAdjList_Recursive_Graph(int V, List<List<Integer>> adjList) {
+        List<Integer> result = new ArrayList<>();
+        boolean[] visited = new boolean[V];
+        int sourceVertex = 0; //source point
+        graphDFSAdjList_Recursive_Helper(adjList, sourceVertex, visited, result);
+        System.out.println("DFS using recursion: " + result);
+    }
+
+    private void findPathRatInMaze_Helper(int[][] m, int n, int x, int y,
+            StringBuilder sb, ArrayList<String> output) {
+
+        if (x < 0 || x >= n || y < 0 || y >= n || m[x][y] == 0) {
+            return;
+        }
+
+        if (x == n - 1 && y == n - 1 && m[x][y] == 1) {
+            output.add(sb.toString());
+            return;
+        }
+
+        int original = m[x][y];
+        m[x][y] = 0;
+
+        //Down
+        sb.append("D");
+        findPathRatInMaze_Helper(m, n, x + 1, y, sb, output);
+        sb.deleteCharAt(sb.length() - 1);
+
+        //Right
+        sb.append("R");
+        findPathRatInMaze_Helper(m, n, x, y + 1, sb, output);
+        sb.deleteCharAt(sb.length() - 1);
+
+        //Left
+        sb.append("L");
+        findPathRatInMaze_Helper(m, n, x, y - 1, sb, output);
+        sb.deleteCharAt(sb.length() - 1);
+
+        //Up
+        sb.append("U");
+        findPathRatInMaze_Helper(m, n, x - 1, y, sb, output);
+        sb.deleteCharAt(sb.length() - 1);
+
+        m[x][y] = original;
+
+    }
+
+    public void findPathRatInMaze_Graph(int[][] m, int n) {
+        ArrayList<String> output = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        findPathRatInMaze_Helper(m, n, 0, 0, sb, output);
+        System.out.println("All possible paths: " + output);
+    }
+
+    private void numberOfIslands_Helper(int[][] grid, int x, int y,
+            int[][] dir, boolean[][] visited) {
+
+        if (x < 0 || x >= grid.length || y < 0 || y >= grid[x].length
+                || grid[x][y] == 0 || visited[x][y] == true) {
+            return;
+        }
+
+        int original = grid[x][y];
+        grid[x][y] = 0;
+        visited[x][y] = true;
+        for (int i = 0; i < dir.length; i++) {
+
+            int x_ = x + dir[i][0];
+            int y_ = y + dir[i][1];
+            numberOfIslands_Helper(grid, x_, y_, dir, visited);
+
+        }
+
+        grid[x][y] = original;
+
+    }
+
+    public void numberOfIslands_Graph(int[][] grid) {
+        int[][] dir = {
+            {-1, -1},
+            {-1, 0},
+            {-1, 1},
+            {0, -1},
+            {0, 1},
+            {1, -1},
+            {1, 0},
+            {1, 1}
+        };
+        boolean[][] visited = new boolean[grid.length][grid[0].length];
+        int islandCount = 0;
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[x].length; y++) {
+
+                if (grid[x][y] == 1 && visited[x][y] != true) {
+                    islandCount++;
+                    numberOfIslands_Helper(grid, x, y, dir, visited);
+                }
+
+            }
+        }
+
+        System.out.println("Number of separated islands: " + islandCount);
+
+    }
+
     public static void main(String[] args) {
 
         //Object to access method
@@ -5105,7 +5329,7 @@ public class DSA450Questions {
 //        obj.flattenBSTToLinkedList(root1);
         //......................................................................
 //        Row: 158
-//        System.out.println("Reverse a dubly linked list");
+//        System.out.println("Reverse a doubly linked list");
 //        Node<Integer> node = new Node<>(3);
 //        Node<Integer> next = new Node<>(4);
 //        node.setNext(next);
@@ -5180,34 +5404,85 @@ public class DSA450Questions {
 //        obj.nMeetingRooms_Greedy(startTime, finishTime);
         //......................................................................
 //        Row: 357, 358
-        System.out.println("BFS/DFS graph");
-        List<List<Integer>> adjList = new ArrayList<>();
-        adjList.add(0,Arrays.asList(1,2,3));
-        adjList.add(1,Arrays.asList());
-        adjList.add(2,Arrays.asList(4));
-        adjList.add(3,Arrays.asList());
-        adjList.add(4,Arrays.asList());
-        obj.graphBFSAdjList_Graph(adjList.size(), adjList);
-        obj.graphDFSAdjList_Graph(adjList.size(), adjList);
-        adjList = new ArrayList<>();
-        adjList.add(0,Arrays.asList(1,2,3));
-        adjList.add(1,Arrays.asList(5));
-        adjList.add(2,Arrays.asList(4));
-        adjList.add(3,Arrays.asList());
-        adjList.add(4,Arrays.asList(3));
-        adjList.add(5,Arrays.asList());
-        obj.graphBFSAdjList_Graph(adjList.size(), adjList);
-        obj.graphDFSAdjList_Graph(adjList.size(), adjList);
-        adjList = new ArrayList<>();
-        adjList.add(0,Arrays.asList(1));
-        adjList.add(1,Arrays.asList(2));
-        adjList.add(2,Arrays.asList(3));
-        adjList.add(3,Arrays.asList(4));
-        adjList.add(4,Arrays.asList(5));
-        adjList.add(5,Arrays.asList());
-        obj.graphBFSAdjList_Graph(adjList.size(), adjList);
-        obj.graphDFSAdjList_Graph(adjList.size(), adjList);
-
+//        System.out.println("BFS/DFS graph");
+//        List<List<Integer>> adjList = new ArrayList<>();
+//        adjList.add(0, Arrays.asList(1, 2, 3));
+//        adjList.add(1, Arrays.asList());
+//        adjList.add(2, Arrays.asList(4));
+//        adjList.add(3, Arrays.asList());
+//        adjList.add(4, Arrays.asList());
+//        obj.graphBFSAdjList_Graph(adjList.size(), adjList);
+//        obj.graphDFSAdjList_Graph(adjList.size(), adjList);
+//        obj.graphDFSAdjList_Recursive_Graph(adjList.size(), adjList);
+//        adjList = new ArrayList<>();
+//        adjList.add(0, Arrays.asList(1, 2, 3));
+//        adjList.add(1, Arrays.asList(5));
+//        adjList.add(2, Arrays.asList(4));
+//        adjList.add(3, Arrays.asList());
+//        adjList.add(4, Arrays.asList(3));
+//        adjList.add(5, Arrays.asList());
+//        obj.graphBFSAdjList_Graph(adjList.size(), adjList);
+//        obj.graphDFSAdjList_Graph(adjList.size(), adjList);
+//        obj.graphDFSAdjList_Recursive_Graph(adjList.size(), adjList);
+//        adjList = new ArrayList<>();
+//        adjList.add(0, Arrays.asList(1));
+//        adjList.add(1, Arrays.asList(2));
+//        adjList.add(2, Arrays.asList(3));
+//        adjList.add(3, Arrays.asList(4));
+//        adjList.add(4, Arrays.asList(5));
+//        adjList.add(5, Arrays.asList());
+//        obj.graphBFSAdjList_Graph(adjList.size(), adjList);
+//        obj.graphDFSAdjList_Graph(adjList.size(), adjList);
+//        obj.graphDFSAdjList_Recursive_Graph(adjList.size(), adjList);
+        //......................................................................
+//        Row: 361
+//        System.out.println("Search in maze");
+//        int[][] maze = {{1, 0, 0, 0},
+//                        {1, 1, 0, 1}, 
+//                        {1, 1, 0, 0},
+//                        {0, 1, 1, 1}};
+//        obj.findPathRatInMaze_Graph(maze, maze.length);
+        //......................................................................
+//        Row: 371
+//        System.out.println("No. of Island");
+//        int[][] grid = {{0, 1, 1, 1, 0, 0, 0}, {0, 0, 1, 1, 0, 1, 0}};
+//        obj.numberOfIslands_Graph(grid);
+        //......................................................................
+//        Row: 348
+//        System.out.println("Check if binary tree is heap (max heap)");
+//        TreeNode<Integer> root = new TreeNode<>(10);
+//        root.setLeft(new TreeNode<>(7));
+//        root.getLeft().setLeft(new TreeNode<>(6));
+//        root.getLeft().setRight(new TreeNode<>(5));
+//        root.setRight(new TreeNode<>(8));
+//        root.getRight().setLeft(new TreeNode<>(4));
+//        obj.checkIfBinaryTreeIsMaxHeap(root);
+//        root = new TreeNode<>(10);
+//        root.setLeft(new TreeNode<>(7));
+//        root.getLeft().setLeft(new TreeNode<>(6));
+//        root.getLeft().setRight(new TreeNode<>(5));
+//        root.setRight(new TreeNode<>(8));
+//        root.getRight().setLeft(new TreeNode<>(9)); 
+//        obj.checkIfBinaryTreeIsMaxHeap(root);
+//        root = new TreeNode<>(10);
+//        root.setLeft(new TreeNode<>(7));
+//        root.getLeft().setLeft(new TreeNode<>(6));
+//        root.getLeft().setRight(new TreeNode<>(5));
+//        root.setRight(new TreeNode<>(8));
+//        root.getRight().setLeft(new TreeNode<>(4)); 
+//        root.getRight().setRight(new TreeNode<>(3)); 
+//        obj.checkIfBinaryTreeIsMaxHeap(root);
+        //......................................................................
+//        Row: 91
+//        System.out.println("Arrange all anagrams together");
+//        obj.arrangeAllWordsAsTheirAnagrams(Arrays.asList("act", "god", "cat", "dog", "tac"));
+        //......................................................................
+//        Row: 90
+        System.out.println("Minimum character to be added at front of string to make it pallindrome");
+        obj.characterAddedAtFrontToMakeStringPallindrome_1("ABC"); // 2 char = B,C (ex CBABC)
+        obj.characterAddedAtFrontToMakeStringPallindrome_1("ABA"); // 0 char already pallindrome
+        obj.characterAddedAtFrontToMakeStringPallindrome_2("ABC"); //KMP based
+        obj.characterAddedAtFrontToMakeStringPallindrome_2("ABA"); //KMP based
     }
 
 }
