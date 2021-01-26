@@ -3467,25 +3467,25 @@ public class DSA450Questions {
         int[] lps = new int[size];
         lps[0] = 0; //always 0th index is 0
         int i = 1;
-        int len = 0;
+        int j = 0;
         while (i < size) {
 
-            if (pattern.charAt(i) == pattern.charAt(len)) {
-                len++;
-                lps[i] = len;
+            if (pattern.charAt(i) == pattern.charAt(j)) {
+                j++;
+                lps[i] = j;
                 i++;
             } else {
                 // char doesn't match
                 // This is tricky. Consider the example. 
                 // AAACAAAA and i = 7. The idea is similar 
                 // to search step. 
-                if (len != 0) {
-                    len = lps[len - 1];
+                if (j != 0) {
+                    j = lps[j - 1];
 
                     // Also, note that we do not increment 
                     // i here 
                 } else {
-                    lps[i] = len;
+                    lps[i] = j;
                     i++;
                 }
             }
@@ -4138,11 +4138,11 @@ public class DSA450Questions {
     private void graphDFSAdjList_Recursive_Helper(List<List<Integer>> adjList, int vertex,
             boolean[] visited, List<Integer> result) {
 
-        if (visited[vertex] != true) {
-            visited[vertex] = true;
-            result.add(vertex);
-            List<Integer> childrens = adjList.get(vertex);
-            for (int childVertex : childrens) {
+        visited[vertex] = true;
+        result.add(vertex);
+        List<Integer> childrens = adjList.get(vertex);
+        for (int childVertex : childrens) {
+            if (visited[childVertex] != true) {
                 graphDFSAdjList_Recursive_Helper(adjList, childVertex, visited, result);
             }
         }
@@ -4252,6 +4252,111 @@ public class DSA450Questions {
 
         System.out.println("Number of separated islands: " + islandCount);
 
+    }
+
+    private boolean detectCycleInGraphDFS_Helper(List<List<Integer>> adjList, int vertex, int parent, boolean[] visited) {
+        visited[vertex] = true;
+
+        List<Integer> childrens = adjList.get(vertex);
+        for (int childVertex : childrens) {
+            if (visited[childVertex] != true) {
+                if (detectCycleInGraphDFS_Helper(adjList, childVertex, vertex, visited)) {
+                    return true;
+                }
+            } else if (childVertex != parent) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean detectCycleInGraphDFS_Graph(int V, List<List<Integer>> adjList) {
+
+        boolean[] visited = new boolean[V];
+        for (int u = 0; u < V; u++) {
+            if (visited[u] != true) {
+                if (detectCycleInGraphDFS_Helper(adjList, u, -1, visited)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    private void topologicalSort_Helper(List<List<Integer>> adjList, int vertex, boolean[] visited, Stack<Integer> resultStack){
+        
+        visited[vertex] = true;
+        List<Integer> childrens = adjList.get(vertex);
+        for(int childVertex: childrens){
+            if(visited[childVertex] != true){
+                topologicalSort_Helper(adjList, childVertex, visited, resultStack);
+            }
+        }
+        
+        resultStack.push(vertex);
+        
+    }
+    
+    public void topologicalSort_Graph(int V, List<List<Integer>> adjList){
+        
+        Stack<Integer> resultStack = new Stack<>();
+        boolean[] visited = new boolean[V];
+        for(int u=0; u<V; u++){
+            if(visited[u] != true){
+                topologicalSort_Helper(adjList, u, visited, resultStack);
+            }
+        }
+        
+        System.out.println("Topological sort: ");
+        while(!resultStack.isEmpty()){
+            System.out.print(resultStack.pop()+" ");
+        }
+        System.out.println();
+    }
+    
+    public void minimumCostToFillGivenBag_DP_Memoization(int[] cost, int W){
+        
+        //problem statement: https://practice.geeksforgeeks.org/problems/minimum-cost-to-fill-given-weight-in-a-bag1956/1
+        
+        //create normal data
+        List<Integer> value = new ArrayList<>();
+        List<Integer> weight = new ArrayList<>();
+        
+        int actualSize = 0;
+        for(int i=0; i<cost.length; i++){
+            if(cost[i] != -1){
+                value.add(cost[i]);
+                weight.add(i+1);
+                actualSize++;
+            }
+        }
+        
+        int[][] memo = new int[actualSize+1][W+1];
+        for(int x=0; x<actualSize+1; x++){
+            for(int y=0; y<W+1; y++){
+                if(x == 0){
+                    memo[x][y] = Integer.MAX_VALUE;
+                }
+               if(y == 0){
+                    memo[x][y] = 0;
+                } 
+            }
+        }
+        
+        for(int x=1; x<actualSize+1; x++){
+            for(int y=1; y<W+1; y++){
+                if(weight.get(x-1) > y){
+                    memo[x][y] = memo[x-1][y];
+                }else{
+                    memo[x][y] = Math.min(value.get(x-1) + memo[x][y - weight.get(x-1)], 
+                            memo[x-1][y]);
+                }
+            }
+        }
+        
+        //output
+        System.out.println("Min cost: "+memo[actualSize][W]);
+        
     }
 
     public static void main(String[] args) {
@@ -5404,7 +5509,7 @@ public class DSA450Questions {
 //        obj.nMeetingRooms_Greedy(startTime, finishTime);
         //......................................................................
 //        Row: 357, 358
-//        System.out.println("BFS/DFS graph");
+//        System.out.println("BFS/DFS directed graph");
 //        List<List<Integer>> adjList = new ArrayList<>();
 //        adjList.add(0, Arrays.asList(1, 2, 3));
 //        adjList.add(1, Arrays.asList());
@@ -5435,7 +5540,7 @@ public class DSA450Questions {
 //        obj.graphDFSAdjList_Graph(adjList.size(), adjList);
 //        obj.graphDFSAdjList_Recursive_Graph(adjList.size(), adjList);
         //......................................................................
-//        Row: 361
+//        Row: 361, 275
 //        System.out.println("Search in maze");
 //        int[][] maze = {{1, 0, 0, 0},
 //                        {1, 1, 0, 1}, 
@@ -5478,11 +5583,43 @@ public class DSA450Questions {
 //        obj.arrangeAllWordsAsTheirAnagrams(Arrays.asList("act", "god", "cat", "dog", "tac"));
         //......................................................................
 //        Row: 90
-        System.out.println("Minimum character to be added at front of string to make it pallindrome");
-        obj.characterAddedAtFrontToMakeStringPallindrome_1("ABC"); // 2 char = B,C (ex CBABC)
-        obj.characterAddedAtFrontToMakeStringPallindrome_1("ABA"); // 0 char already pallindrome
-        obj.characterAddedAtFrontToMakeStringPallindrome_2("ABC"); //KMP based
-        obj.characterAddedAtFrontToMakeStringPallindrome_2("ABA"); //KMP based
+//        System.out.println("Minimum character to be added at front of string to make it pallindrome");
+//        obj.characterAddedAtFrontToMakeStringPallindrome_1("ABC"); // 2 char = B,C (ex CBABC)
+//        obj.characterAddedAtFrontToMakeStringPallindrome_1("ABA"); // 0 char already pallindrome
+//        obj.characterAddedAtFrontToMakeStringPallindrome_2("ABC"); //KMP based
+//        obj.characterAddedAtFrontToMakeStringPallindrome_2("ABA"); //KMP based
+        //......................................................................
+//        Row: 360
+//        System.out.println("Detect cycle in undirected graph");
+//        List<List<Integer>> adjList = new ArrayList<>();
+//        adjList.add(0, Arrays.asList(1, 2));
+//        adjList.add(1, Arrays.asList(0, 2));
+//        adjList.add(2, Arrays.asList(0, 1));
+//        System.out.println("Is there a cycle in undirected graph: " + obj.detectCycleInGraphDFS_Graph(adjList.size(), adjList));
+//        adjList = new ArrayList<>(); //NO CYCLE
+//        adjList.add(0, Arrays.asList(1));
+//        adjList.add(1, Arrays.asList(0, 2));
+//        adjList.add(2, Arrays.asList());
+//        System.out.println("Is there a cycle in undirected graph: " + obj.detectCycleInGraphDFS_Graph(adjList.size(), adjList));
+        //......................................................................
+//        Row: 368
+//        System.out.println("Topological sort graph");    
+//        List<List<Integer>> adjList = new ArrayList<>();
+//        adjList.add(0, Arrays.asList());
+//        adjList.add(1, Arrays.asList());
+//        adjList.add(2, Arrays.asList(3));
+//        adjList.add(3, Arrays.asList(1));
+//        adjList.add(4, Arrays.asList(0,1));
+//        adjList.add(5, Arrays.asList(0,2));
+//        obj.topologicalSort_Graph(adjList.size(), adjList);
+        //......................................................................
+//        Row: 439
+        System.out.println("Minimum cost to fill the given bag");
+        //https://www.geeksforgeeks.org/minimum-cost-to-fill-given-weight-in-a-bag/
+        obj.minimumCostToFillGivenBag_DP_Memoization(new int[]{20, 10, 4, 50, 100}, 5);
+        obj.minimumCostToFillGivenBag_DP_Memoization(new int[]{-1, -1, 4, 3, -1}, 5);
+        
+        
     }
 
 }
