@@ -672,6 +672,66 @@ public class DSA450Questions {
 
     }
 
+    public void bestProfitToBuySellStock(int[] prices) {
+
+        //https://leetcode.com/problems/best-time-to-buy-and-sell-stock/
+        int minPrice = Integer.MAX_VALUE;
+        int maxProfit = 0;
+        for (int i = 0; i < prices.length; i++) {
+
+            if (prices[i] < minPrice) {
+                minPrice = prices[i];
+            } else if (prices[i] - minPrice > maxProfit) {
+                maxProfit = prices[i] - minPrice;
+            }
+
+        }
+
+        //output:
+        System.out.println("Maximum profit from buying and selling the stocks: " + maxProfit);
+
+    }
+
+    public void countAllPairsInArrayThatSumIsK(int[] arr, int K) {
+        /*
+         //brute force apprach
+         //........................T: O(N^2)
+         int pairCount = 0;
+         for(int i=0; i<arr.length; i++){
+         for(int j=i+1; j<arr.length; j++){
+         if(arr[i] + arr[j] == K){
+         pairCount++;
+         }
+         }
+         }
+        
+         System.out.println("Count of pairs whose sum is equal to K: "+pairCount);
+         */
+
+        //Time optimised approach
+        //https://www.geeksforgeeks.org/count-pairs-with-given-sum/
+        //.......................T: O(N)
+        //.......................S: O(N)
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int element : arr) {
+            map.put(element, map.getOrDefault(element, 0) + 1);
+        }
+
+        int pairCount = 0;
+        for (int element : arr) {
+            if (map.get(K - element) != null) {
+                pairCount += map.get(K - element);
+            }
+
+            if (K - element == element) {
+                pairCount--;
+            }
+
+        }
+
+        System.out.println("Count of pairs whose sum is equal to K: " + pairCount / 2);
+    }
+
     public void rotateMatrixClockWise90Deg(int[][] mat) {
 
         int row = mat.length;
@@ -1268,6 +1328,11 @@ public class DSA450Questions {
 
         //output:
         System.out.println("No. of character to be added at front to make it pallindrome KMP based: " + (str.length() - lps[s.length() - 1]));
+    }
+
+    public boolean checkIfOneStringRotationOfOtherString(String str1, String str2) {
+        return (str1.length() == str2.length())
+                && ((str1 + str1).indexOf(str2) != -1);
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -3242,6 +3307,50 @@ public class DSA450Questions {
 
     }
 
+    public void largestAreaInHistogram(int[] hist) {
+
+        // Create an empty stack. The stack holds indexes of hist[] array 
+        // The bars stored in stack are always in increasing order of their 
+        // heights. 
+        Stack<Integer> st = new Stack<>();
+        int n = hist.length;
+        int maxArea = 0; // Initialize max area 
+        int top;  // To store top of stack 
+        int areaWithTop; // To store area with top bar as the smallest bar 
+
+        // Run through all bars of given histogram 
+        int i = 0;
+        while (i < n) {
+            // If this bar is higher than the bar on top stack, push it to stack 
+            if (st.isEmpty() || hist[st.peek()] <= hist[i]) {
+                st.push(i++);
+
+            // If this bar is lower than top of stack, then calculate area of rectangle  
+                // with stack top as the smallest (or minimum height) bar. 'i' is  
+                // 'right index' for the top and element before top in stack is 'left index' 
+            } else {
+                
+                top = st.pop();  // store the top index 
+                // Calculate the area with hist[tp] stack as smallest bar 
+                areaWithTop = hist[top] * (st.isEmpty() ? i : i - st.peek() - 1);
+                // update max area, if needed 
+                maxArea = Math.max(maxArea, areaWithTop);
+            }
+        }
+        
+        // Now pop the remaining bars from stack and calculate area with every 
+        // popped bar as the smallest bar 
+        while (!st.isEmpty()) {
+            top = st.pop();
+            areaWithTop = hist[top] * (st.isEmpty() ? i : i - st.peek() - 1);
+            maxArea = Math.max(maxArea, areaWithTop);
+        } 
+       
+        //output:
+        System.out.println("Max area of histogram: "+maxArea);
+
+    }
+
     public void minCostOfRope(int[] a) {
 
         //GREEDY ALGO
@@ -4282,81 +4391,80 @@ public class DSA450Questions {
         }
         return false;
     }
-    
-    private void topologicalSort_Helper(List<List<Integer>> adjList, int vertex, boolean[] visited, Stack<Integer> resultStack){
-        
+
+    private void topologicalSort_Helper(List<List<Integer>> adjList, int vertex, boolean[] visited, Stack<Integer> resultStack) {
+
         visited[vertex] = true;
         List<Integer> childrens = adjList.get(vertex);
-        for(int childVertex: childrens){
-            if(visited[childVertex] != true){
+        for (int childVertex : childrens) {
+            if (visited[childVertex] != true) {
                 topologicalSort_Helper(adjList, childVertex, visited, resultStack);
             }
         }
-        
+
         resultStack.push(vertex);
-        
+
     }
-    
-    public void topologicalSort_Graph(int V, List<List<Integer>> adjList){
-        
+
+    public void topologicalSort_Graph(int V, List<List<Integer>> adjList) {
+
         Stack<Integer> resultStack = new Stack<>();
         boolean[] visited = new boolean[V];
-        for(int u=0; u<V; u++){
-            if(visited[u] != true){
+        for (int u = 0; u < V; u++) {
+            if (visited[u] != true) {
                 topologicalSort_Helper(adjList, u, visited, resultStack);
             }
         }
-        
+
         System.out.println("Topological sort: ");
-        while(!resultStack.isEmpty()){
-            System.out.print(resultStack.pop()+" ");
+        while (!resultStack.isEmpty()) {
+            System.out.print(resultStack.pop() + " ");
         }
         System.out.println();
     }
-    
-    public void minimumCostToFillGivenBag_DP_Memoization(int[] cost, int W){
-        
+
+    public void minimumCostToFillGivenBag_DP_Memoization(int[] cost, int W) {
+
         //problem statement: https://practice.geeksforgeeks.org/problems/minimum-cost-to-fill-given-weight-in-a-bag1956/1
-        
         //create normal data
         List<Integer> value = new ArrayList<>();
         List<Integer> weight = new ArrayList<>();
-        
+
         int actualSize = 0;
-        for(int i=0; i<cost.length; i++){
-            if(cost[i] != -1){
+        for (int i = 0; i < cost.length; i++) {
+            if (cost[i] != -1) {
                 value.add(cost[i]);
-                weight.add(i+1);
+                weight.add(i + 1);
                 actualSize++;
             }
         }
-        
-        int[][] memo = new int[actualSize+1][W+1];
-        for(int x=0; x<actualSize+1; x++){
-            for(int y=0; y<W+1; y++){
-                if(x == 0){
+
+        int[][] memo = new int[actualSize + 1][W + 1];
+        for (int x = 0; x < actualSize + 1; x++) {
+            for (int y = 0; y < W + 1; y++) {
+                if (x == 0) {
                     memo[x][y] = Integer.MAX_VALUE;
                 }
-               if(y == 0){
+                if (y == 0) {
                     memo[x][y] = 0;
-                } 
-            }
-        }
-        
-        for(int x=1; x<actualSize+1; x++){
-            for(int y=1; y<W+1; y++){
-                if(weight.get(x-1) > y){
-                    memo[x][y] = memo[x-1][y];
-                }else{
-                    memo[x][y] = Math.min(value.get(x-1) + memo[x][y - weight.get(x-1)], 
-                            memo[x-1][y]);
                 }
             }
         }
-        
+
+        for (int x = 1; x < actualSize + 1; x++) {
+            for (int y = 1; y < W + 1; y++) {
+                if (weight.get(x - 1) > y) {
+                    memo[x][y] = memo[x - 1][y];
+                } else {
+                    memo[x][y] = Math.min(value.get(x - 1) + memo[x][y - weight.get(x - 1)],
+                            memo[x - 1][y]);
+                }
+            }
+        }
+
         //output
-        System.out.println("Min cost: "+memo[actualSize][W]);
-        
+        System.out.println("Min cost: " + memo[actualSize][W]);
+
     }
 
     public static void main(String[] args) {
@@ -5614,12 +5722,31 @@ public class DSA450Questions {
 //        obj.topologicalSort_Graph(adjList.size(), adjList);
         //......................................................................
 //        Row: 439
-        System.out.println("Minimum cost to fill the given bag");
-        //https://www.geeksforgeeks.org/minimum-cost-to-fill-given-weight-in-a-bag/
-        obj.minimumCostToFillGivenBag_DP_Memoization(new int[]{20, 10, 4, 50, 100}, 5);
-        obj.minimumCostToFillGivenBag_DP_Memoization(new int[]{-1, -1, 4, 3, -1}, 5);
-        
-        
+//        System.out.println("Minimum cost to fill the given bag");
+//        //https://www.geeksforgeeks.org/minimum-cost-to-fill-given-weight-in-a-bag/
+//        obj.minimumCostToFillGivenBag_DP_Memoization(new int[]{20, 10, 4, 50, 100}, 5);
+//        obj.minimumCostToFillGivenBag_DP_Memoization(new int[]{-1, -1, 4, 3, -1}, 5);
+        //......................................................................
+//        Row: 22
+//        System.out.println("Best time to buy and sell stock");
+//        obj.bestProfitToBuySellStock(new int[]{7,1,5,3,6,4});
+//        obj.bestProfitToBuySellStock(new int[]{7,6,4,3,1});
+        //......................................................................
+//        Row: 23
+//        System.out.println("Find all pairs in array whose sum is given to K");
+//        //https://www.geeksforgeeks.org/count-pairs-with-given-sum/
+//        obj.countAllPairsInArrayThatSumIsK(new int[]{1, 5, 7, 1}, 6);
+//        obj.countAllPairsInArrayThatSumIsK(new int[]{1, 1, 1, 1}, 2);
+        //......................................................................
+//        Row: 60
+//        System.out.println("Check if one string is rotation of other string");
+//        //https://www.geeksforgeeks.org/a-program-to-check-if-strings-are-rotations-of-each-other/
+//        System.out.println("Check if one string is rotation: "+obj.checkIfOneStringRotationOfOtherString("AACD", "ACDA"));
+        //......................................................................
+//        Row: 312
+        System.out.println("Largest area of histogram");
+        //https://www.geeksforgeeks.org/largest-rectangle-under-histogram/
+        obj.largestAreaInHistogram(new int[]{6, 2, 5, 4, 5, 1, 6});
     }
 
 }
