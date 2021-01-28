@@ -1335,6 +1335,57 @@ public class DSA450Questions {
                 && ((str1 + str1).indexOf(str2) != -1);
     }
 
+    private int countOccurenceOfGivenStringInCharArray_Count = 0;
+
+    private void countOccurenceOfGivenStringInCharArray_Helper(char[][] charArr, int x, int y,
+            int startPoint, String str, StringBuilder sb) {
+
+        if (sb.toString().equals(str)) {
+            //once set of string is found reset stringbuilder
+            sb.setLength(0);
+            countOccurenceOfGivenStringInCharArray_Count++;
+            return;
+        }
+        
+        if (x < 0 || x >= charArr.length || y < 0 || y >= charArr[0].length
+                || startPoint >= str.length()
+                || charArr[x][y] != str.charAt(startPoint)) {
+            return;
+        }
+
+        sb.append(charArr[x][y]);
+        
+        //UP
+        countOccurenceOfGivenStringInCharArray_Helper(charArr, x - 1, y, startPoint + 1, str, sb);
+
+        //Down
+        countOccurenceOfGivenStringInCharArray_Helper(charArr, x + 1, y, startPoint + 1, str, sb);
+
+        //Left
+        countOccurenceOfGivenStringInCharArray_Helper(charArr, x, y - 1, startPoint + 1, str, sb);
+
+        //Right
+        countOccurenceOfGivenStringInCharArray_Helper(charArr, x, y + 1, startPoint + 1, str, sb);
+
+    }
+
+    public void countOccurenceOfGivenStringInCharArray(char[][] charArr, String str) {
+
+        countOccurenceOfGivenStringInCharArray_Count = 0; //reset/init
+        StringBuilder sb = new StringBuilder();
+        int N = charArr.length;
+        int startPoint = 0;
+        for (int x = 0; x < N; x++) {
+            for (int y = 0; y < N; y++) {
+                countOccurenceOfGivenStringInCharArray_Helper(charArr, x, y, startPoint, str, sb);
+            }
+        }
+        
+        //output
+        System.out.println("Count of the given string is: "+countOccurenceOfGivenStringInCharArray_Count);
+
+    }
+
     public void reverseLinkedList_Iterative(Node<Integer> node) {
         System.out.println("Reverse linked list iterative");
         //actual
@@ -2039,6 +2090,37 @@ public class DSA450Questions {
         new LinkedListUtil(prevToCurr).print();
 
     }
+    
+    public void intersectionOfTwoSortedLinkedList(Node<Integer> node1, Node<Integer> node2){
+        
+        //....................T: O(M+N)
+        //....................S: O(M+N)
+        
+        Set<Integer> node1Set = new HashSet<>();
+        while(node1 != null){
+            node1Set.add(node1.getData());
+            node1 = node1.getNext();
+        }
+        
+        Set<Integer> node2Set = new HashSet<>();
+        Node<Integer> newHead = new Node<>(Integer.MIN_VALUE);
+        Node<Integer> copy = newHead;
+        while(node2 != null){
+            
+            //all the in node2 that is present in node1 set but same node2 should not be repested in node2 set
+            if(node1Set.contains(node2.getData()) && !node2Set.contains(node2.getData())){
+                copy.setNext(new Node<>(node2.getData()));
+                copy = copy.getNext();
+            }
+            node2Set.add(node2.getData());
+            node2 = node2.getNext();
+        }
+        
+        //output:
+        new LinkedListUtil<Integer>(newHead.getNext()).print();
+        
+    }
+    
 
     public void levelOrderTraversal_Iterative(TreeNode root) {
 
@@ -3199,6 +3281,134 @@ public class DSA450Questions {
                 + checkIfBinaryTreeIsMaxHeap_Helper(root, new CheckIfBinaryTreeIsMaxHeapClass()));
     }
 
+    public boolean checkIfAllLevelsOfTwoTreesAreAnagrams_1(TreeNode<Integer> root1, TreeNode<Integer> root2) {
+
+        //this approach performs level order traversal first and then anagrams checking
+        if (root1 == null && root2 == null) {
+            return true;
+        }
+
+        if (root1 == null || root2 == null) {
+            return false;
+        }
+
+        Map<Integer, List<Integer>> levelOrder1 = new TreeMap<>();
+        levelOrderTraversal_Recursive_Helper(root1, 0, levelOrder1); //T: O(N)
+
+        Map<Integer, List<Integer>> levelOrder2 = new TreeMap<>();
+        levelOrderTraversal_Recursive_Helper(root2, 0, levelOrder2); //T: O(N)
+
+        //if both tree are of different levels then two trees acn't be anagrams
+        if (levelOrder1.size() != levelOrder2.size()) {
+            return false;
+        }
+
+        //T: O(H) H = height of tree
+        for (int level = 0; level < levelOrder1.size(); level++) {
+
+            List<Integer> l1 = levelOrder1.get(level);
+            List<Integer> l2 = levelOrder2.get(level);
+
+            //sort: T: O(Logl1) + O(Logl2)
+            Collections.sort(l1);
+            Collections.sort(l2);
+
+            //if levels of two trees after sorting are not equal then they are not anagram
+            //ex l1.sort: [2,3], l2.sort: [3,4] then l1 != l2
+            if (!l1.equals(l2)) {
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
+    public boolean checkIfAllLevelsOfTwoTreesAreAnagrams_2(TreeNode<Integer> root1, TreeNode<Integer> root2) {
+
+        //this approach performs level order traversal and anagrams checking at the same time
+        if (root1 == null && root2 == null) {
+            return true;
+        }
+
+        if (root1 == null || root2 == null) {
+            return false;
+        }
+
+        Queue<TreeNode<Integer>> q1 = new LinkedList<>();
+        Queue<TreeNode<Integer>> q2 = new LinkedList<>();
+        q1.add(root1);
+        q2.add(root2);
+
+        Queue<TreeNode<Integer>> intQ1 = new LinkedList<>();
+        Queue<TreeNode<Integer>> intQ2 = new LinkedList<>();
+
+        List<Integer> l1 = new ArrayList<>();
+        List<Integer> l2 = new ArrayList<>();
+
+        while (!q1.isEmpty() && !q1.isEmpty()) {
+
+            TreeNode<Integer> curr1 = q1.poll();
+            TreeNode<Integer> curr2 = q2.poll();
+
+            l1.add(curr1.getData());
+            l2.add(curr2.getData());
+
+            if (curr1.getLeft() != null) {
+                intQ1.add(curr1.getLeft());
+            }
+
+            if (curr1.getRight() != null) {
+                intQ1.add(curr1.getRight());
+            }
+
+            if (curr2.getLeft() != null) {
+                intQ2.add(curr2.getLeft());
+            }
+
+            if (curr2.getRight() != null) {
+                intQ2.add(curr2.getRight());
+            }
+
+            if (q1.isEmpty() && q2.isEmpty()) {
+
+                Collections.sort(l1);
+                Collections.sort(l2);
+
+                //if after sorting the nodes at a paticular level from both
+                //the tree are not equal
+                //ex l1.sort: [2,3], l2.sort: [3,4] then l1 != l2
+                if (!l1.equals(l2)) {
+                    return false;
+                }
+
+                l1.clear();
+                l2.clear();
+
+                //intQ holds the immediate child nodes of a parent node
+                //if the no. of immediate child nodes are different then further 
+                //checking for anagrams are not req.
+                //ex T1: 1.left = 2, 1.right = 3
+                //T2: 1.left = 2
+                //at parent node = 1 intQ will hold immediate childs
+                //intQ1 = [2,3], intQ2 = [2] here intQ1.size != intQ2.size
+                if (intQ1.size() != intQ2.size()) {
+                    return false;
+                }
+
+                q1.addAll(intQ1);
+                q2.addAll(intQ2);
+
+                intQ1.clear();
+                intQ2.clear();
+
+            }
+        }
+
+        //if none of the cond in while is false then all the levels in both tree are anagrams
+        return true;
+    }
+
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
     private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
@@ -3325,11 +3535,11 @@ public class DSA450Questions {
             if (st.isEmpty() || hist[st.peek()] <= hist[i]) {
                 st.push(i++);
 
-            // If this bar is lower than top of stack, then calculate area of rectangle  
+                // If this bar is lower than top of stack, then calculate area of rectangle  
                 // with stack top as the smallest (or minimum height) bar. 'i' is  
                 // 'right index' for the top and element before top in stack is 'left index' 
             } else {
-                
+
                 top = st.pop();  // store the top index 
                 // Calculate the area with hist[tp] stack as smallest bar 
                 areaWithTop = hist[top] * (st.isEmpty() ? i : i - st.peek() - 1);
@@ -3337,17 +3547,17 @@ public class DSA450Questions {
                 maxArea = Math.max(maxArea, areaWithTop);
             }
         }
-        
+
         // Now pop the remaining bars from stack and calculate area with every 
         // popped bar as the smallest bar 
         while (!st.isEmpty()) {
             top = st.pop();
             areaWithTop = hist[top] * (st.isEmpty() ? i : i - st.peek() - 1);
             maxArea = Math.max(maxArea, areaWithTop);
-        } 
-       
+        }
+
         //output:
-        System.out.println("Max area of histogram: "+maxArea);
+        System.out.println("Max area of histogram: " + maxArea);
 
     }
 
@@ -3402,6 +3612,56 @@ public class DSA450Questions {
         }
 
         System.out.println();
+    }
+
+    public void mergeKSortedArrays(int[][] arr) {
+
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        for (int[] row : arr) {
+            for (int cell : row) {
+                minHeap.add(cell);
+            }
+        }
+
+        List<Integer> sortedList = new ArrayList<>();
+        while (!minHeap.isEmpty()) {
+
+            sortedList.add(minHeap.poll());
+
+        }
+
+        //output:
+        System.out.println("K sorted array into a list: " + sortedList);
+
+    }
+
+    public void kThLargestSumFromContigousSubarray(int[] arr, int K) {
+
+        //arr[]: [20, -5, -1]
+        //contSumSubarry: [20, 15, 14, -5, -6, -1]
+        //20, 20+(-5), 20+(-5)+(-1), -5, -5+(-1), -1 
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        List<Integer> contSumSubarry = new ArrayList<>();
+        //................................T: O(N^2)
+        for (int i = 0; i < arr.length; i++) {
+            contSumSubarry.add(arr[i]);
+            int contSum = arr[i];
+            for (int j = i + 1; j < arr.length; j++) {
+                contSum += arr[j];
+                contSumSubarry.add(contSum);
+            }
+        }
+
+        //...............................T: O(LogK)
+        for (int sum : contSumSubarry) {
+            minHeap.add(sum);
+            if (minHeap.size() > K) {
+                minHeap.poll();
+            }
+        }
+
+        System.out.println("kth largest sum from contigous subarray: " + minHeap.peek());
+
     }
 
     public void majorityElement_1(int[] a) {
@@ -4095,6 +4355,50 @@ public class DSA450Questions {
 
         //output:
         System.out.println("Binomial coefficient (nCr) DP way: " + memo[n][r]);
+
+    }
+
+    public int friendsPairingProblem_Recursion(int n) {
+
+        //https://www.geeksforgeeks.org/friends-pairing-problem/
+        //if no friend is there nothing is possible
+        if (n == 0) {
+            return 0;
+        }
+
+        //if 1 friend is avaialbe he can only remain single
+        if (n == 1) {
+            return 1;
+        }
+
+        //if 2 friends are available there can be two ways
+        //friend can remain single: {2} Or can be be paired as {1,2}
+        if (n == 2) {
+            return 2;
+        }
+
+        //if above cond doesn't fulfil we have two choices
+        //1. ether we can remain single fun(n-1)
+        //2. Or we can keep ourself and check others for pair: (n-1)*fun(n-2)
+        return friendsPairingProblem_Recursion(n - 1) + (n - 1) * friendsPairingProblem_Recursion(n - 2);
+
+    }
+
+    public void friendsPairingProblem_DP_Memoization(int n) {
+
+        //https://www.geeksforgeeks.org/friends-pairing-problem/
+        int[] memo = new int[n + 1];
+        //base cond
+        memo[0] = 0;
+        memo[1] = 1;
+        memo[2] = 2;
+
+        for (int i = 3; i < n + 1; i++) {
+            memo[i] = memo[i - 1] + (i - 1) * memo[i - 2];
+        }
+
+        //output
+        System.out.println("No. ways freinds can be paired: " + memo[n]);
 
     }
 
@@ -5744,9 +6048,115 @@ public class DSA450Questions {
 //        System.out.println("Check if one string is rotation: "+obj.checkIfOneStringRotationOfOtherString("AACD", "ACDA"));
         //......................................................................
 //        Row: 312
-        System.out.println("Largest area of histogram");
-        //https://www.geeksforgeeks.org/largest-rectangle-under-histogram/
-        obj.largestAreaInHistogram(new int[]{6, 2, 5, 4, 5, 1, 6});
+//        System.out.println("Largest area of histogram");
+//        //https://www.geeksforgeeks.org/largest-rectangle-under-histogram/
+//        obj.largestAreaInHistogram(new int[]{6, 2, 5, 4, 5, 1, 6});
+        //......................................................................
+//        Row: 418
+//        System.out.println("Friends pairing DP problem");
+//        //https://www.geeksforgeeks.org/friends-pairing-problem/
+//        System.out.println("No. of ways friends can be paired recursion: "+obj.friendsPairingProblem_Recursion(4));
+//        obj.friendsPairingProblem_DP_Memoization(4);
+        //......................................................................
+//        Row: 341
+//        System.out.println("Merge k sorted arrays (heap)");
+//        int[][] arr = new int[][]{
+//            {1,2,3},
+//            {4,5,6},
+//            {7,8,9}
+//        };
+//        obj.mergeKSortedArrays(arr);
+        //......................................................................
+//        Row: 343
+//        System.out.println("Kth largest sum from contigous subarray");
+//        //https://www.geeksforgeeks.org/k-th-largest-sum-contiguous-subarray/
+//        obj.kThLargestSumFromContigousSubarray(new int[]{10, -10, 20, -40}, 6);
+//        obj.kThLargestSumFromContigousSubarray(new int[]{20, -5, -1}, 3);
+        //......................................................................
+//        Row: 329
+//        System.out.println("Check if all levels in two trees are anagrams of each other");
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setLeft(new TreeNode<>(4));
+//        root1.getRight().setRight(new TreeNode<>(5));
+//        TreeNode<Integer> root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode<>(3));
+//        root2.setRight(new TreeNode<>(2));
+//        root2.getRight().setLeft(new TreeNode<>(5));
+//        root2.getRight().setRight(new TreeNode<>(4));
+//        System.out.println("Check if all levels of two trees are anagrams 1: "+
+//                obj.checkIfAllLevelsOfTwoTreesAreAnagrams_1(root1, root2));
+//        System.out.println("Check if all levels of two trees are anagrams 2: "+
+//                obj.checkIfAllLevelsOfTwoTreesAreAnagrams_2(root1, root2));
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(6));
+//        root1.getLeft().setRight(new TreeNode<>(7));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setLeft(new TreeNode<>(4));
+//        root1.getRight().setRight(new TreeNode<>(5));
+//        root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode<>(3));
+//        root2.setRight(new TreeNode<>(2));
+//        root2.getRight().setLeft(new TreeNode<>(5));
+//        root2.getRight().setRight(new TreeNode<>(4));
+//        System.out.println("Check if all levels of two trees are anagrams 1: "+
+//                obj.checkIfAllLevelsOfTwoTreesAreAnagrams_1(root1, root2));
+//        System.out.println("Check if all levels of two trees are anagrams 2: "+
+//                obj.checkIfAllLevelsOfTwoTreesAreAnagrams_2(root1, root2));
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.setRight(new TreeNode<>(2));
+//        root1.getRight().setLeft(new TreeNode<>(4));
+//        root1.getRight().setRight(new TreeNode<>(5));
+//        root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode<>(3));
+//        root2.setRight(new TreeNode<>(2));
+//        root2.getRight().setLeft(new TreeNode<>(5));
+//        root2.getRight().setRight(new TreeNode<>(4));
+//        System.out.println("Check if all levels of two trees are anagrams 1: "+
+//                obj.checkIfAllLevelsOfTwoTreesAreAnagrams_1(root1, root2));
+//        System.out.println("Check if all levels of two trees are anagrams 2: "+
+//                obj.checkIfAllLevelsOfTwoTreesAreAnagrams_2(root1, root2));
+        //......................................................................
+//        Row: 78
+//        System.out.println("Count the presence of given string in char array");
+//        char[][] charArr = new char[][]{
+//            {'D','D','D','G','D','D'},
+//            {'B','B','D','E','B','S'},
+//            {'B','S','K','E','B','K'},
+//            {'D','D','D','D','D','E'},
+//            {'D','D','D','D','D','E'},
+//            {'D','D','D','D','D','G'}
+//           };
+//        String str= "GEEKS";
+//        obj.countOccurenceOfGivenStringInCharArray(charArr, str);
+//        charArr = new char[][]{
+//            {'B','B','M','B','B','B'},
+//            {'C','B','A','B','B','B'},
+//            {'I','B','G','B','B','B'},
+//            {'G','B','I','B','B','B'},
+//            {'A','B','C','B','B','B'},
+//            {'M','C','I','G','A','M'}
+//           };
+//        str= "MAGIC";
+//        obj.countOccurenceOfGivenStringInCharArray(charArr, str);
+        //......................................................................
+//        Row: 149
+        System.out.println("Intersection of two sorted linked list");
+        Node<Integer> node = new Node<>(1);
+        node.setNext(new Node<>(2));
+        node.getNext().setNext(new Node<>(3));
+        node.getNext().getNext().setNext(new Node<>(4));
+        node.getNext().getNext().getNext().setNext(new Node<>(5));
+        node.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+        Node<Integer> node2 = new Node<>(2);
+        node2.setNext(new Node<>(4));
+        node2.getNext().setNext(new Node<>(4));
+        node2.getNext().getNext().setNext(new Node<>(6));
+        obj.intersectionOfTwoSortedLinkedList(node2, node2);
+
     }
 
 }
