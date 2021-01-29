@@ -678,12 +678,14 @@ public class DSA450Questions {
         int minPrice = Integer.MAX_VALUE;
         int maxProfit = 0;
         for (int i = 0; i < prices.length; i++) {
-
+            //buy any stock at min price, so find a price < minPrice
             if (prices[i] < minPrice) {
                 minPrice = prices[i];
-            } else if (prices[i] - minPrice > maxProfit) {
-                maxProfit = prices[i] - minPrice;
             }
+            
+            //if any price > minPrice, we can sell that stock to earn profit
+            //maxProfit = max(maxProfit, price - minPrice)
+            maxProfit = Math.max(maxProfit, prices[i] - minPrice);
 
         }
 
@@ -732,6 +734,55 @@ public class DSA450Questions {
         System.out.println("Count of pairs whose sum is equal to K: " + pairCount / 2);
     }
 
+    public boolean checkIfSubarrayWithSum0(int[] arr){
+        
+        int n = arr.length;
+        int sum = 0;
+        Set<Integer> set = new HashSet<>();
+        for(int i=0; i<n; i++){
+            sum += arr[i];
+            
+            if(arr[i] == 0 || sum == 0 || set.add(sum)){
+                return true;
+            }
+            set.add(sum);
+        }
+        return false;
+        
+    }
+    
+    public void bestProfitToBuySellStockAtMostTwice(int[] prices){
+        
+        int n = prices.length;
+        int[] maxProfits = new int[n];
+        
+        int currMaxPrice = prices[n-1];
+        for(int i = n-2; i>=0; i--){
+            
+            if(prices[i] > currMaxPrice){
+                currMaxPrice = prices[i];
+            }
+            
+            maxProfits[i] = Math.max(maxProfits[i+1], currMaxPrice - prices[i]);
+            
+        }
+        
+        int currMinPrice = prices[0];
+        for(int i=1; i<n; i++){
+            
+            if(currMinPrice > prices[i]){
+                currMaxPrice = prices[i];
+            }
+            
+            maxProfits[i] = Math.max(maxProfits[i-1], maxProfits[i]+(prices[i] - currMinPrice));
+            
+        }
+        
+        //output:
+        System.out.println("Max profit frm buying selling stock atmost twice: "+maxProfits[n-1]);
+        
+    }
+    
     public void rotateMatrixClockWise90Deg(int[][] mat) {
 
         int row = mat.length;
@@ -2118,6 +2169,75 @@ public class DSA450Questions {
         
         //output:
         new LinkedListUtil<Integer>(newHead.getNext()).print();
+        
+    }
+    
+    private int lengthOfLinkedList(Node<Integer> node){
+        int len = 0;
+        Node<Integer> curr = node;
+        while(curr != null){
+            len++;
+            curr = curr.getNext();
+        }
+        
+        return len;
+    }
+    
+    private Node<Integer> moveLinkedListNodeByDiff(Node<Integer> node, int diff){
+        
+        int index = 0;
+        Node<Integer> curr = node;
+        while(index++ < diff){
+            curr = curr.getNext();
+        }
+        return curr;
+    }
+    
+    private int intersectionPointOfTwoLinkedListByRef_Helper(Node<Integer> n1, Node<Integer> n2){
+        
+        Node<Integer> currN1 = n1;
+        Node<Integer> currN2 = n2;
+        while(currN1 != null && currN2 != null){
+            
+            //nodes get common by ref
+            if(currN1 == currN2){
+                return currN1.getData();
+            }
+            
+            currN1 = currN1.getNext();
+            currN2 = currN2.getNext();
+            
+        }
+        
+        return -1;
+    }
+    
+    public void intersectionPointOfTwoLinkedListByRef(Node<Integer> node1, Node<Integer> node2){
+        
+        //find length of node1 T: O(M)
+        int M = lengthOfLinkedList(node1);
+        //find length of node2 T: O(N)
+        int N = lengthOfLinkedList(node2);
+        
+        //find the absolute diff in both the length
+        //diff = abs(M - N)
+        int diff = Math.abs(M - N);
+        
+        //if M > N move ptr in node1 by diff forward else move ptr in node2
+        //once ptr is available move ptr and node1 or node2 till null and find the intersection point
+        //by ref
+        int intersectedData = -1;
+        Node<Integer> curr = null;
+        if(M > N){
+            curr = moveLinkedListNodeByDiff(node1, diff);
+            intersectedData = intersectionPointOfTwoLinkedListByRef_Helper(curr, node2);
+        }else{
+            curr = moveLinkedListNodeByDiff(node2, diff);
+            intersectedData = intersectionPointOfTwoLinkedListByRef_Helper(curr, node1);
+        }
+        
+        //output:
+        System.out.println("Two linked list are intersected at: "+intersectedData);
         
     }
     
@@ -3829,6 +3949,89 @@ public class DSA450Questions {
 
         return -1;
 
+    }
+    
+    public void findRepeatingAndMissingInUnsortedArray_1(int[] arr){
+        
+        //problem statement: https://www.geeksforgeeks.org/find-a-repeating-and-a-missing-number/
+        //arr: will be of size N and elements in arr[] will be [1..N]
+        //.......................T: O(N)
+        //.......................S: O(N)
+        System.out.println("Approach 1");
+        int[] count = new int[arr.length + 1];
+        //get the occurence of arr element in count[] where count[i] i: elements in arr
+        for(int i=0; i<arr.length; i++){
+            count[arr[i]]++;
+        }
+        
+        for(int i=1; i<count.length; i++){
+            //first ith index that has count[i] = 0 is the element in arr which is supposed to be missing
+            //count[i] == 0 => i = element in arr is supposed to be missing
+            if(count[i] == 0){
+                System.out.println("Missing: "+i);
+                break;
+            }
+        }
+        
+        for(int i=1; i<count.length; i++){
+            //first ith index which has count[i] > 1 (occuring more that 1)
+            //is the element which is repeating
+            //count[i] > 1 => i = element in arr which is repeating
+            if(count[i] > 1){
+                System.out.println("Repeating: "+i);
+                break;
+            }
+        }
+        
+    }
+    
+    public void findRepeatingAndMissingInUnsortedArray_2(int[] arr){
+        
+        //problem statement: https://www.geeksforgeeks.org/find-a-repeating-and-a-missing-number/
+        //OPTIMISED
+        //.......................T: O(N)
+        //.......................S: O(1)
+        System.out.println("Approach 2");
+        System.out.println("Repeating element: ");
+        for(int i=0; i<arr.length; i++){
+            int absVal = Math.abs(arr[i]);
+            if(arr[absVal - 1] > 0){
+                arr[absVal - 1] = -arr[absVal - 1];
+            }else {
+                System.out.println(absVal);
+            }
+        }
+        
+        System.out.println("Missing element: ");
+        for(int i=0; i<arr.length; i++){
+            if(arr[i] > 0){
+                System.out.println(i+1);
+            }
+        }
+        
+    }
+    
+    public boolean checkIfPairPossibleInArrayHavingGivenDiff(int[] arr, int diff){
+        
+        //..................T; O(N)
+        //..................S: O(N)
+        
+        Set<Integer> set = new HashSet<>();
+        for(int i=0; i<arr.length; i++){
+            //arr[x] - arr[y] = diff
+            //arr[x] = diff + arr[y]
+            //if set.contains(arr[y]) then pair is possible
+            if(set.contains(arr[i])){
+                return true;
+            }
+            
+            //arr[x] = arr[y] +diff
+            set.add(arr[i] + diff);
+            
+        }
+        
+        return false;
+        
     }
 
     private int[] KMP_PatternMatching_Algorithm_LPSArray(String pattern, int size) {
@@ -6144,19 +6347,54 @@ public class DSA450Questions {
 //        obj.countOccurenceOfGivenStringInCharArray(charArr, str);
         //......................................................................
 //        Row: 149
-        System.out.println("Intersection of two sorted linked list");
-        Node<Integer> node = new Node<>(1);
-        node.setNext(new Node<>(2));
-        node.getNext().setNext(new Node<>(3));
-        node.getNext().getNext().setNext(new Node<>(4));
-        node.getNext().getNext().getNext().setNext(new Node<>(5));
-        node.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
-        Node<Integer> node2 = new Node<>(2);
-        node2.setNext(new Node<>(4));
-        node2.getNext().setNext(new Node<>(4));
-        node2.getNext().getNext().setNext(new Node<>(6));
-        obj.intersectionOfTwoSortedLinkedList(node2, node2);
-
+//        System.out.println("Intersection of two sorted linked list");
+//        Node<Integer> node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        node.getNext().getNext().setNext(new Node<>(4));
+//        node.getNext().getNext().getNext().setNext(new Node<>(5));
+//        node.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        Node<Integer> node2 = new Node<>(2);
+//        node2.setNext(new Node<>(4));
+//        node2.getNext().setNext(new Node<>(4));
+//        node2.getNext().getNext().setNext(new Node<>(6));
+//        obj.intersectionOfTwoSortedLinkedList(node2, node2);
+        //......................................................................
+//        Row: 26
+//        System.out.println("Check if any sub array with sum 0 is present or not");
+//        System.out.println("Is there with subarray sum 0 "+obj.checkIfSubarrayWithSum0(new int[]{4, 2, -3, 1, 6}));
+        //......................................................................
+//        Row: 31
+//        System.out.println("Maximum profit by buying seling stocks atmost twice");
+//        obj.bestProfitToBuySellStockAtMostTwice(new int[]{ 2, 30, 15, 10, 8, 25, 80 });
+//        obj.bestProfitToBuySellStockAtMostTwice(new int[]{ 2, 30, 80, 10, 8, 25, 60 });
+        //......................................................................
+//        Row: 107
+//        System.out.println("Find repeating and missing in unsorted array");
+//        //https://www.geeksforgeeks.org/find-a-repeating-and-a-missing-number/
+//        obj.findRepeatingAndMissingInUnsortedArray_1(new int[]{7, 3, 4, 5, 5, 6, 2 });
+//        obj.findRepeatingAndMissingInUnsortedArray_1(new int[]{3,1,3});
+//        obj.findRepeatingAndMissingInUnsortedArray_2(new int[]{7, 3, 4, 5, 5, 6, 2 });
+//        obj.findRepeatingAndMissingInUnsortedArray_2(new int[]{3,1,3});
+        //......................................................................
+//        Row: 110
+//        System.out.println("Check if any pair possible in an array having given difference");
+//        System.out.println("Check if any pair is possible in the array having given diff: "+
+//                obj.checkIfPairPossibleInArrayHavingGivenDiff(new int[]{5, 20, 3, 2, 5, 80}, 78));
+//        System.out.println("Check if any pair is possible in the array having given diff: "+
+//                obj.checkIfPairPossibleInArrayHavingGivenDiff(new int[]{90, 70, 20, 80, 50}, 45));
+        //......................................................................
+//        Row: 150
+        System.out.println("Intersection point in two given linked list (by ref linkage)");
+        Node<Integer> common = new Node<>(15);
+        common.setNext(new Node<>(30));
+        Node<Integer> node1 = new Node<>(3);
+        node1.setNext(new Node<>(9));
+        node1.getNext().setNext(new Node<>(6));
+        node1.getNext().getNext().setNext(common);
+        Node<Integer> node2 = new Node<>(10);
+        node2.setNext(common);
+        obj.intersectionPointOfTwoLinkedListByRef(node1, node2);
     }
 
 }
