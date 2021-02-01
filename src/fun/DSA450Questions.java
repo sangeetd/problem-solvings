@@ -682,7 +682,7 @@ public class DSA450Questions {
             if (prices[i] < minPrice) {
                 minPrice = prices[i];
             }
-            
+
             //if any price > minPrice, we can sell that stock to earn profit
             //maxProfit = max(maxProfit, price - minPrice)
             maxProfit = Math.max(maxProfit, prices[i] - minPrice);
@@ -734,55 +734,55 @@ public class DSA450Questions {
         System.out.println("Count of pairs whose sum is equal to K: " + pairCount / 2);
     }
 
-    public boolean checkIfSubarrayWithSum0(int[] arr){
-        
+    public boolean checkIfSubarrayWithSum0(int[] arr) {
+
         int n = arr.length;
         int sum = 0;
         Set<Integer> set = new HashSet<>();
-        for(int i=0; i<n; i++){
+        for (int i = 0; i < n; i++) {
             sum += arr[i];
-            
-            if(arr[i] == 0 || sum == 0 || set.add(sum)){
+
+            if (arr[i] == 0 || sum == 0 || set.add(sum)) {
                 return true;
             }
             set.add(sum);
         }
         return false;
-        
+
     }
-    
-    public void bestProfitToBuySellStockAtMostTwice(int[] prices){
-        
+
+    public void bestProfitToBuySellStockAtMostTwice(int[] prices) {
+
         int n = prices.length;
         int[] maxProfits = new int[n];
-        
-        int currMaxPrice = prices[n-1];
-        for(int i = n-2; i>=0; i--){
-            
-            if(prices[i] > currMaxPrice){
+
+        int currMaxPrice = prices[n - 1];
+        for (int i = n - 2; i >= 0; i--) {
+
+            if (prices[i] > currMaxPrice) {
                 currMaxPrice = prices[i];
             }
-            
-            maxProfits[i] = Math.max(maxProfits[i+1], currMaxPrice - prices[i]);
-            
+
+            maxProfits[i] = Math.max(maxProfits[i + 1], currMaxPrice - prices[i]);
+
         }
-        
+
         int currMinPrice = prices[0];
-        for(int i=1; i<n; i++){
-            
-            if(currMinPrice > prices[i]){
+        for (int i = 1; i < n; i++) {
+
+            if (currMinPrice > prices[i]) {
                 currMaxPrice = prices[i];
             }
-            
-            maxProfits[i] = Math.max(maxProfits[i-1], maxProfits[i]+(prices[i] - currMinPrice));
-            
+
+            maxProfits[i] = Math.max(maxProfits[i - 1], maxProfits[i] + (prices[i] - currMinPrice));
+
         }
-        
+
         //output:
-        System.out.println("Max profit frm buying selling stock atmost twice: "+maxProfits[n-1]);
-        
+        System.out.println("Max profit frm buying selling stock atmost twice: " + maxProfits[n - 1]);
+
     }
-    
+
     public void rotateMatrixClockWise90Deg(int[][] mat) {
 
         int row = mat.length;
@@ -808,6 +808,65 @@ public class DSA450Questions {
             System.out.println();
         }
 
+    }
+
+    private int areaPerRow(int[] hist) {
+        
+        //same as laregstAreaHistogram method
+        Stack<Integer> stack = new Stack<>();
+        int n = hist.length;
+        int maxArea = 0;
+        int top = 0;
+        int areaWithTop = 0;
+        int i = 0;
+        while (i < n) {
+
+            if (stack.isEmpty() || hist[stack.peek()] <= hist[i]) {
+                stack.push(i++);
+            } else {
+                top = stack.pop();
+                areaWithTop = hist[top] * (stack.isEmpty() ? i : i - stack.peek() - 1);
+                maxArea = Math.max(maxArea, areaWithTop);
+            }
+        }
+
+        while (!stack.isEmpty()) {
+            top = stack.pop();
+            areaWithTop = hist[top] * (stack.isEmpty() ? i : i - stack.peek() - 1);
+            maxArea = Math.max(maxArea, areaWithTop);
+        }
+        
+        return maxArea;
+
+    }
+
+    public void maxAreaOfRectangleInBinaryMatrix(int[][] mat) {
+
+        //problem statment & sol: https://www.geeksforgeeks.org/maximum-size-rectangle-binary-sub-matrix-1s/
+        
+        //find max area of per row int the matrix
+        //each row in the matrix is histogram
+        //use max area histogram
+        int R = mat.length;
+        int C = mat[0].length;
+        
+        int maxArea = areaPerRow(mat[0]);
+        
+        for(int r=1; r<R; r++){
+            for(int c=0; c<C; c++){
+                
+                if(mat[r][c] == 1){
+                    mat[r][c] += mat[r-1][c];
+                }
+                
+                maxArea = Math.max(maxArea, areaPerRow(mat[r]));
+                
+            }
+        }
+
+        //output:
+        System.out.println("Max area in binary matrix: "+maxArea);
+        
     }
 
     public String reverseString(String str) {
@@ -1397,7 +1456,7 @@ public class DSA450Questions {
             countOccurenceOfGivenStringInCharArray_Count++;
             return;
         }
-        
+
         if (x < 0 || x >= charArr.length || y < 0 || y >= charArr[0].length
                 || startPoint >= str.length()
                 || charArr[x][y] != str.charAt(startPoint)) {
@@ -1405,7 +1464,7 @@ public class DSA450Questions {
         }
 
         sb.append(charArr[x][y]);
-        
+
         //UP
         countOccurenceOfGivenStringInCharArray_Helper(charArr, x - 1, y, startPoint + 1, str, sb);
 
@@ -1431,9 +1490,9 @@ public class DSA450Questions {
                 countOccurenceOfGivenStringInCharArray_Helper(charArr, x, y, startPoint, str, sb);
             }
         }
-        
+
         //output
-        System.out.println("Count of the given string is: "+countOccurenceOfGivenStringInCharArray_Count);
+        System.out.println("Count of the given string is: " + countOccurenceOfGivenStringInCharArray_Count);
 
     }
 
@@ -2141,106 +2200,104 @@ public class DSA450Questions {
         new LinkedListUtil(prevToCurr).print();
 
     }
-    
-    public void intersectionOfTwoSortedLinkedList(Node<Integer> node1, Node<Integer> node2){
-        
+
+    public void intersectionOfTwoSortedLinkedList(Node<Integer> node1, Node<Integer> node2) {
+
         //....................T: O(M+N)
         //....................S: O(M+N)
-        
         Set<Integer> node1Set = new HashSet<>();
-        while(node1 != null){
+        while (node1 != null) {
             node1Set.add(node1.getData());
             node1 = node1.getNext();
         }
-        
+
         Set<Integer> node2Set = new HashSet<>();
         Node<Integer> newHead = new Node<>(Integer.MIN_VALUE);
         Node<Integer> copy = newHead;
-        while(node2 != null){
-            
+        while (node2 != null) {
+
             //all the in node2 that is present in node1 set but same node2 should not be repested in node2 set
-            if(node1Set.contains(node2.getData()) && !node2Set.contains(node2.getData())){
+            if (node1Set.contains(node2.getData()) && !node2Set.contains(node2.getData())) {
                 copy.setNext(new Node<>(node2.getData()));
                 copy = copy.getNext();
             }
             node2Set.add(node2.getData());
             node2 = node2.getNext();
         }
-        
+
         //output:
         new LinkedListUtil<Integer>(newHead.getNext()).print();
-        
+
     }
-    
-    private int lengthOfLinkedList(Node<Integer> node){
+
+    private int lengthOfLinkedList(Node<Integer> node) {
         int len = 0;
         Node<Integer> curr = node;
-        while(curr != null){
+        while (curr != null) {
             len++;
             curr = curr.getNext();
         }
-        
+
         return len;
     }
-    
-    private Node<Integer> moveLinkedListNodeByDiff(Node<Integer> node, int diff){
-        
+
+    private Node<Integer> moveLinkedListNodeByDiff(Node<Integer> node, int diff) {
+
         int index = 0;
         Node<Integer> curr = node;
-        while(index++ < diff){
+        while (index++ < diff) {
             curr = curr.getNext();
         }
         return curr;
     }
-    
-    private int intersectionPointOfTwoLinkedListByRef_Helper(Node<Integer> n1, Node<Integer> n2){
-        
+
+    private int intersectionPointOfTwoLinkedListByRef_Helper(Node<Integer> n1, Node<Integer> n2) {
+
         Node<Integer> currN1 = n1;
         Node<Integer> currN2 = n2;
-        while(currN1 != null && currN2 != null){
-            
+        while (currN1 != null && currN2 != null) {
+
             //nodes get common by ref
-            if(currN1 == currN2){
+            if (currN1 == currN2) {
                 return currN1.getData();
             }
-            
+
             currN1 = currN1.getNext();
             currN2 = currN2.getNext();
-            
+
         }
-        
+
         return -1;
     }
-    
-    public void intersectionPointOfTwoLinkedListByRef(Node<Integer> node1, Node<Integer> node2){
-        
+
+    public void intersectionPointOfTwoLinkedListByRef(Node<Integer> node1, Node<Integer> node2) {
+
         //find length of node1 T: O(M)
         int M = lengthOfLinkedList(node1);
         //find length of node2 T: O(N)
         int N = lengthOfLinkedList(node2);
-        
+
         //find the absolute diff in both the length
         //diff = abs(M - N)
         int diff = Math.abs(M - N);
-        
+
         //if M > N move ptr in node1 by diff forward else move ptr in node2
         //once ptr is available move ptr and node1 or node2 till null and find the intersection point
         //by ref
         int intersectedData = -1;
         Node<Integer> curr = null;
-        if(M > N){
+        if (M > N) {
             curr = moveLinkedListNodeByDiff(node1, diff);
             intersectedData = intersectionPointOfTwoLinkedListByRef_Helper(curr, node2);
-        }else{
+        } else {
             curr = moveLinkedListNodeByDiff(node2, diff);
             intersectedData = intersectionPointOfTwoLinkedListByRef_Helper(curr, node1);
         }
-        
+
         //output:
-        System.out.println("Two linked list are intersected at: "+intersectedData);
-        
+        System.out.println("Two linked list are intersected at: " + intersectedData);
+
     }
-    
 
     public void levelOrderTraversal_Iterative(TreeNode root) {
 
@@ -3950,9 +4007,9 @@ public class DSA450Questions {
         return -1;
 
     }
-    
-    public void findRepeatingAndMissingInUnsortedArray_1(int[] arr){
-        
+
+    public void findRepeatingAndMissingInUnsortedArray_1(int[] arr) {
+
         //problem statement: https://www.geeksforgeeks.org/find-a-repeating-and-a-missing-number/
         //arr: will be of size N and elements in arr[] will be [1..N]
         //.......................T: O(N)
@@ -3960,78 +4017,77 @@ public class DSA450Questions {
         System.out.println("Approach 1");
         int[] count = new int[arr.length + 1];
         //get the occurence of arr element in count[] where count[i] i: elements in arr
-        for(int i=0; i<arr.length; i++){
+        for (int i = 0; i < arr.length; i++) {
             count[arr[i]]++;
         }
-        
-        for(int i=1; i<count.length; i++){
+
+        for (int i = 1; i < count.length; i++) {
             //first ith index that has count[i] = 0 is the element in arr which is supposed to be missing
             //count[i] == 0 => i = element in arr is supposed to be missing
-            if(count[i] == 0){
-                System.out.println("Missing: "+i);
+            if (count[i] == 0) {
+                System.out.println("Missing: " + i);
                 break;
             }
         }
-        
-        for(int i=1; i<count.length; i++){
+
+        for (int i = 1; i < count.length; i++) {
             //first ith index which has count[i] > 1 (occuring more that 1)
             //is the element which is repeating
             //count[i] > 1 => i = element in arr which is repeating
-            if(count[i] > 1){
-                System.out.println("Repeating: "+i);
+            if (count[i] > 1) {
+                System.out.println("Repeating: " + i);
                 break;
             }
         }
-        
+
     }
-    
-    public void findRepeatingAndMissingInUnsortedArray_2(int[] arr){
-        
+
+    public void findRepeatingAndMissingInUnsortedArray_2(int[] arr) {
+
         //problem statement: https://www.geeksforgeeks.org/find-a-repeating-and-a-missing-number/
         //OPTIMISED
         //.......................T: O(N)
         //.......................S: O(1)
         System.out.println("Approach 2");
         System.out.println("Repeating element: ");
-        for(int i=0; i<arr.length; i++){
+        for (int i = 0; i < arr.length; i++) {
             int absVal = Math.abs(arr[i]);
-            if(arr[absVal - 1] > 0){
+            if (arr[absVal - 1] > 0) {
                 arr[absVal - 1] = -arr[absVal - 1];
-            }else {
+            } else {
                 System.out.println(absVal);
             }
         }
-        
+
         System.out.println("Missing element: ");
-        for(int i=0; i<arr.length; i++){
-            if(arr[i] > 0){
-                System.out.println(i+1);
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] > 0) {
+                System.out.println(i + 1);
             }
         }
-        
+
     }
-    
-    public boolean checkIfPairPossibleInArrayHavingGivenDiff(int[] arr, int diff){
-        
+
+    public boolean checkIfPairPossibleInArrayHavingGivenDiff(int[] arr, int diff) {
+
         //..................T; O(N)
         //..................S: O(N)
-        
         Set<Integer> set = new HashSet<>();
-        for(int i=0; i<arr.length; i++){
+        for (int i = 0; i < arr.length; i++) {
             //arr[x] - arr[y] = diff
             //arr[x] = diff + arr[y]
             //if set.contains(arr[y]) then pair is possible
-            if(set.contains(arr[i])){
+            if (set.contains(arr[i])) {
                 return true;
             }
-            
+
             //arr[x] = arr[y] +diff
             set.add(arr[i] + diff);
-            
+
         }
-        
+
         return false;
-        
+
     }
 
     private int[] KMP_PatternMatching_Algorithm_LPSArray(String pattern, int size) {
@@ -4170,7 +4226,7 @@ public class DSA450Questions {
             return 1;
         }
 
-        if (K <= 0) {
+        if (K < 0) {
             return 0;
         }
 
@@ -4870,13 +4926,13 @@ public class DSA450Questions {
 
     }
 
-    private boolean detectCycleInGraphDFS_Helper(List<List<Integer>> adjList, int vertex, int parent, boolean[] visited) {
+    private boolean detectCycleInUndirectedGraphDFS_Helper(List<List<Integer>> adjList, int vertex, int parent, boolean[] visited) {
         visited[vertex] = true;
 
         List<Integer> childrens = adjList.get(vertex);
         for (int childVertex : childrens) {
             if (visited[childVertex] != true) {
-                if (detectCycleInGraphDFS_Helper(adjList, childVertex, vertex, visited)) {
+                if (detectCycleInUndirectedGraphDFS_Helper(adjList, childVertex, vertex, visited)) {
                     return true;
                 }
             } else if (childVertex != parent) {
@@ -4886,12 +4942,12 @@ public class DSA450Questions {
         return false;
     }
 
-    public boolean detectCycleInGraphDFS_Graph(int V, List<List<Integer>> adjList) {
+    public boolean detectCycleInUndirectedGraphDFS_Graph(int V, List<List<Integer>> adjList) {
 
         boolean[] visited = new boolean[V];
         for (int u = 0; u < V; u++) {
             if (visited[u] != true) {
-                if (detectCycleInGraphDFS_Helper(adjList, u, -1, visited)) {
+                if (detectCycleInUndirectedGraphDFS_Helper(adjList, u, -1, visited)) {
                     return true;
                 }
             }
@@ -4928,6 +4984,109 @@ public class DSA450Questions {
             System.out.print(resultStack.pop() + " ");
         }
         System.out.println();
+    }
+
+    public boolean detectCycleInDirectedGraphDFS_Helper(List<List<Integer>> adjList, int vertex,
+            boolean[] visited, boolean[] recurStack) {
+
+        if (recurStack[vertex]) {
+            return true;
+        }
+
+        if (visited[vertex]) {
+            return false;
+        }
+
+        recurStack[vertex] = true;
+        visited[vertex] = true;
+
+        List<Integer> childrens = adjList.get(vertex);
+        if (childrens != null && childrens.size() > 0) {
+            for (int childVertex : childrens) {
+                if (detectCycleInDirectedGraphDFS_Helper(adjList, childVertex, visited, recurStack)) {
+                    return true;
+                }
+            }
+        }
+        recurStack[vertex] = false;
+        return false;
+
+    }
+
+    public boolean detectCycleInDirectedGraphDFS_Graph(int V, List<List<Integer>> adjList) {
+        boolean[] visited = new boolean[V];
+        boolean[] recurStack = new boolean[V];
+        for (int u = 0; u < V; u++) {
+            if (detectCycleInDirectedGraphDFS_Helper(adjList, u, visited, recurStack)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void floodFill_Helper(int[][] image, int srcR, int srcC,
+            int srcColor, int newColor, boolean[][] visited) {
+
+        //bounds check
+        if (srcR < 0 || srcR >= image.length || srcC < 0 || srcC >= image[srcR].length
+                || image[srcR][srcC] != srcColor
+                || visited[srcR][srcC] == true) {
+            return;
+        }
+
+        //mark it as visited first
+        visited[srcR][srcC] = true;
+
+        //do dfs in 4 adjacent dir
+        //UP
+        floodFill_Helper(image, srcR - 1, srcC, srcColor, newColor, visited);
+
+        //DOWN
+        floodFill_Helper(image, srcR + 1, srcC, srcColor, newColor, visited);
+
+        //LEFT
+        floodFill_Helper(image, srcR, srcC - 1, srcColor, newColor, visited);
+
+        //RIGHT
+        floodFill_Helper(image, srcR, srcC + 1, srcColor, newColor, visited);
+
+        //at this point we can say we can't go any deep in dfs
+        //start the flood fill and recurse back
+        if (image[srcR][srcC] == srcColor) {
+            image[srcR][srcC] = newColor;
+        }
+
+        //we have reached the last srcR and srcC where we can't go any further
+        //probably we have flood filled that coordinate also
+        //we must reverse the state of the visited coordinate back
+        visited[srcR][srcC] = false;
+
+    }
+
+    public void floodFill(int[][] image, int srcR, int srcC, int newColor) {
+
+        //actual
+        System.out.println();
+        for (int[] r : image) {
+            for (int c : r) {
+                System.out.print(c + "\t");
+            }
+            System.out.println();
+        }
+
+        int srcColor = image[srcR][srcC];
+        boolean[][] visited = new boolean[image.length][image[0].length];
+        floodFill_Helper(image, srcR, srcC, srcColor, newColor, visited);
+
+        //output
+        System.out.println("output: ");
+        for (int[] r : image) {
+            for (int c : r) {
+                System.out.print(c + "\t");
+            }
+            System.out.println();
+        }
+
     }
 
     public void minimumCostToFillGivenBag_DP_Memoization(int[] cost, int W) {
@@ -6205,17 +6364,22 @@ public class DSA450Questions {
 //        obj.characterAddedAtFrontToMakeStringPallindrome_2("ABA"); //KMP based
         //......................................................................
 //        Row: 360
-//        System.out.println("Detect cycle in undirected graph");
-//        List<List<Integer>> adjList = new ArrayList<>();
-//        adjList.add(0, Arrays.asList(1, 2));
+//        System.out.println("Detect cycle in undirected graph DFS");
+//        //https://www.geeksforgeeks.org/detect-cycle-undirected-graph/
+//        List<List<Integer>> adjList = new ArrayList<>(); //CYCLE //0 <--> 1 <--> 2 <--> 0
+//        adjList.add(0, Arrays.asList(1, 2)); 
 //        adjList.add(1, Arrays.asList(0, 2));
 //        adjList.add(2, Arrays.asList(0, 1));
-//        System.out.println("Is there a cycle in undirected graph: " + obj.detectCycleInGraphDFS_Graph(adjList.size(), adjList));
-//        adjList = new ArrayList<>(); //NO CYCLE
+//        System.out.println("Is there a cycle in undirected graph: " + obj.detectCycleInUndirectedGraphDFS_Graph(adjList.size(), adjList));
+//        adjList = new ArrayList<>(); //NO CYCLE 0 <--> 1 <--> 2
 //        adjList.add(0, Arrays.asList(1));
 //        adjList.add(1, Arrays.asList(0, 2));
-//        adjList.add(2, Arrays.asList());
-//        System.out.println("Is there a cycle in undirected graph: " + obj.detectCycleInGraphDFS_Graph(adjList.size(), adjList));
+//        adjList.add(2, Arrays.asList(1));
+//        System.out.println("Is there a cycle in undirected graph: " + obj.detectCycleInUndirectedGraphDFS_Graph(adjList.size(), adjList));
+//        adjList = new ArrayList<>(); //CYCLE //FAIL CASE // 0 <--> 1
+//        adjList.add(0, Arrays.asList(1));
+//        adjList.add(1, Arrays.asList(0));
+//        System.out.println("Is there a cycle in undirected graph: " + obj.detectCycleInUndirectedGraphDFS_Graph(adjList.size(), adjList));
         //......................................................................
 //        Row: 368
 //        System.out.println("Topological sort graph");    
@@ -6385,16 +6549,73 @@ public class DSA450Questions {
 //                obj.checkIfPairPossibleInArrayHavingGivenDiff(new int[]{90, 70, 20, 80, 50}, 45));
         //......................................................................
 //        Row: 150
-        System.out.println("Intersection point in two given linked list (by ref linkage)");
-        Node<Integer> common = new Node<>(15);
-        common.setNext(new Node<>(30));
-        Node<Integer> node1 = new Node<>(3);
-        node1.setNext(new Node<>(9));
-        node1.getNext().setNext(new Node<>(6));
-        node1.getNext().getNext().setNext(common);
-        Node<Integer> node2 = new Node<>(10);
-        node2.setNext(common);
-        obj.intersectionPointOfTwoLinkedListByRef(node1, node2);
+//        System.out.println("Intersection point in two given linked list (by ref linkage)");
+//        Node<Integer> common = new Node<>(15);
+//        common.setNext(new Node<>(30));
+//        Node<Integer> node1 = new Node<>(3);
+//        node1.setNext(new Node<>(9));
+//        node1.getNext().setNext(new Node<>(6));
+//        node1.getNext().getNext().setNext(common);
+//        Node<Integer> node2 = new Node<>(10);
+//        node2.setNext(common);
+//        obj.intersectionPointOfTwoLinkedListByRef(node1, node2);
+        //......................................................................
+//        Row: 359
+//        System.out.println("Detect cycle in directed graph using DFS");
+//        //https://www.geeksforgeeks.org/detect-cycle-in-a-graph/
+//        List<List<Integer>> adjList = new ArrayList<>();
+//        adjList.add(0, Arrays.asList(1)); //CYCLE 0 --> 1 --> 2 --> 0
+//        adjList.add(1, Arrays.asList(2));
+//        adjList.add(2, Arrays.asList(0));
+//        System.out.println("Is there a cycle in directed graph: " + obj.detectCycleInDirectedGraphDFS_Graph(adjList.size(), adjList));
+//        adjList = new ArrayList<>(); //NO CYCLE // 0 --> 1 --> 2
+//        adjList.add(0, Arrays.asList(1));
+//        adjList.add(1, Arrays.asList(2));
+//        adjList.add(2, Arrays.asList());
+//        System.out.println("Is there a cycle in directed graph: " + obj.detectCycleInDirectedGraphDFS_Graph(adjList.size(), adjList));
+//        adjList = new ArrayList<>(); //CYCLE // 0 --> 1 --> 0
+//        adjList.add(0, Arrays.asList(1));
+//        adjList.add(1, Arrays.asList(0));
+//        System.out.println("Is there a cycle in directed graph: " + obj.detectCycleInDirectedGraphDFS_Graph(adjList.size(), adjList));
+        //......................................................................
+//        Row: 363
+//        System.out.println("Flood fill");
+//        int[][] image = new int[][]{
+//            {1,1,1},
+//            {1,1,0},
+//            {1,0,1}
+//        };
+//        obj.floodFill(image, 1, 1, 2);
+//        image = new int[][]{
+//            {0,0,0},
+//            {0,0,0}
+//        };
+//        obj.floodFill(image, 0, 0, 2);
+//        image = new int[][]{
+//            {0,0,0,0,0},
+//            {0,1,1,1,0},
+//            {0,1,1,1,0},
+//            {0,1,1,1,0},
+//            {0,0,0,0,0},
+//        };
+//        obj.floodFill(image, 2, 2, 3);
+        //......................................................................
+//        Row: 49
+        System.out.println("Maximum size of rectangle in binary matrix");
+        int[][] mat = new int[][]{
+            { 0, 1, 1, 0 },
+            { 1, 1, 1, 1 },
+            { 1, 1, 1, 1 },
+            { 1, 1, 0, 0 },
+        };
+        obj.maxAreaOfRectangleInBinaryMatrix(mat);
+        mat = new int[][]{
+            { 0, 0, 0, 0 },
+            { 0, 1, 1, 0 },
+            { 0, 1, 1, 0 },
+            { 0, 0, 0, 0 },
+        };
+        obj.maxAreaOfRectangleInBinaryMatrix(mat);
     }
 
 }
