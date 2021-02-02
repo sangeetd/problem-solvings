@@ -783,6 +783,80 @@ public class DSA450Questions {
 
     }
 
+    public void mergeIntervals_1(int[][] intervals) {
+
+        //.................................T: O(N.LogN)
+        System.out.println("approach 1");
+        List<int[]> result = new ArrayList<>();
+
+        if (intervals == null || intervals.length == 0) {
+            //return result.toArray(new int[0][]);
+            return;
+        }
+
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+        int start = intervals[0][0];
+        int end = intervals[0][1];
+
+        for (int i = 1; i < intervals.length; i++) {
+
+            int start_ = intervals[i][0];
+            int end_ = intervals[i][1];
+
+            //no overlapp situation
+            if (end < start_) {
+                result.add(new int[]{start, end});
+                start = start_;
+                end = end_;
+            } else if (end_ >= end) {
+                end = end_;
+            }
+
+        }
+
+        //final pair
+        result.add(new int[]{start, end});
+        //output:
+        int[][] output = result.toArray(new int[result.size()][]);
+        for (int[] r : output) {
+            System.out.print("[");
+            for (int c : r) {
+                System.out.print(c + " ");
+            }
+            System.out.println("]");
+            System.out.println();
+        }
+
+    }
+
+    public void mergeIntervals_2(int[][] intervals) {
+
+        //.................................T: O(N.LogN)
+        System.out.println("approach 2");
+        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));
+        LinkedList<int[]> merged = new LinkedList<>();
+        for (int[] interval : intervals) {
+
+            if (merged.isEmpty() || merged.getLast()[1] < interval[0]) {
+                merged.add(interval);
+            } else {
+                merged.getLast()[1] = Math.max(merged.getLast()[1], interval[1]);
+            }
+        }
+
+        //output:
+        int[][] output = merged.toArray(new int[merged.size()][]);
+        for (int[] r : output) {
+            System.out.print("[");
+            for (int c : r) {
+                System.out.print(c + " ");
+            }
+            System.out.println("]");
+            System.out.println();
+        }
+
+    }
+
     public void rotateMatrixClockWise90Deg(int[][] mat) {
 
         int row = mat.length;
@@ -811,7 +885,7 @@ public class DSA450Questions {
     }
 
     private int areaPerRow(int[] hist) {
-        
+
         //same as laregstAreaHistogram method
         Stack<Integer> stack = new Stack<>();
         int n = hist.length;
@@ -835,7 +909,7 @@ public class DSA450Questions {
             areaWithTop = hist[top] * (stack.isEmpty() ? i : i - stack.peek() - 1);
             maxArea = Math.max(maxArea, areaWithTop);
         }
-        
+
         return maxArea;
 
     }
@@ -843,30 +917,102 @@ public class DSA450Questions {
     public void maxAreaOfRectangleInBinaryMatrix(int[][] mat) {
 
         //problem statment & sol: https://www.geeksforgeeks.org/maximum-size-rectangle-binary-sub-matrix-1s/
-        
         //find max area of per row int the matrix
         //each row in the matrix is histogram
         //use max area histogram
         int R = mat.length;
         int C = mat[0].length;
-        
+
         int maxArea = areaPerRow(mat[0]);
-        
-        for(int r=1; r<R; r++){
-            for(int c=0; c<C; c++){
-                
-                if(mat[r][c] == 1){
-                    mat[r][c] += mat[r-1][c];
+
+        for (int r = 1; r < R; r++) {
+            for (int c = 0; c < C; c++) {
+
+                if (mat[r][c] == 1) {
+                    mat[r][c] += mat[r - 1][c];
                 }
-                
+
                 maxArea = Math.max(maxArea, areaPerRow(mat[r]));
-                
+
             }
         }
 
         //output:
-        System.out.println("Max area in binary matrix: "+maxArea);
-        
+        System.out.println("Max area in binary matrix: " + maxArea);
+
+    }
+
+    public void maximumOnesInRowOfABinarySortedMatrix_1(int[][] mat) {
+
+        //.....................................T; O(M*N)
+        //problem statement: https://www.geeksforgeeks.org/find-the-row-with-maximum-number-1s/
+        int maxOnes = 0;
+        int index = 0;
+        for (int i = 0; i < mat.length; i++) {
+
+            int onePerRow = areaPerRow(mat[i]);
+            if (maxOnes < onePerRow) {
+                maxOnes = onePerRow;
+                index = i;
+            }
+        }
+
+        //output;
+        System.out.println("Max 1(s) found at index: " + (maxOnes == 0 ? -1 : index) + " counts of is are: " + maxOnes);
+
+    }
+
+    public void maximumOnesInRowOfABinarySortedMatrix_2(int[][] mat) {
+
+        //............................T: O(M.LogN)
+        //OPTIMISED
+        int maxOnes = 0;
+        int index = 0;
+        for (int r = 0; r < mat.length; r++) {
+            int C = mat[r].length;
+            int firstIndexOfOne = findFirstOccurenceKInSortedArray(mat[r], 1, 0, C - 1, C);
+
+            //if no index is found
+            if (firstIndexOfOne == -1) {
+                continue;
+            }
+
+            int onePerRow = C - firstIndexOfOne;
+            if (maxOnes < onePerRow) {
+                maxOnes = onePerRow;
+                index = r;
+            }
+        }
+
+        //output;
+        System.out.println("Max 1(s) found at index: " + (maxOnes == 0 ? -1 : index) + " counts of is are: " + maxOnes);
+    }
+
+    public void findAValueInRowWiseSortedMatrix(int[][] mat, int K) {
+
+        int M = mat.length;
+        int N = mat[0].length;
+
+        int i = 0;
+        int j = N - 1;
+
+        //search starts from top right corner
+        while (i < M && j >= 0) {
+
+            if (mat[i][j] == K) {
+                System.out.println("Found at: " + i + ", " + j);
+                return;
+            } else if (K < mat[i][j]) {
+                j--;
+            } else {
+                i++;
+            }
+
+        }
+
+        //K is not there in the matrix at all
+        System.out.println("Not found");
+
     }
 
     public String reverseString(String str) {
@@ -1494,6 +1640,32 @@ public class DSA450Questions {
         //output
         System.out.println("Count of the given string is: " + countOccurenceOfGivenStringInCharArray_Count);
 
+    }
+    
+    private void printAllSubSequencesOfAString_Helper(String str, int start, int N, 
+            String current, Set<String> subseq){
+        
+        if(start == N){
+            subseq.add(current);
+            return;
+        }
+        
+        for(int i = start; i<N; i++){
+            printAllSubSequencesOfAString_Helper(str, i+1, N, current+str.charAt(i), subseq);
+            printAllSubSequencesOfAString_Helper(str, i+1, N, current, subseq);
+        }
+        
+        
+    }
+    
+    public void printAllSubSequencesOfAString(String str){
+        
+        int N = str.length();
+        Set<String> subseq = new HashSet<>();
+        printAllSubSequencesOfAString_Helper(str, 0, N, "", subseq);
+        
+        //output:
+        System.out.println("All possible subsequences of string: "+subseq);
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -3327,26 +3499,51 @@ public class DSA450Questions {
          }
 
          }*/
-        List<TreeNode> q = new ArrayList<>();
-        q.add(root);
-        while (!q.isEmpty()) {
+        /*List<TreeNode> q = new ArrayList<>();
+         q.add(root);
+         while (!q.isEmpty()) {
 
-            TreeNode curr = q.remove(0);
+         TreeNode curr = q.remove(0);
 
+         if (curr.getRight() != null) {
+         q.add(0, curr.getRight());
+         }
+
+         if (curr.getLeft() != null) {
+         q.add(0, curr.getLeft());
+         }
+
+         if (!q.isEmpty()) {
+         curr.setRight(q.get(0));
+         curr.setLeft(null);
+         }
+
+         }*/
+        //using LIFO stack
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(root);
+        while (!stack.isEmpty()) {
+
+            TreeNode curr = stack.pop();
+
+            //we need left at peek of stack so pushing right first
+            //and then left so that left can be at peek
             if (curr.getRight() != null) {
-                q.add(0, curr.getRight());
+                stack.push(curr.getRight());
             }
 
             if (curr.getLeft() != null) {
-                q.add(0, curr.getLeft());
+                stack.push(curr.getLeft());
             }
 
-            if (!q.isEmpty()) {
-                curr.setRight(q.get(0));
+            if (!stack.isEmpty()) {
+
+                curr.setRight(stack.peek());
                 curr.setLeft(null);
             }
 
         }
+
         //output:
         new BinaryTree(root).treeBFS();
         System.out.println();
@@ -6027,13 +6224,14 @@ public class DSA450Questions {
 //        obj.kLargestElementInArray(new int[]{12, 5, 787, 1, 23}, 2);
 //        obj.kLargestElementInArray(new int[]{1, 23, 12, 9, 30, 2, 50}, 3);
         //......................................................................
-//        Row: 20
+//        Row: 20, 70
 //        System.out.println("Next permutation");
 //        //https://leetcode.com/problems/next-permutation/solution/
 //        obj.nextPermutation(new int[]{1,2,3});
 //        obj.nextPermutation(new int[]{4,3,2,1});
 //        obj.nextPermutation(new int[]{1,3,1,4,7,6,2});
 //        obj.nextPermutation(new int[]{2,7,4,3,2});
+//        obj.nextPermutation(new int[]{1, 2, 3, 6, 5, 4});
         //......................................................................
 //        Row: 27
 //        System.out.println("Factorial of large number");
@@ -6143,7 +6341,7 @@ public class DSA450Questions {
 //        obj.findPredecessorAndSuccessorInBST(root1, 10); //ONLY PREDECESSOR IS POSSIBLE
 //        obj.findPredecessorAndSuccessorInBST(root1, -1); //ONLY SUCCESSOR IS POSSIBLE
         //......................................................................
-//        Row: 424
+//        Row: 424, 64
 //        System.out.println("Longest Repeating Subsequence DP problem");
 //        System.out.println("Longest repeating subsequence: "+obj.longestRepeatingSubsequence_Recursion("axxxy", 5)); //xx, xx
 //        obj.longestRepeatingSubsequence_DP_Memoization("axxxy"); //xx, xx
@@ -6601,21 +6799,68 @@ public class DSA450Questions {
 //        obj.floodFill(image, 2, 2, 3);
         //......................................................................
 //        Row: 49
-        System.out.println("Maximum size of rectangle in binary matrix");
-        int[][] mat = new int[][]{
-            { 0, 1, 1, 0 },
-            { 1, 1, 1, 1 },
-            { 1, 1, 1, 1 },
-            { 1, 1, 0, 0 },
-        };
-        obj.maxAreaOfRectangleInBinaryMatrix(mat);
-        mat = new int[][]{
-            { 0, 0, 0, 0 },
-            { 0, 1, 1, 0 },
-            { 0, 1, 1, 0 },
-            { 0, 0, 0, 0 },
-        };
-        obj.maxAreaOfRectangleInBinaryMatrix(mat);
+//        System.out.println("Maximum size of rectangle in binary matrix");
+//        int[][] mat = new int[][]{
+//            {0, 1, 1, 0},
+//            {1, 1, 1, 1},
+//            {1, 1, 1, 1},
+//            {1, 1, 0, 0},};
+//        obj.maxAreaOfRectangleInBinaryMatrix(mat);
+//        mat = new int[][]{
+//            {0, 0, 0, 0},
+//            {0, 1, 1, 0},
+//            {0, 1, 1, 0},
+//            {0, 0, 0, 0},};
+//        obj.maxAreaOfRectangleInBinaryMatrix(mat);
+        //......................................................................
+//        Row: 19
+//        System.out.println("Merge intervals");
+//        int[][] intervals = new int[][]{
+//            {1, 3}, {2, 6}, {8, 10}, {15, 18}
+//        };
+//        obj.mergeIntervals_1(intervals);
+//        obj.mergeIntervals_2(intervals);
+//        intervals = new int[][]{
+//            {1, 4}, {4, 5}
+//        };
+//        obj.mergeIntervals_1(intervals);
+//        obj.mergeIntervals_2(intervals);
+        //......................................................................
+//        Row: 47
+//        System.out.println("Row with maximum 1s in the matrix");
+//        //https://www.geeksforgeeks.org/find-the-row-with-maximum-number-1s/
+//        int[][] mat = new int[][]{
+//            {0, 1, 1, 1},
+//            {0, 0, 1, 1},
+//            {1, 1, 1, 1},
+//            {0, 0, 0, 0}
+//        };
+//        obj.maximumOnesInRowOfABinarySortedMatrix_1(mat);
+//        obj.maximumOnesInRowOfABinarySortedMatrix_2(mat); //OPTIMISED
+//        mat = new int[][]{
+//            {0, 0, 0, 0}
+//        };
+//        obj.maximumOnesInRowOfABinarySortedMatrix_1(mat);
+//        obj.maximumOnesInRowOfABinarySortedMatrix_2(mat); //OPTIMISED
+        //......................................................................
+//        Row: 45
+//        System.out.println("Find a value in row wise sorted matrix");
+//        int[][] mat = new int[][]{
+//            {1, 3, 5, 7}, 
+//            {10, 11, 16, 20}, 
+//            {23, 30, 34, 60}
+//        };
+//        obj.findAValueInRowWiseSortedMatrix(mat, 13);
+//        mat = new int[][]{
+//            {1, 3, 5, 7}, 
+//            {10, 11, 16, 20}, 
+//            {23, 30, 34, 60}
+//        };
+//        obj.findAValueInRowWiseSortedMatrix(mat, 11);
+        //......................................................................
+//        Row: 65
+        System.out.println("Print all subsequences of the given string");
+        obj.printAllSubSequencesOfAString("abc");
     }
 
 }
