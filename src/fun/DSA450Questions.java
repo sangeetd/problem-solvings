@@ -1015,6 +1015,55 @@ public class DSA450Questions {
 
     }
 
+    public void spiralMatrixTraversal(int[][] mat) {
+
+        List<Integer> result = new ArrayList<>();
+
+        int R = mat.length;
+        int C = mat[0].length;
+
+        int top = 0; // top row
+        int bottom = R - 1; //bottom row
+        int left = 0; //left col
+        int right = C - 1; //right col
+        int totalElement = R * C;
+
+        //with each row and col processing we will shrink the matrix bounds (top++, bottom--, left++, right--)
+        //result list is going to hold all the elements in the matrix
+        while (result.size() < totalElement) {
+
+            //get the top row from left to right
+            for (int i = left; i <= right && result.size() < totalElement; i++) {
+                result.add(mat[top][i]); //top row and ith col left to right
+            }
+            top++; //since we traversed top row now to next row next time.
+
+            //top to bottom but right col
+            for (int i = top; i <= bottom && result.size() < totalElement; i++) {
+                result.add(mat[i][right]); //top to bottom but right col
+            }
+            right--; //now till here we have traversed the very right col of mat. for next time right col is prev
+
+            //right to left but bottom row only
+            for (int i = right; i >= left && result.size() < totalElement; i--) {
+                result.add(mat[bottom][i]); //bottom row from right to left
+            }
+            bottom--; //completed bottom row also next time bottom to be prev one
+
+            //bottom to top but only left col
+            for (int i = bottom; i >= top && result.size() < totalElement; i--) {
+                result.add(mat[i][left]); //left col
+            }
+            left++; //for next itr left will be moved ahead
+
+        }
+        
+        
+        //output:
+        System.out.println("Spiral matrix: "+result);
+
+    }
+
     public String reverseString(String str) {
 
         int len = str.length();
@@ -1641,31 +1690,30 @@ public class DSA450Questions {
         System.out.println("Count of the given string is: " + countOccurenceOfGivenStringInCharArray_Count);
 
     }
-    
-    private void printAllSubSequencesOfAString_Helper(String str, int start, int N, 
-            String current, Set<String> subseq){
-        
-        if(start == N){
+
+    private void printAllSubSequencesOfAString_Helper(String str, int start, int N,
+            String current, Set<String> subseq) {
+
+        if (start == N) {
             subseq.add(current);
             return;
         }
-        
-        for(int i = start; i<N; i++){
-            printAllSubSequencesOfAString_Helper(str, i+1, N, current+str.charAt(i), subseq);
-            printAllSubSequencesOfAString_Helper(str, i+1, N, current, subseq);
+
+        for (int i = start; i < N; i++) {
+            printAllSubSequencesOfAString_Helper(str, i + 1, N, current + str.charAt(i), subseq);
+            printAllSubSequencesOfAString_Helper(str, i + 1, N, current, subseq);
         }
-        
-        
+
     }
-    
-    public void printAllSubSequencesOfAString(String str){
-        
+
+    public void printAllSubSequencesOfAString(String str) {
+
         int N = str.length();
         Set<String> subseq = new HashSet<>();
         printAllSubSequencesOfAString_Helper(str, 0, N, "", subseq);
-        
+
         //output:
-        System.out.println("All possible subsequences of string: "+subseq);
+        System.out.println("All possible subsequences of string: " + subseq);
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -2471,6 +2519,35 @@ public class DSA450Questions {
 
     }
 
+    public boolean checkIfLinkedListPallindrome(Node<Integer> node){
+        
+        //empty list or 1 node list is by default true
+        if(node == null || node.getNext() == null){
+            return true;
+        }
+        
+        Node<Integer> curr = node;
+        Stack<Node<Integer>> stack = new Stack<>();
+        while(curr != null){
+            stack.push(curr);
+            curr = curr.getNext();
+        }
+        
+        //pop stack and start checking from the head of list
+        while(!stack.isEmpty()){
+            
+            Node<Integer> popped = stack.pop();
+            if(node.getData() != popped.getData()){
+                return false;
+            }
+            node = node.getNext();
+        }
+        
+        //if while loop doesn't prove false
+        return true;
+        
+    }
+    
     public void levelOrderTraversal_Iterative(TreeNode root) {
 
         if (root == null) {
@@ -3720,7 +3797,7 @@ public class DSA450Questions {
         List<Integer> l1 = new ArrayList<>();
         List<Integer> l2 = new ArrayList<>();
 
-        while (!q1.isEmpty() && !q1.isEmpty()) {
+        while (!q1.isEmpty() && !q2.isEmpty()) {
 
             TreeNode<Integer> curr1 = q1.poll();
             TreeNode<Integer> curr2 = q2.poll();
@@ -4987,6 +5064,7 @@ public class DSA450Questions {
             List<Integer> childrens = adjList.get(node);
             if (childrens != null && childrens.size() > 0) {
                 //reverse loop so the first element goes on peek of stack!
+                //doesn't matter if you loop it normally
                 for (int i = childrens.size() - 1; i >= 0; i--) {
                     int childVertex = childrens.get(i);
                     if (visited[childVertex] != true) {
@@ -5080,8 +5158,6 @@ public class DSA450Questions {
             return;
         }
 
-        int original = grid[x][y];
-        grid[x][y] = 0;
         visited[x][y] = true;
         for (int i = 0; i < dir.length; i++) {
 
@@ -5090,9 +5166,6 @@ public class DSA450Questions {
             numberOfIslands_Helper(grid, x_, y_, dir, visited);
 
         }
-
-        grid[x][y] = original;
-
     }
 
     public void numberOfIslands_Graph(int[][] grid) {
@@ -6514,10 +6587,19 @@ public class DSA450Questions {
         //......................................................................
 //        Row: 361, 275
 //        System.out.println("Search in maze");
-//        int[][] maze = {{1, 0, 0, 0},
-//                        {1, 1, 0, 1}, 
-//                        {1, 1, 0, 0},
-//                        {0, 1, 1, 1}};
+//        int[][] maze = new int[][]{
+//            {1, 0, 0, 0},
+//            {1, 1, 0, 1},
+//            {1, 1, 0, 0},
+//            {0, 1, 1, 1}
+//        };
+//        obj.findPathRatInMaze_Graph(maze, maze.length);
+//        maze = new int[][]{
+//            {1, 0, 0, 0},
+//            {1, 1, 0, 1},
+//            {1, 1, 0, 0},
+//            {0, 1, 1, 0}
+//        };
 //        obj.findPathRatInMaze_Graph(maze, maze.length);
         //......................................................................
 //        Row: 371
@@ -6616,6 +6698,7 @@ public class DSA450Questions {
 //        System.out.println("Largest area of histogram");
 //        //https://www.geeksforgeeks.org/largest-rectangle-under-histogram/
 //        obj.largestAreaInHistogram(new int[]{6, 2, 5, 4, 5, 1, 6});
+//        obj.largestAreaInHistogram(new int[]{6,9,8});
         //......................................................................
 //        Row: 418
 //        System.out.println("Friends pairing DP problem");
@@ -6859,8 +6942,38 @@ public class DSA450Questions {
 //        obj.findAValueInRowWiseSortedMatrix(mat, 11);
         //......................................................................
 //        Row: 65
-        System.out.println("Print all subsequences of the given string");
-        obj.printAllSubSequencesOfAString("abc");
+//        System.out.println("Print all subsequences of the given string");
+//        //https://www.geeksforgeeks.org/print-subsequences-string/
+//        obj.printAllSubSequencesOfAString("abc");
+//        obj.printAllSubSequencesOfAString("aaaa");
+        //......................................................................
+//        Row: 44
+//        System.out.println("Spiral matrix traversal");
+//        int[][] mat = new int[][]{
+//            {1, 2, 3, 4},
+//            {5, 6, 7, 8},
+//            {9, 10, 11, 12},
+//            {13, 14, 15, 16}
+//        };
+//        obj.spiralMatrixTraversal(mat);
+//        mat = new int[][]{
+//            {1, 2, 3, 4},
+//           {5, 6, 7, 8},
+//           {9, 10, 11, 12}
+//        };
+//        obj.spiralMatrixTraversal(mat);
+        //......................................................................
+//        Row: 156
+        System.out.println("Check singly linked list is pallindrome or not");
+        Node<Integer> node = new Node<>(1);
+        node.setNext(new Node<>(2));
+        node.getNext().setNext(new Node<>(1));
+        System.out.println("Is linked list pallindrome: "+obj.checkIfLinkedListPallindrome(node));
+        node = new Node<>(1);
+        node.setNext(new Node<>(2));
+        node.getNext().setNext(new Node<>(3));
+        System.out.println("Is linked list pallindrome: "+obj.checkIfLinkedListPallindrome(node));
+
     }
 
 }
