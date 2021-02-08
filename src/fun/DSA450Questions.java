@@ -742,7 +742,7 @@ public class DSA450Questions {
         for (int i = 0; i < n; i++) {
             sum += arr[i];
 
-            if (arr[i] == 0 || sum == 0 || set.add(sum)) {
+            if (arr[i] == 0 || sum == 0 || set.contains(sum)) {
                 return true;
             }
             set.add(sum);
@@ -927,13 +927,10 @@ public class DSA450Questions {
 
         for (int r = 1; r < R; r++) {
             for (int c = 0; c < C; c++) {
-
                 if (mat[r][c] == 1) {
                     mat[r][c] += mat[r - 1][c];
                 }
-
                 maxArea = Math.max(maxArea, areaPerRow(mat[r]));
-
             }
         }
 
@@ -1057,10 +1054,9 @@ public class DSA450Questions {
             left++; //for next itr left will be moved ahead
 
         }
-        
-        
+
         //output:
-        System.out.println("Spiral matrix: "+result);
+        System.out.println("Spiral matrix: " + result);
 
     }
 
@@ -1714,6 +1710,29 @@ public class DSA450Questions {
 
         //output:
         System.out.println("All possible subsequences of string: " + subseq);
+    }
+
+    public boolean balancedParenthesisEvaluation(String s) {
+
+        Stack<Character> stack = new Stack<>();
+        for (char ch : s.toCharArray()) {
+
+            if (ch == '{' || ch == '[' || ch == '(') {
+                stack.push(ch);
+                continue;
+            }else if (!stack.isEmpty() && stack.peek() == '(' && ch == ')') {
+                stack.pop();
+            }else if (!stack.isEmpty() && stack.peek() == '{' && ch == '}') {
+                stack.pop();
+            }else if (!stack.isEmpty() && stack.peek() == '[' && ch == ']') {
+                stack.pop();
+            }else {
+                return false;
+            }
+        }
+        
+        return stack.isEmpty();
+
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -2465,7 +2484,7 @@ public class DSA450Questions {
 
         int index = 0;
         Node<Integer> curr = node;
-        while (index++ < diff) {
+        while (index++ < diff) { //evaluates as index++ -> 0+1 -> 1 then 1 < diff
             curr = curr.getNext();
         }
         return curr;
@@ -2519,35 +2538,62 @@ public class DSA450Questions {
 
     }
 
-    public boolean checkIfLinkedListPallindrome(Node<Integer> node){
-        
+    public void intersectionPointOfTwoLinkedListByRef_HashBased(Node<Integer> node1, Node<Integer> node2) {
+
+        //................................T: O(N)
+        //................................S: O(N)
+        Set<Node<Integer>> set1 = new HashSet<>();
+        Node<Integer> curr = node1;
+        while (curr != null) {
+            set1.add(curr);
+            curr = curr.getNext();
+        }
+
+        int intersectedData = -1;
+        curr = node2;
+        while (curr != null) {
+
+            if (set1.contains(curr)) {
+                intersectedData = curr.getData();
+                break;
+            }
+            curr = curr.getNext();
+        }
+
+        //output:
+        System.out.println("Two linked list are intersected at (hashbased): " + intersectedData);
+
+    }
+
+    public boolean checkIfLinkedListPallindrome(Node<Integer> node) {
+
         //empty list or 1 node list is by default true
-        if(node == null || node.getNext() == null){
+        if (node == null || node.getNext() == null) {
             return true;
         }
-        
+
         Node<Integer> curr = node;
         Stack<Node<Integer>> stack = new Stack<>();
-        while(curr != null){
+        while (curr != null) {
             stack.push(curr);
             curr = curr.getNext();
         }
-        
+
         //pop stack and start checking from the head of list
-        while(!stack.isEmpty()){
-            
+        while (!stack.isEmpty()) {
+
             Node<Integer> popped = stack.pop();
-            if(node.getData() != popped.getData()){
+            if (node.getData() != popped.getData()) {
                 return false;
             }
             node = node.getNext();
         }
-        
+
         //if while loop doesn't prove false
         return true;
-        
+
     }
-    
+
     public void levelOrderTraversal_Iterative(TreeNode root) {
 
         if (root == null) {
@@ -3859,6 +3905,65 @@ public class DSA450Questions {
         //if none of the cond in while is false then all the levels in both tree are anagrams
         return true;
     }
+    
+    private boolean areTwoTreeIsoMorphic_Helper(TreeNode<Integer> root1, TreeNode<Integer> root2){
+        
+        if(root1 == null && root2 == null){
+            return true;
+        }
+        
+        if(root1 == null || root2 == null){
+            return false;
+        }
+        
+        return root1.getData() == root2.getData() 
+                && (
+         (areTwoTreeIsoMorphic_Helper(root1.getLeft(), root2.getRight()) && areTwoTreeIsoMorphic_Helper(root1.getRight(), root2.getLeft()))
+        || (areTwoTreeIsoMorphic_Helper(root1.getLeft(), root2.getLeft()) && areTwoTreeIsoMorphic_Helper(root1.getRight(), root2.getRight()))
+                );
+        
+    }
+    
+    public boolean areTwoTreeIsoMorphic(TreeNode<Integer> root1, TreeNode<Integer> root2){
+        return areTwoTreeIsoMorphic_Helper(root1, root2);
+    }
+    
+    private String findDuplicateSubtreeInAGivenTree_Inorder(TreeNode<Integer> root, 
+            Map<String, Integer> map, List<TreeNode<Integer>> subtrees){
+        
+        if(root == null){
+            return "";
+        }
+        
+        String str = "(";
+        str += findDuplicateSubtreeInAGivenTree_Inorder(root.getLeft(), map, subtrees);
+        str += String.valueOf(root.getData());
+        str += findDuplicateSubtreeInAGivenTree_Inorder(root.getRight(), map, subtrees);
+        str += ")";
+        
+//        System.out.println(str);
+        if(map.containsKey(str) && map.get(str) == 1){
+            //System.out.println(root.getData()+ " "); //print the starting node of suplicate subtree
+            subtrees.add(root);
+        }
+        
+        map.put(str, map.getOrDefault(str, 0) + 1);
+        
+        return str;
+        
+    }
+    
+    public void findDuplicateSubtreeInAGivenTree(TreeNode<Integer> root){
+        Map<String, Integer> map = new HashMap<>();
+        List<TreeNode<Integer>> subtrees = new ArrayList<>();
+        findDuplicateSubtreeInAGivenTree_Inorder(root, map, subtrees);
+        
+        //output:
+        //print level order of found subtrees
+        for(TreeNode<Integer> tree: subtrees){
+            levelOrderTraversal_Recursive(tree);
+        }
+    }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
@@ -4009,6 +4114,92 @@ public class DSA450Questions {
 
         //output:
         System.out.println("Max area of histogram: " + maxArea);
+
+    }
+
+    public void postfixExpressionEvaluation_SingleDigit(String expr) {
+
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 0; i < expr.length(); i++) {
+
+            char ch = expr.charAt(i);
+            if (Character.isDigit(ch)) {
+                stack.push(ch - '0');
+            } else {
+                int num1 = stack.pop();
+                int num2 = stack.pop();
+
+                switch (ch) {
+                    case '+':
+                        stack.push(num2 + num1);
+                        break;
+                    case '-':
+                        stack.push(num2 - num1);
+                        break;
+                    case '*':
+                        stack.push(num2 * num1);
+                        break;
+                    case '/':
+                        stack.push(num2 / num1);
+                        break;
+                }
+
+            }
+
+        }
+
+        //output:
+        System.out.println("Evaluation single digit expression: " + stack.pop());
+
+    }
+
+    public void postfixExpressionEvaluation_MultipleDigit(String expr) {
+
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 0; i < expr.length(); i++) {
+
+            char ch = expr.charAt(i);
+
+            //space is needed in expr to distinguish b/w 2 different multiple digit
+            if (ch == ' ') {
+                continue;
+            }
+
+            //if we found atleat one digit
+            //try to iterate i until we found a char ch which is not a digit
+            if (Character.isDigit(ch)) {
+                int createNum = 0;
+                while (Character.isDigit(expr.charAt(i))) {
+                    createNum = createNum * 10 + (expr.charAt(i) - '0');
+                    i++; //this to further iterate i and find digit char 
+                }
+//                i--; //just to balance to one iter back
+                stack.push(createNum);
+            } else {
+                int num1 = stack.pop();
+                int num2 = stack.pop();
+
+                switch (ch) {
+                    case '+':
+                        stack.push(num2 + num1);
+                        break;
+                    case '-':
+                        stack.push(num2 - num1);
+                        break;
+                    case '*':
+                        stack.push(num2 * num1);
+                        break;
+                    case '/':
+                        stack.push(num2 / num1);
+                        break;
+                }
+
+            }
+
+        }
+
+        //output:
+        System.out.println("Evaluation multiple digit expression: " + stack.pop());
 
     }
 
@@ -4362,6 +4553,53 @@ public class DSA450Questions {
 
         return false;
 
+    }
+    
+    private double squareRootOfANumber_BinarySearch(double n, double f, double l){
+        
+        if(l > f){
+            
+            double mid = f + (l - f)/2.0;
+            double sqr = mid*mid;
+            
+            if(sqr == n || Math.abs(n - sqr) < 0.00001){
+                return mid;
+            }else if(sqr < n){
+                return squareRootOfANumber_BinarySearch(n, mid, l);
+            }else {
+                return squareRootOfANumber_BinarySearch(n, f, mid);
+            }
+            
+        }
+        
+        return 1.0;
+        
+    }
+    
+    public double squareRootOfANumber(double n){
+        
+        if(n == 0.0 || n == 1.0){
+            return n;
+        }
+        
+        double i = 1;
+        while(true){
+            double sqr = i*i;
+            if(sqr == n){
+                return i;
+            }else if(sqr > n){
+                //at this point where sqr of i is > n then that means sqr root for n lies b/w 
+                // i-1 and i
+                //ex sqrt(3) == 1.73 (lie b/w 1 and 2)
+                // i = 1 sqr = 1*1 = 1
+                //i = 2 sqr = 2*2 = 4
+                //4 > n i.e 4 > 3 that means sqrt(3) lie in b/w 1 and 2
+                //so we will do binary search i-1, i (1, 2)
+                double res = squareRootOfANumber_BinarySearch(n, i-1, i);
+                return res;
+            }
+            i++;
+        }
     }
 
     private int[] KMP_PatternMatching_Algorithm_LPSArray(String pattern, int size) {
@@ -6808,6 +7046,7 @@ public class DSA450Questions {
 //        Row: 26
 //        System.out.println("Check if any sub array with sum 0 is present or not");
 //        System.out.println("Is there with subarray sum 0 "+obj.checkIfSubarrayWithSum0(new int[]{4, 2, -3, 1, 6}));
+//        System.out.println("Is there with subarray sum 0 "+obj.checkIfSubarrayWithSum0(new int[]{4, 2, 0, -1}));
         //......................................................................
 //        Row: 31
 //        System.out.println("Maximum profit by buying seling stocks atmost twice");
@@ -6830,7 +7069,7 @@ public class DSA450Questions {
 //                obj.checkIfPairPossibleInArrayHavingGivenDiff(new int[]{90, 70, 20, 80, 50}, 45));
         //......................................................................
 //        Row: 150
-//        System.out.println("Intersection point in two given linked list (by ref linkage)");
+//        System.out.println("Intersection point in two given linked list (by ref linkage) 2 approach");
 //        Node<Integer> common = new Node<>(15);
 //        common.setNext(new Node<>(30));
 //        Node<Integer> node1 = new Node<>(3);
@@ -6840,6 +7079,19 @@ public class DSA450Questions {
 //        Node<Integer> node2 = new Node<>(10);
 //        node2.setNext(common);
 //        obj.intersectionPointOfTwoLinkedListByRef(node1, node2);
+//        obj.intersectionPointOfTwoLinkedListByRef_HashBased(node1, node2);
+//        common = new Node<>(4);
+//        common.setNext(new Node<>(5));
+//        common.getNext().setNext(new Node<>(6));
+//        node1 = new Node<>(1);
+//        node1.setNext(new Node<>(2));
+//        node1.getNext().setNext(new Node<>(3));
+//        node1.getNext().getNext().setNext(common);
+//        node2 = new Node<>(10);
+//        node2.setNext(new Node<>(20));
+//        node2.getNext().setNext(common);
+//        obj.intersectionPointOfTwoLinkedListByRef(node1, node2);
+//        obj.intersectionPointOfTwoLinkedListByRef_HashBased(node1, node2);
         //......................................................................
 //        Row: 359
 //        System.out.println("Detect cycle in directed graph using DFS");
@@ -6964,16 +7216,71 @@ public class DSA450Questions {
 //        obj.spiralMatrixTraversal(mat);
         //......................................................................
 //        Row: 156
-        System.out.println("Check singly linked list is pallindrome or not");
-        Node<Integer> node = new Node<>(1);
-        node.setNext(new Node<>(2));
-        node.getNext().setNext(new Node<>(1));
-        System.out.println("Is linked list pallindrome: "+obj.checkIfLinkedListPallindrome(node));
-        node = new Node<>(1);
-        node.setNext(new Node<>(2));
-        node.getNext().setNext(new Node<>(3));
-        System.out.println("Is linked list pallindrome: "+obj.checkIfLinkedListPallindrome(node));
-
+//        System.out.println("Check singly linked list is pallindrome or not");
+//        Node<Integer> node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(1));
+//        System.out.println("Is linked list pallindrome: "+obj.checkIfLinkedListPallindrome(node));
+//        node = new Node<>(1);
+//        node.setNext(new Node<>(2));
+//        node.getNext().setNext(new Node<>(3));
+//        System.out.println("Is linked list pallindrome: "+obj.checkIfLinkedListPallindrome(node));
+        //......................................................................
+//        Row: 307
+//        System.out.println("Postfix expression evaluation");
+//        obj.postfixExpressionEvaluation_SingleDigit("23+");
+//        obj.postfixExpressionEvaluation_SingleDigit("231*+9-");
+//        obj.postfixExpressionEvaluation_MultipleDigit("10 20 +");
+//        obj.postfixExpressionEvaluation_MultipleDigit("100 200 * 10 /");
+//        obj.postfixExpressionEvaluation_MultipleDigit("100 200 + 10 / 1000 +");
+        //......................................................................
+//        Row: 71
+//        System.out.println("Balanced parenthesis evaluation");
+//        System.out.println(obj.balancedParenthesisEvaluation("()"));
+//        System.out.println(obj.balancedParenthesisEvaluation("({[]})"));
+//        System.out.println(obj.balancedParenthesisEvaluation(")}]"));
+//        System.out.println(obj.balancedParenthesisEvaluation("({)}"));
+        //......................................................................
+//        Row: 104
+//        System.out.println("Square root of a number");
+//        System.out.println("Square root of a number: "+obj.squareRootOfANumber(4));
+//        System.out.println("Square root of a number: "+obj.squareRootOfANumber(1));
+//        System.out.println("Square root of a number: "+obj.squareRootOfANumber(3));
+//        System.out.println("Square root of a number: "+obj.squareRootOfANumber(1.5));
+        //......................................................................
+//        Row: 211
+//        System.out.println("Tree isomorphic");
+//        //https://www.geeksforgeeks.org/tree-isomorphism-problem/
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.setRight(new TreeNode<>(3));
+//        TreeNode<Integer> root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode<>(3));
+//        root2.getLeft().setLeft(new TreeNode<>(4));
+//        root2.setRight(new TreeNode<>(2));
+//        System.out.println("Are two tres isomorphic: "+obj.areTwoTreeIsoMorphic(root1, root2));
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.setRight(new TreeNode<>(3));
+//        root2 = new TreeNode<>(1);
+//        root2.setLeft(new TreeNode<>(3));
+//        root2.setRight(new TreeNode<>(2));
+//        root2.getRight().setRight(new TreeNode<>(4));
+//        System.out.println("Are two tres isomorphic: "+obj.areTwoTreeIsoMorphic(root1, root2));
+        //......................................................................
+//        Row: 210
+        System.out.println("Duplicate subtrees in a tree");
+        //https://www.geeksforgeeks.org/find-duplicate-subtrees/
+        TreeNode<Integer> root1 = new TreeNode<>(1);
+        root1.setLeft(new TreeNode<>(2));
+        root1.getLeft().setLeft(new TreeNode<>(4));
+        root1.setRight(new TreeNode<>(3));
+        root1.getRight().setLeft(new TreeNode<>(2));
+        root1.getRight().getLeft().setLeft(new TreeNode<>(4));
+        root1.getRight().setRight(new TreeNode<>(4));
+        obj.findDuplicateSubtreeInAGivenTree(root1);
     }
 
 }
