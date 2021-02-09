@@ -857,6 +857,35 @@ public class DSA450Questions {
 
     }
 
+    public void minOperationsToMakeArrayPallindrome(int[] arr) {
+
+        //TWO POINTERS
+        int n = arr.length;
+        int i = 0;
+        int j = n - 1;
+        int minOpr = 0;
+        while (j >= i) {
+
+            if (arr[i] == arr[j]) {
+                i++;
+                j--;
+            } else if (arr[i] > arr[j]) {
+                j--;
+                arr[j] += arr[j + 1];
+                minOpr++;
+            } else {
+                i++;
+                arr[i] += arr[i - 1];
+                minOpr++;
+            }
+
+        }
+
+        //output:
+        System.out.println("Minimum operation to make array pallindrome: " + minOpr);
+
+    }
+
     public void rotateMatrixClockWise90Deg(int[][] mat) {
 
         int row = mat.length;
@@ -1720,17 +1749,17 @@ public class DSA450Questions {
             if (ch == '{' || ch == '[' || ch == '(') {
                 stack.push(ch);
                 continue;
-            }else if (!stack.isEmpty() && stack.peek() == '(' && ch == ')') {
+            } else if (!stack.isEmpty() && stack.peek() == '(' && ch == ')') {
                 stack.pop();
-            }else if (!stack.isEmpty() && stack.peek() == '{' && ch == '}') {
+            } else if (!stack.isEmpty() && stack.peek() == '{' && ch == '}') {
                 stack.pop();
-            }else if (!stack.isEmpty() && stack.peek() == '[' && ch == ']') {
+            } else if (!stack.isEmpty() && stack.peek() == '[' && ch == ']') {
                 stack.pop();
-            }else {
+            } else {
                 return false;
             }
         }
-        
+
         return stack.isEmpty();
 
     }
@@ -3905,64 +3934,122 @@ public class DSA450Questions {
         //if none of the cond in while is false then all the levels in both tree are anagrams
         return true;
     }
-    
-    private boolean areTwoTreeIsoMorphic_Helper(TreeNode<Integer> root1, TreeNode<Integer> root2){
-        
-        if(root1 == null && root2 == null){
+
+    private boolean areTwoTreeIsoMorphic_Helper(TreeNode<Integer> root1, TreeNode<Integer> root2) {
+
+        if (root1 == null && root2 == null) {
             return true;
         }
-        
-        if(root1 == null || root2 == null){
+
+        if (root1 == null || root2 == null) {
             return false;
         }
-        
-        return root1.getData() == root2.getData() 
-                && (
-         (areTwoTreeIsoMorphic_Helper(root1.getLeft(), root2.getRight()) && areTwoTreeIsoMorphic_Helper(root1.getRight(), root2.getLeft()))
-        || (areTwoTreeIsoMorphic_Helper(root1.getLeft(), root2.getLeft()) && areTwoTreeIsoMorphic_Helper(root1.getRight(), root2.getRight()))
-                );
-        
+
+        return root1.getData() == root2.getData()
+                && ((areTwoTreeIsoMorphic_Helper(root1.getLeft(), root2.getRight()) && areTwoTreeIsoMorphic_Helper(root1.getRight(), root2.getLeft()))
+                || (areTwoTreeIsoMorphic_Helper(root1.getLeft(), root2.getLeft()) && areTwoTreeIsoMorphic_Helper(root1.getRight(), root2.getRight())));
+
     }
-    
-    public boolean areTwoTreeIsoMorphic(TreeNode<Integer> root1, TreeNode<Integer> root2){
+
+    public boolean areTwoTreeIsoMorphic(TreeNode<Integer> root1, TreeNode<Integer> root2) {
         return areTwoTreeIsoMorphic_Helper(root1, root2);
     }
-    
-    private String findDuplicateSubtreeInAGivenTree_Inorder(TreeNode<Integer> root, 
-            Map<String, Integer> map, List<TreeNode<Integer>> subtrees){
-        
-        if(root == null){
+
+    private String findDuplicateSubtreeInAGivenTree_Inorder(TreeNode<Integer> root,
+            Map<String, Integer> map, List<TreeNode<Integer>> subtrees) {
+
+        if (root == null) {
             return "";
         }
-        
+
         String str = "(";
         str += findDuplicateSubtreeInAGivenTree_Inorder(root.getLeft(), map, subtrees);
         str += String.valueOf(root.getData());
         str += findDuplicateSubtreeInAGivenTree_Inorder(root.getRight(), map, subtrees);
         str += ")";
-        
+
 //        System.out.println(str);
-        if(map.containsKey(str) && map.get(str) == 1){
+        if (map.containsKey(str) && map.get(str) == 1) {
             //System.out.println(root.getData()+ " "); //print the starting node of suplicate subtree
             subtrees.add(root);
         }
-        
+
         map.put(str, map.getOrDefault(str, 0) + 1);
-        
+
         return str;
-        
+
     }
-    
-    public void findDuplicateSubtreeInAGivenTree(TreeNode<Integer> root){
+
+    public void findDuplicateSubtreeInAGivenTree(TreeNode<Integer> root) {
         Map<String, Integer> map = new HashMap<>();
         List<TreeNode<Integer>> subtrees = new ArrayList<>();
         findDuplicateSubtreeInAGivenTree_Inorder(root, map, subtrees);
-        
+
         //output:
         //print level order of found subtrees
-        for(TreeNode<Integer> tree: subtrees){
+        for (TreeNode<Integer> tree : subtrees) {
             levelOrderTraversal_Recursive(tree);
         }
+    }
+
+    private void allNodesAtKDistanceFromRoot(TreeNode<Integer> root, int level,
+            int K, List<Integer> result) {
+
+        if (root == null) {
+            return;
+        }
+
+        if (level == K) {
+            result.add(root.getData());
+        }
+
+        allNodesAtKDistanceFromRoot(root.getLeft(), level + 1, K, result);
+        allNodesAtKDistanceFromRoot(root.getRight(), level + 1, K, result);
+    }
+
+    private int printAllTheNodesAtKDistanceFromTargetNode_DFS(TreeNode<Integer> root, int target,
+            int K, List<Integer> result) {
+
+        if (root == null) {
+            return -1;
+        }
+
+        if (root.getData() == target) {
+            //search all the nodes at K dist below the target node
+            allNodesAtKDistanceFromRoot(root, 0, K, result);
+            return 1;
+        }
+
+        int left = printAllTheNodesAtKDistanceFromTargetNode_DFS(root.getLeft(), target, K, result);
+
+        if (left != -1) {
+            if (left == K) {
+                result.add(root.getData());
+            }
+            allNodesAtKDistanceFromRoot(root.getRight(), left + 1, K, result);
+            return left + 1;
+        }
+
+        int right = printAllTheNodesAtKDistanceFromTargetNode_DFS(root.getRight(), target, K, result);
+
+        if (right != -1) {
+            if (right == K) {
+                result.add(root.getData());
+            }
+            allNodesAtKDistanceFromRoot(root.getLeft(), right + 1, K, result);
+            return right + 1;
+        }
+
+        return -1;
+    }
+
+    public void printAllTheNodesAtKDistanceFromTargetNode(TreeNode<Integer> root, int target, int K) {
+
+        List<Integer> result = new ArrayList<>();
+        printAllTheNodesAtKDistanceFromTargetNode_DFS(root, target, K, result);
+        //output:
+        System.out.println("All nodes at K distance from target node: " + result);
+
     }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
@@ -4554,40 +4641,40 @@ public class DSA450Questions {
         return false;
 
     }
-    
-    private double squareRootOfANumber_BinarySearch(double n, double f, double l){
-        
-        if(l > f){
-            
-            double mid = f + (l - f)/2.0;
-            double sqr = mid*mid;
-            
-            if(sqr == n || Math.abs(n - sqr) < 0.00001){
+
+    private double squareRootOfANumber_BinarySearch(double n, double f, double l) {
+
+        if (l > f) {
+
+            double mid = f + (l - f) / 2.0;
+            double sqr = mid * mid;
+
+            if (sqr == n || Math.abs(n - sqr) < 0.00001) {
                 return mid;
-            }else if(sqr < n){
+            } else if (sqr < n) {
                 return squareRootOfANumber_BinarySearch(n, mid, l);
-            }else {
+            } else {
                 return squareRootOfANumber_BinarySearch(n, f, mid);
             }
-            
+
         }
-        
+
         return 1.0;
-        
+
     }
-    
-    public double squareRootOfANumber(double n){
-        
-        if(n == 0.0 || n == 1.0){
+
+    public double squareRootOfANumber(double n) {
+
+        if (n == 0.0 || n == 1.0) {
             return n;
         }
-        
+
         double i = 1;
-        while(true){
-            double sqr = i*i;
-            if(sqr == n){
+        while (true) {
+            double sqr = i * i;
+            if (sqr == n) {
                 return i;
-            }else if(sqr > n){
+            } else if (sqr > n) {
                 //at this point where sqr of i is > n then that means sqr root for n lies b/w 
                 // i-1 and i
                 //ex sqrt(3) == 1.73 (lie b/w 1 and 2)
@@ -4595,7 +4682,7 @@ public class DSA450Questions {
                 //i = 2 sqr = 2*2 = 4
                 //4 > n i.e 4 > 3 that means sqrt(3) lie in b/w 1 and 2
                 //so we will do binary search i-1, i (1, 2)
-                double res = squareRootOfANumber_BinarySearch(n, i-1, i);
+                double res = squareRootOfANumber_BinarySearch(n, i - 1, i);
                 return res;
             }
             i++;
@@ -5173,6 +5260,47 @@ public class DSA450Questions {
 
     }
 
+    public int sticklerThief_Recursion(int[] houses, int n) {
+
+        //if no houses is available
+        if (n == 0) {
+            return 0;
+        }
+
+        //if only one house is available
+        if (n == 1) {
+            return houses[n - 1];
+        }
+
+        //2 choices
+        //1. we choose not to pick a house and we simply move to next house
+        //2. we choose to pick that house then we have to add the amount in that house in our result and move to 
+        //alternate house (which is not adjacent(n-2))
+        //just choose the max of these choices
+        return Math.max(sticklerThief_Recursion(houses, n - 1), houses[n - 1] + sticklerThief_Recursion(houses, n - 2));
+
+    }
+
+    public void sticklerThief_DP_Memoization(int[] houses) {
+
+        int n = houses.length;
+        int[] memo = new int[n + 1];
+
+        //base cond
+        memo[0] = 0; //if house is available
+        memo[1] = houses[0]; //if only one house is available
+
+        for (int i = 2; i < memo.length; i++) {
+
+            memo[i] = Math.max(memo[i - 1], houses[i - 1] + memo[i - 2]);
+
+        }
+
+        //output;
+        System.out.println("The maximum amount stickler thief can pick from alternate houses: " + memo[n]);
+
+    }
+
     public void nMeetingRooms_Greedy(int[] startTime, int[] finishTime) {
 
         class Meeting {
@@ -5594,6 +5722,33 @@ public class DSA450Questions {
             }
             System.out.println();
         }
+
+    }
+
+    public boolean checkIfGivenUndirectedGraphIsBinaryTree(int V, List<List<Integer>> adjList) {
+
+        //two condition for a undirected graph to be tree
+        //1. should not have a cycle
+        //2. the graph should be connected
+        boolean[] visited = new boolean[V];
+
+        //check undriected cycle
+        for (int u = 0; u < V; u++) {
+            if (visited[u] != true) {
+                if(detectCycleInUndirectedGraphDFS_Helper(adjList, u, -1, visited)){
+                    return false;
+                }
+                
+            }
+        }
+        
+        for (int u = 0; u < V; u++) {
+            if (visited[u] != true) {
+                return false;
+            }
+        }
+        
+        return true;
 
     }
 
@@ -7053,7 +7208,7 @@ public class DSA450Questions {
 //        obj.bestProfitToBuySellStockAtMostTwice(new int[]{ 2, 30, 15, 10, 8, 25, 80 });
 //        obj.bestProfitToBuySellStockAtMostTwice(new int[]{ 2, 30, 80, 10, 8, 25, 60 });
         //......................................................................
-//        Row: 107
+//        Row: 107, 16
 //        System.out.println("Find repeating and missing in unsorted array");
 //        //https://www.geeksforgeeks.org/find-a-repeating-and-a-missing-number/
 //        obj.findRepeatingAndMissingInUnsortedArray_1(new int[]{7, 3, 4, 5, 5, 6, 2 });
@@ -7271,16 +7426,67 @@ public class DSA450Questions {
 //        System.out.println("Are two tres isomorphic: "+obj.areTwoTreeIsoMorphic(root1, root2));
         //......................................................................
 //        Row: 210
-        System.out.println("Duplicate subtrees in a tree");
-        //https://www.geeksforgeeks.org/find-duplicate-subtrees/
-        TreeNode<Integer> root1 = new TreeNode<>(1);
-        root1.setLeft(new TreeNode<>(2));
-        root1.getLeft().setLeft(new TreeNode<>(4));
-        root1.setRight(new TreeNode<>(3));
-        root1.getRight().setLeft(new TreeNode<>(2));
-        root1.getRight().getLeft().setLeft(new TreeNode<>(4));
-        root1.getRight().setRight(new TreeNode<>(4));
-        obj.findDuplicateSubtreeInAGivenTree(root1);
+//        System.out.println("Duplicate subtrees in a tree");
+//        //https://www.geeksforgeeks.org/find-duplicate-subtrees/
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setLeft(new TreeNode<>(2));
+//        root1.getRight().getLeft().setLeft(new TreeNode<>(4));
+//        root1.getRight().setRight(new TreeNode<>(4));
+//        obj.findDuplicateSubtreeInAGivenTree(root1);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Print all the nodes that are at K distance from the target node");
+//        TreeNode<Integer> root1 = new TreeNode<>(3);
+//        root1.setLeft(new TreeNode<>(5));
+//        root1.getLeft().setLeft(new TreeNode<>(6));
+//        root1.getLeft().setRight(new TreeNode<>(2));
+//        root1.getLeft().getRight().setLeft(new TreeNode<>(7));
+//        root1.getLeft().getRight().setRight(new TreeNode<>(4));
+//        root1.setRight(new TreeNode<>(1));
+//        root1.getRight().setLeft(new TreeNode<>(0));
+//        root1.getRight().setRight(new TreeNode<>(8));
+//        obj.printAllTheNodesAtKDistanceFromTargetNode(root1, 5, 2);
+//        obj.printAllTheNodesAtKDistanceFromTargetNode(root1, 3, 3);
+//        obj.printAllTheNodesAtKDistanceFromTargetNode(root1, 6, 3);
+        //......................................................................
+//        Row: 39
+//        System.out.println("Minimum no of operations required to make an array pallindrome");
+//        obj.minOperationsToMakeArrayPallindrome(new int[]{10, 15, 10});
+//        obj.minOperationsToMakeArrayPallindrome(new int[]{1, 4, 5, 9, 1});
+        //......................................................................
+//        Row: 112
+//        System.out.println("maximum sum such that no 2 elements are adjacent / Sticler thief DP problem");
+//        int[] houses = new int[]{5,5,10,100,10,5};
+//        System.out.println("The maximum amount stickler thief can pick from alternate houses: "+obj.sticklerThief_Recursion(houses, houses.length));
+//        obj.sticklerThief_DP_Memoization(houses);
+//        houses = new int[]{1,2,3};
+//        System.out.println("The maximum amount stickler thief can pick from alternate houses: "+obj.sticklerThief_Recursion(houses, houses.length));
+//        obj.sticklerThief_DP_Memoization(houses);
+//        houses = new int[]{5};
+//        System.out.println("The maximum amount stickler thief can pick from alternate houses: "+obj.sticklerThief_Recursion(houses, houses.length));
+//        obj.sticklerThief_DP_Memoization(houses);
+        //......................................................................
+//        Row: 203
+        System.out.println("Check if given undirected graph is a binary tree or not");
+        //https://www.geeksforgeeks.org/check-given-graph-tree/#:~:text=Since%20the%20graph%20is%20undirected,graph%20is%20connected%2C%20otherwise%20not.
+        List<List<Integer>> adjList = new ArrayList<>(); 
+        adjList.add(0, Arrays.asList(1, 2, 3)); 
+        adjList.add(1, Arrays.asList(0));
+        adjList.add(2, Arrays.asList(0));
+        adjList.add(3, Arrays.asList(0, 4));
+        adjList.add(4, Arrays.asList(3));
+        System.out.println("Is graph is binary tree: "+obj.checkIfGivenUndirectedGraphIsBinaryTree(adjList.size(), adjList));
+        adjList = new ArrayList<>(); 
+        adjList.add(0, Arrays.asList(1, 2, 3)); 
+        adjList.add(1, Arrays.asList(0, 2)); // CYCLE 0 <--> 1 <--> 2
+        adjList.add(2, Arrays.asList(0, 1));
+        adjList.add(3, Arrays.asList(0, 4));
+        adjList.add(4, Arrays.asList(3));
+        System.out.println("Is graph is binary tree: "+obj.checkIfGivenUndirectedGraphIsBinaryTree(adjList.size(), adjList));
+    
     }
 
 }
