@@ -9,6 +9,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1761,6 +1762,33 @@ public class DSA450Questions {
         }
 
         return stack.isEmpty();
+
+    }
+
+    public void firstNonRepeatingCharacterFromStream(String stream) {
+
+        int MAX_CHAR = 256;
+        List<Character> list = new ArrayList<>();
+        boolean[] vis = new boolean[MAX_CHAR];
+        for (int i = 0; i < stream.length(); i++) {
+            char ch = stream.charAt(i);
+            if (vis[ch] != true) {
+
+                if (list.contains(ch)) {
+                    list.remove((Character) ch);
+                    vis[ch] = true;
+                } else {
+                    list.add(ch);
+                }
+
+            }
+
+            System.out.println("First non repeating character till " + stream.substring(0, i + 1));
+            if (list.size() != 0) {
+                System.out.println(list.get(0) + " ");
+            }
+
+        }
 
     }
 
@@ -5287,7 +5315,7 @@ public class DSA450Questions {
         int[] memo = new int[n + 1];
 
         //base cond
-        memo[0] = 0; //if house is available
+        memo[0] = 0; //if no house is available
         memo[1] = houses[0]; //if only one house is available
 
         for (int i = 2; i < memo.length; i++) {
@@ -5299,6 +5327,81 @@ public class DSA450Questions {
         //output;
         System.out.println("The maximum amount stickler thief can pick from alternate houses: " + memo[n]);
 
+    }
+
+    public void longestIncreasingSubsequence_BruteForce(int[] arr, int n) {
+
+        int maxLengthLongestIncSubseq = 0;
+        for (int i = 0; i < n; i++) {
+            int currSeq = arr[i];
+            int currMaxLength = 1;
+            for (int j = i + 1; j < n; j++) {
+                if (arr[j] > currSeq) {
+                    currSeq = arr[j];
+                    currMaxLength++;
+                }
+            }
+            maxLengthLongestIncSubseq = Math.max(maxLengthLongestIncSubseq, currMaxLength);
+
+        }
+
+        //output:
+        System.out.println("Longest inc subseq of the given array is: " + maxLengthLongestIncSubseq);
+
+    }
+
+    int longestIncreasingSubsequence_LongestSeqLength;
+
+    private int longestIncreasingSubsequence_Recursion_Helper(int[] arr, int n) {
+
+        //if there is one element in arr then the longest seq length is just one
+        if (n == 1) {
+            return 1;
+        }
+
+        int res = 0;
+        int maxLengthHere = 1;
+
+        for (int i = 1; i < n; i++) {
+
+            res = longestIncreasingSubsequence_Recursion_Helper(arr, i);
+            if (arr[i - 1] < arr[n - 1] && res + 1 > maxLengthHere) {
+                maxLengthHere = res + 1;
+            }
+        }
+
+        longestIncreasingSubsequence_LongestSeqLength = Math.max(longestIncreasingSubsequence_LongestSeqLength, maxLengthHere);
+
+        return maxLengthHere;
+    }
+
+    public int longestIncreasingSubsequence_Recursion(int[] arr, int n) {
+        longestIncreasingSubsequence_LongestSeqLength = 0;
+        longestIncreasingSubsequence_Recursion_Helper(arr, n);
+        return longestIncreasingSubsequence_LongestSeqLength;
+    }
+
+    public void longestIncreasingSubsequence_DP_Memoization(int[] arr, int n) {
+
+        int[] memo = new int[n];
+        //base cond
+        Arrays.fill(memo, 1);
+
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (arr[i] > arr[j] && memo[i] < memo[j] + 1) {
+                    memo[i] = memo[j] + 1;
+                }
+            }
+        }
+
+        int maxLengthLongestIncSubseq = 0;
+        for (int i = 0; i < memo.length; i++) {
+            maxLengthLongestIncSubseq = Math.max(maxLengthLongestIncSubseq, memo[i]);
+        }
+
+        //output:
+        System.out.println("Longest inc subseq of the given array is: " + maxLengthLongestIncSubseq);
     }
 
     public void nMeetingRooms_Greedy(int[] startTime, int[] finishTime) {
@@ -5358,6 +5461,86 @@ public class DSA450Questions {
         System.out.println("No. of meetings can be conducted: " + meetingsCanBeConducted);
         System.out.println("Index of meetings can be conducted: " + indexOfMeetingTimings);
 
+    }
+
+    public void pairsOfMoviesCanBeWatchedDuringFlightDurationK_Greedy(int[] movieLength, int K) {
+
+        //prepare index wise data
+        int[][] input = new int[movieLength.length][2];
+        for (int i = 0; i < movieLength.length; i++) {
+
+            input[i][0] = movieLength[i];
+            input[i][1] = i;
+
+        }
+
+        //sort the input
+        Arrays.sort(input, new Comparator<int[]>() {
+
+            @Override
+            public int compare(int[] a, int[] b) {
+                return a[0] - b[0];
+            }
+        });
+
+        int n = movieLength.length;
+        int l = 0;
+        int h = n - 1;
+        int i = 0;
+        int j = 0;
+        int sum = 0;
+        while (l < h) {
+
+            int firstMovie = input[l][0];
+            int secondMovie = input[h][0];
+            
+            if(firstMovie+secondMovie <= K){
+                
+                if(sum < firstMovie+secondMovie){
+                    sum = firstMovie+secondMovie;
+                    i = input[l][1];
+                    j = input[h][1];
+                }
+                l++;
+            }else if(firstMovie+secondMovie > K){
+                h--;
+            }
+        }
+        
+        //output:
+        System.out.println("Pair of movies can be watched during flight duration K: "
+                +(i+","+j)+"-"
+                +(movieLength[i]+","+movieLength[j]));
+
+    }
+    
+    public int choclateDistribution_Greedy(int[] choclates, int students){
+        
+        //.........................T: O(N.LogN)
+        //https://www.geeksforgeeks.org/chocolate-distribution-problem/
+        
+        //if no choclates are there OR there are no student available for distribution
+        if(choclates.length == 0 || students == 0){
+            return 0;
+        }
+        
+        //if the no. of choclates is less than the no. of student
+        if(choclates.length < students){
+            return -1;
+        }
+        
+        //sort the no of choclates
+        Arrays.sort(choclates);
+        
+        int minDiff = Integer.MAX_VALUE;
+        for(int i=0; i + students - 1<choclates.length; i++){
+            int currDiff = choclates[i + students - 1] - choclates[i];
+            minDiff = Math.min(minDiff, currDiff);
+        }
+        
+        //output:
+        return minDiff;
+        
     }
 
     public void graphBFSAdjList_Graph(int V, List<List<Integer>> adjList) {
@@ -5733,21 +5916,19 @@ public class DSA450Questions {
         boolean[] visited = new boolean[V];
 
         //check undriected cycle
-        for (int u = 0; u < V; u++) {
-            if (visited[u] != true) {
-                if(detectCycleInUndirectedGraphDFS_Helper(adjList, u, -1, visited)){
-                    return false;
-                }
-                
-            }
+        //if all nodes is reachable via vertex 0 without forming a cycle
+        //if cycle is present then its not tree and return false
+        //it will also mark visited = true all those nodes that are connected to each other
+        if (detectCycleInUndirectedGraphDFS_Helper(adjList, 0, -1, visited)) {
+            return false;
         }
-        
+
         for (int u = 0; u < V; u++) {
             if (visited[u] != true) {
                 return false;
             }
         }
-        
+
         return true;
 
     }
@@ -7456,6 +7637,7 @@ public class DSA450Questions {
 //        System.out.println("Minimum no of operations required to make an array pallindrome");
 //        obj.minOperationsToMakeArrayPallindrome(new int[]{10, 15, 10});
 //        obj.minOperationsToMakeArrayPallindrome(new int[]{1, 4, 5, 9, 1});
+//        obj.minOperationsToMakeArrayPallindrome(new int[]{1, 2, 3, 4});
         //......................................................................
 //        Row: 112
 //        System.out.println("maximum sum such that no 2 elements are adjacent / Sticler thief DP problem");
@@ -7470,23 +7652,76 @@ public class DSA450Questions {
 //        obj.sticklerThief_DP_Memoization(houses);
         //......................................................................
 //        Row: 203
-        System.out.println("Check if given undirected graph is a binary tree or not");
-        //https://www.geeksforgeeks.org/check-given-graph-tree/#:~:text=Since%20the%20graph%20is%20undirected,graph%20is%20connected%2C%20otherwise%20not.
-        List<List<Integer>> adjList = new ArrayList<>(); 
-        adjList.add(0, Arrays.asList(1, 2, 3)); 
-        adjList.add(1, Arrays.asList(0));
-        adjList.add(2, Arrays.asList(0));
-        adjList.add(3, Arrays.asList(0, 4));
-        adjList.add(4, Arrays.asList(3));
-        System.out.println("Is graph is binary tree: "+obj.checkIfGivenUndirectedGraphIsBinaryTree(adjList.size(), adjList));
-        adjList = new ArrayList<>(); 
-        adjList.add(0, Arrays.asList(1, 2, 3)); 
-        adjList.add(1, Arrays.asList(0, 2)); // CYCLE 0 <--> 1 <--> 2
-        adjList.add(2, Arrays.asList(0, 1));
-        adjList.add(3, Arrays.asList(0, 4));
-        adjList.add(4, Arrays.asList(3));
-        System.out.println("Is graph is binary tree: "+obj.checkIfGivenUndirectedGraphIsBinaryTree(adjList.size(), adjList));
-    
+//        System.out.println("Check if given undirected graph is a binary tree or not");
+//        //https://www.geeksforgeeks.org/check-given-graph-tree/#:~:text=Since%20the%20graph%20is%20undirected,graph%20is%20connected%2C%20otherwise%20not.
+//        List<List<Integer>> adjList = new ArrayList<>();
+//        adjList.add(0, Arrays.asList(1, 2, 3));
+//        adjList.add(1, Arrays.asList(0));
+//        adjList.add(2, Arrays.asList(0));
+//        adjList.add(3, Arrays.asList(0, 4));
+//        adjList.add(4, Arrays.asList(3));
+//        System.out.println("Is graph is binary tree: " + obj.checkIfGivenUndirectedGraphIsBinaryTree(adjList.size(), adjList));
+//        adjList = new ArrayList<>();
+//        adjList.add(0, Arrays.asList(1, 2, 3));
+//        adjList.add(1, Arrays.asList(0, 2)); // CYCLE 0 <--> 1 <--> 2
+//        adjList.add(2, Arrays.asList(0, 1));
+//        adjList.add(3, Arrays.asList(0, 4));
+//        adjList.add(4, Arrays.asList(3));
+//        System.out.println("Is graph is binary tree: " + obj.checkIfGivenUndirectedGraphIsBinaryTree(adjList.size(), adjList));
+//        adjList = new ArrayList<>();
+//        adjList.add(0, Arrays.asList(1, 2, 3));
+//        adjList.add(1, Arrays.asList(0));
+//        adjList.add(2, Arrays.asList(0));
+//        adjList.add(3, Arrays.asList(0));
+//        adjList.add(4, Arrays.asList()); // vertex 4 is not connected
+//        System.out.println("Is graph is binary tree: " + obj.checkIfGivenUndirectedGraphIsBinaryTree(adjList.size(), adjList));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("First non character from the stream of character");
+//        obj.firstNonRepeatingCharacterFromStream("geeksforgeeksandgeeksquizfor");
+//        obj.firstNonRepeatingCharacterFromStream("aaaaa");
+//        obj.firstNonRepeatingCharacterFromStream("abcd");
+//        obj.firstNonRepeatingCharacterFromStream("aabbccdd");
+        //......................................................................
+//        Row: 425
+//        System.out.println("Longest increasing subsequence");
+//        //https://www.geeksforgeeks.org/longest-increasing-subsequence-dp-3/
+//        int[] arr = new int[]{10, 22, 9, 33, 21, 50, 41, 60}; //LONGEST INC SEQ 10, 22, 33, 50, 60: length = 5
+//        obj.longestIncreasingSubsequence_BruteForce(arr, arr.length);
+//        System.out.println("Longest increasing subsequnec in the givve array: " + obj.longestIncreasingSubsequence_Recursion(arr, arr.length));
+//        obj.longestIncreasingSubsequence_DP_Memoization(arr, arr.length);
+//        arr = new int[]{3, 10, 2, 1, 20};
+//        obj.longestIncreasingSubsequence_BruteForce(arr, arr.length);
+//        System.out.println("Longest increasing subsequnec in the givve array: " + obj.longestIncreasingSubsequence_Recursion(arr, arr.length));
+//        obj.longestIncreasingSubsequence_DP_Memoization(arr, arr.length);
+//        arr = new int[]{3, 2};
+//        obj.longestIncreasingSubsequence_BruteForce(arr, arr.length);
+//        System.out.println("Longest increasing subsequnec in the givve array: " + obj.longestIncreasingSubsequence_Recursion(arr, arr.length));
+//        obj.longestIncreasingSubsequence_DP_Memoization(arr, arr.length);
+//        arr = new int[]{0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15}; //LONGEST INC SEQ 0, 2, 6, 9, 13, 15: length 6
+//        obj.longestIncreasingSubsequence_BruteForce(arr, arr.length); //FAIL CASE
+//        System.out.println("Longest increasing subsequnec in the givve array: " + obj.longestIncreasingSubsequence_Recursion(arr, arr.length));
+//        obj.longestIncreasingSubsequence_DP_Memoization(arr, arr.length);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Pair of movie watching during a flight");
+//        //problem: https://www.geeksforgeeks.org/amazon-interview-experience-sde-2-10/
+//        //solution: https://leetcode.com/discuss/interview-question/313719/Amazon-Online-Assessment-2019-Tho-sum-closest/291502
+//        obj.pairsOfMoviesCanBeWatchedDuringFlightDurationK_Greedy(new int[]{90, 85, 75, 60, 120, 150, 125}, 250);
+//        obj.pairsOfMoviesCanBeWatchedDuringFlightDurationK_Greedy(new int[]{27, 1,10, 39, 12, 52, 32, 67, 76}, 77);
+        //......................................................................
+//        Row: 261
+        System.out.println("Choclate distributions");
+        //https://www.geeksforgeeks.org/chocolate-distribution-problem/
+        System.out.println("Min diff in distribution of choclates among the students: "
+                +obj.choclateDistribution_Greedy(new int[]{12, 4, 7, 9, 2, 23,
+                    25, 41, 30, 40, 28,
+                    42, 30, 44, 48, 43,
+                   50}, 7));
+        System.out.println("Min diff in distribution of choclates among the students: "
+                +obj.choclateDistribution_Greedy(new int[]{7, 3, 2, 4, 9, 12, 56}, 3));
+        
+        
     }
 
 }
