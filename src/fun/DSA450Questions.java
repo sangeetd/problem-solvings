@@ -4717,6 +4717,81 @@ public class DSA450Questions {
         }
     }
 
+    public void kThElementInTwoSortedArrays_1(int[] a, int[] b, int K) {
+
+        //HEAP SORTING AND MERGING
+        //...........................T: O(N.LogN)
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+        for (int a_ : a) {
+            minHeap.add(a_);
+        }
+
+        for (int b_ : b) {
+            minHeap.add(b_);
+        }
+
+        //pop out K element from heap
+        int kthElement = -1;
+        while (K-- != 0 && !minHeap.isEmpty()) {
+            kthElement = minHeap.poll();
+        }
+
+        //output:
+        System.out.println("Kth element in two sorted arrays: " + kthElement);
+
+    }
+
+    public void kThElementInTwoSortedArrays_2(int[] a, int[] b, int K) {
+
+        //Two arrays are already sorted
+        //...........................T: O(K)
+        int iK = 0;
+        int m = a.length;
+        int n = b.length;
+        int i = 0;
+        int j = 0;
+        int kthElement = -1;
+
+        while (i < m && i < n) {
+
+            if (a[i] < b[j]) {
+                iK++;
+                if (iK == K) {
+                    kthElement = a[i];
+                }
+                i++;
+            } else {
+                iK++;
+                if (iK == K) {
+                    kthElement = b[j];
+                }
+                j++;
+            }
+
+        }
+
+        //if loop ends beacuse we run out of one array element
+        while (i < m) {
+            iK++;
+            if (iK == K) {
+                kthElement = a[i];
+            }
+            i++;
+        }
+
+        while (j < n) {
+            iK++;
+            if (iK == K) {
+                kthElement = b[j];
+            }
+            j++;
+        }
+
+        //output:
+        System.out.println("Kth element in two sorted arrays: " + kthElement);
+
+    }
+
     private int[] KMP_PatternMatching_Algorithm_LPSArray(String pattern, int size) {
 
         int[] lps = new int[size];
@@ -5493,54 +5568,53 @@ public class DSA450Questions {
 
             int firstMovie = input[l][0];
             int secondMovie = input[h][0];
-            
-            if(firstMovie+secondMovie <= K){
-                
-                if(sum < firstMovie+secondMovie){
-                    sum = firstMovie+secondMovie;
+
+            if (firstMovie + secondMovie <= K) {
+
+                if (sum < firstMovie + secondMovie) {
+                    sum = firstMovie + secondMovie;
                     i = input[l][1];
                     j = input[h][1];
                 }
                 l++;
-            }else if(firstMovie+secondMovie > K){
+            } else if (firstMovie + secondMovie > K) {
                 h--;
             }
         }
-        
+
         //output:
         System.out.println("Pair of movies can be watched during flight duration K: "
-                +(i+","+j)+"-"
-                +(movieLength[i]+","+movieLength[j]));
+                + (i + "," + j) + "-"
+                + (movieLength[i] + "," + movieLength[j]));
 
     }
-    
-    public int choclateDistribution_Greedy(int[] choclates, int students){
-        
+
+    public int choclateDistribution_Greedy(int[] choclates, int students) {
+
         //.........................T: O(N.LogN)
         //https://www.geeksforgeeks.org/chocolate-distribution-problem/
-        
         //if no choclates are there OR there are no student available for distribution
-        if(choclates.length == 0 || students == 0){
+        if (choclates.length == 0 || students == 0) {
             return 0;
         }
-        
+
         //if the no. of choclates is less than the no. of student
-        if(choclates.length < students){
+        if (choclates.length < students) {
             return -1;
         }
-        
+
         //sort the no of choclates
         Arrays.sort(choclates);
-        
+
         int minDiff = Integer.MAX_VALUE;
-        for(int i=0; i + students - 1<choclates.length; i++){
+        for (int i = 0; i + students - 1 < choclates.length; i++) {
             int currDiff = choclates[i + students - 1] - choclates[i];
             minDiff = Math.min(minDiff, currDiff);
         }
-        
+
         //output:
         return minDiff;
-        
+
     }
 
     public void graphBFSAdjList_Graph(int V, List<List<Integer>> adjList) {
@@ -6551,7 +6625,7 @@ public class DSA450Questions {
 //        System.out.println("Min cost to combine ropes of diff lengths into one big rope");
 //        obj.minCostOfRope(new int[]{4, 3, 2, 6});
         //......................................................................
-//        Row: 344, 89
+//        Row: 344, 89, 271
 //        System.out.println("Reorganise string");
 //        //https://leetcode.com/problems/reorganize-string/
 //        System.out.println("Reorganise string output: "+obj.reorganizeString("aab"));
@@ -7676,8 +7750,8 @@ public class DSA450Questions {
 //        adjList.add(4, Arrays.asList()); // vertex 4 is not connected
 //        System.out.println("Is graph is binary tree: " + obj.checkIfGivenUndirectedGraphIsBinaryTree(adjList.size(), adjList));
         //......................................................................
-//        Row: SEPARATE QUESTION IMPORTANT
-//        System.out.println("First non character from the stream of character");
+//        Row: 174
+//        System.out.println("First non repeating character from the stream of character");
 //        obj.firstNonRepeatingCharacterFromStream("geeksforgeeksandgeeksquizfor");
 //        obj.firstNonRepeatingCharacterFromStream("aaaaa");
 //        obj.firstNonRepeatingCharacterFromStream("abcd");
@@ -7711,17 +7785,21 @@ public class DSA450Questions {
 //        obj.pairsOfMoviesCanBeWatchedDuringFlightDurationK_Greedy(new int[]{27, 1,10, 39, 12, 52, 32, 67, 76}, 77);
         //......................................................................
 //        Row: 261
-        System.out.println("Choclate distributions");
-        //https://www.geeksforgeeks.org/chocolate-distribution-problem/
-        System.out.println("Min diff in distribution of choclates among the students: "
-                +obj.choclateDistribution_Greedy(new int[]{12, 4, 7, 9, 2, 23,
-                    25, 41, 30, 40, 28,
-                    42, 30, 44, 48, 43,
-                   50}, 7));
-        System.out.println("Min diff in distribution of choclates among the students: "
-                +obj.choclateDistribution_Greedy(new int[]{7, 3, 2, 4, 9, 12, 56}, 3));
-        
-        
+//        System.out.println("Choclate distributions");
+//        //https://www.geeksforgeeks.org/chocolate-distribution-problem/
+//        System.out.println("Min diff in distribution of choclates among the students: "
+//                +obj.choclateDistribution_Greedy(new int[]{12, 4, 7, 9, 2, 23,
+//                    25, 41, 30, 40, 28,
+//                    42, 30, 44, 48, 43,
+//                   50}, 7));
+//        System.out.println("Min diff in distribution of choclates among the students: "
+//                +obj.choclateDistribution_Greedy(new int[]{7, 3, 2, 4, 9, 12, 56}, 3));
+        //......................................................................
+//        Row: 123
+        System.out.println("Kth element in 2 sorted array 2 approaches");
+        //https://www.geeksforgeeks.org/k-th-element-two-sorted-arrays/
+        obj.kThElementInTwoSortedArrays_1(new int[]{2, 3, 6, 7, 9 }, new int[]{1, 4, 8, 10}, 5);
+        obj.kThElementInTwoSortedArrays_2(new int[]{2, 3, 6, 7, 9 }, new int[]{1, 4, 8, 10}, 5); //OPTIMISED
     }
 
 }
