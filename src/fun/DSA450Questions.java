@@ -1792,6 +1792,22 @@ public class DSA450Questions {
 
     }
 
+    public boolean wordBreak(String str, Set<String> set) {
+
+        //https://www.geeksforgeeks.org/word-break-problem-dp-32/
+        int n = str.length();
+        if (n == 0) {
+            return true;
+        }
+
+        for (int i = 1; i <= n; i++) {
+            if (set.contains(str.substring(0, i)) && wordBreak(str.substring(i, n), set)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void reverseLinkedList_Iterative(Node<Integer> node) {
         System.out.println("Reverse linked list iterative");
         //actual
@@ -4318,6 +4334,143 @@ public class DSA450Questions {
 
     }
 
+    private void rotAllAdjacent(int[][] basket,
+            int x, int y,
+            boolean[][] visited,
+            int row, int col) {
+
+        //all aadjacent coordinate
+        //check new coordinates are in bounds
+        //check new coordinates are not previously visited
+        //maake the adjacent rot and mark them visited
+        int x1 = -1;
+        int y1 = -1;
+
+        //left coordinate to x,y = x, y-1
+        x1 = x;
+        y1 = y - 1;
+        if ((x1 >= 0 && x1 < row) && (y1 >= 0 && y1 < col) && visited[x1][y1] != true && basket[x1][y1] != 0) {
+            visited[x1][y1] = true; //maark them visited
+            basket[x1][y1] = 2; //make them rot
+            rotAllAdjacent(basket, x1, y1, visited, row, col);
+        }
+
+        //right coordinate to x,y = x, y+1
+        x1 = x;
+        y1 = y + 1;
+        if ((x1 >= 0 && x1 < row) && (y1 >= 0 && y1 < col) && visited[x1][y1] != true && basket[x1][y1] != 0) {
+            visited[x1][y1] = true; //maark them visited
+            basket[x1][y1] = 2; //make them rot
+            rotAllAdjacent(basket, x1, y1, visited, row, col);
+        }
+
+        //top coordinate to x,y = x-1, y
+        x1 = x - 1;
+        y1 = y;
+        if ((x1 >= 0 && x1 < row) && (y1 >= 0 && y1 < col) && visited[x1][y1] != true && basket[x1][y1] != 0) {
+            visited[x1][y1] = true; //maark them visited
+            basket[x1][y1] = 2; //make them rot
+            rotAllAdjacent(basket, x1, y1, visited, row, col);
+        }
+
+        //bottom coordinate to x,y = x+1, y
+        x1 = x + 1;
+        y1 = y;
+        if ((x1 >= 0 && x1 < row) && (y1 >= 0 && y1 < col) && visited[x1][y1] != true && basket[x1][y1] != 0) {
+            visited[x1][y1] = true; //maark them visited
+            basket[x1][y1] = 2; //make them rot
+            rotAllAdjacent(basket, x1, y1, visited, row, col);
+        }
+
+    }
+
+    public void rottenOranges_DFS(int[][] basket) {
+
+        int rottenTime = 0;
+        int row = basket.length;
+        int col = basket[0].length;
+
+        boolean[][] visited = new boolean[row][col];
+
+        for (int x = 0; x < row; x++) {
+            for (int y = 0; y < col; y++) {
+                if (visited[x][y] != true && basket[x][y] == 2) {
+                    //rotten oranges == 2
+                    visited[x][y] = true;
+                    rottenTime++;
+                    rotAllAdjacent(basket, x, y, visited, row, col);
+                }
+            }
+        }
+
+        //check if any one is left unrotten(1)
+        for (int x = 0; x < row; x++) {
+            for (int y = 0; y < col; y++) {
+                if (basket[x][y] == 1) {
+                    //rotten oranges == 2
+                    rottenTime = -1;
+                }
+            }
+        }
+
+        System.out.println("rotten time " + rottenTime);
+
+    }
+    
+    public int rottenOranges_HashBased(int[][] grid) {
+
+        Set<String> fresh = new HashSet<>();
+        Set<String> rotten = new HashSet<>();
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[i].length; j++) {
+
+                if (grid[i][j] == 1) {
+                    fresh.add(i + "" + j);
+                }
+
+                if (grid[i][j] == 2) {
+                    rotten.add(i + "" + j);
+                }
+
+            }
+        }
+
+        int minTime = 0;
+        int[][] dir = {
+            {-1, 0},
+            {1, 0},
+            {0, -1},
+            {0, 1}
+        };
+
+        while (fresh.size() > 0) {
+
+            Set<String> infected = new HashSet<>();
+            for (String coor : rotten) {
+                int x = coor.charAt(0) - '0';
+                int y = coor.charAt(1) - '0';
+                for (int[] r : dir) {
+                    int x_ = x + r[0];
+                    int y_ = y + r[1];
+                    if (fresh.contains(x_ + "" + y_)) {
+                        fresh.remove(x_ + "" + y_);
+                        infected.add(x_ + "" + y_);
+                    }
+                }
+            }
+
+            if (infected.size() == 0) {
+                return -1;
+            }
+
+            rotten = infected;
+            minTime++;
+
+        }
+
+        return minTime;
+    }
+
     public void minCostOfRope(int[] a) {
 
         //GREEDY ALGO
@@ -5554,6 +5707,7 @@ public class DSA450Questions {
 
             @Override
             public int compare(int[] a, int[] b) {
+                //0th index holds movieLength and sortng asc on basis of that
                 return a[0] - b[0];
             }
         });
@@ -5614,6 +5768,109 @@ public class DSA450Questions {
 
         //output:
         return minDiff;
+
+    }
+
+    public void minimumPlatformNeeded_BruteForce(int[] arr, int[] dep) {
+
+        //.......................T: O(N^2)
+        int n = arr.length;
+
+        int maxPlatform = 1;
+        for (int i = 0; i < n; i++) {
+            int currPlatform = 1;
+            for (int j = i + 1; j < n; j++) {
+
+                if ((arr[i] >= arr[j] && arr[i] <= dep[j])
+                        || (arr[j] >= arr[i] && arr[j] <= dep[i])) {
+                    currPlatform++;
+                }
+
+                maxPlatform = Math.max(maxPlatform, currPlatform);
+
+            }
+        }
+
+        //output:
+        System.out.println("max platfrm needed: " + maxPlatform);
+
+    }
+
+    public void minimumPlatformNeeded_Greedy(int[] arr, int[] dep) {
+
+        //.......................T: O(N.LogN)
+        int n = arr.length;
+
+        //.................T: O(N.LogN)
+        Arrays.sort(arr);
+        Arrays.sort(dep);
+
+        int i = 1;
+        int j = 0;
+        int maxPlatform = 1;
+        int currPlatform = 1;
+
+        while (i < n && j < n) {
+
+            if (arr[i] <= dep[j]) {
+                currPlatform++;
+                i++;
+            } else if (arr[i] > dep[j]) {
+                currPlatform--;
+                j++;
+            }
+
+            maxPlatform = Math.max(maxPlatform, currPlatform);
+
+        }
+
+        //output:
+        System.out.println("max platfrm needed: " + maxPlatform);
+
+    }
+
+    public void fractionalKnapsack(int[] weight, int[] value, int W) {
+
+        int n = weight.length;
+
+        //prepare data\
+        double[][] input = new double[n][3];
+        //0: weight, 1: value, 2: costPerWeight
+        for (int i = 0; i < n; i++) {
+
+            input[i][0] = weight[i];
+            input[i][1] = value[i];
+            input[i][2] = (double) value[i] / (double) weight[i];
+
+        }
+
+        //sort the input on basis of costPerWeight desc
+        Arrays.sort(input, (a, b) -> (int) (b[2] - a[2])); //2: costPerWeight
+
+        double maxValue = 0;
+        for (int i = 0; i < n; i++) {
+
+            int currWeight = (int) input[i][0];
+            int currValue = (int) input[i][1];
+
+            if (W - currWeight >= 0) {
+                W -= currWeight;
+                maxValue += currValue;
+            } else {
+
+                //if we can't pick up an item as whole
+                //we will calculate the fraction we can pick up
+                //i.e W/currWeight
+                double frac = (double) W / currWeight;
+                //value per frac
+                maxValue += (currValue * frac);
+                //estimating balanced capacity
+                W = (int) (W - (currWeight * frac));
+            }
+        }
+
+        //output:
+        System.out.println("Max value can be picked up by fractional knapsack: " + maxValue);
 
     }
 
@@ -7195,7 +7452,7 @@ public class DSA450Questions {
 //        root1.getRight().setRight(new TreeNode(9));
 //        obj.diameterOfTree(root1);
         //......................................................................
-//        Row: 238
+//        Row: 238, 251
 //        System.out.println("N meeting in a room/ Activity selection");
 //        int[] startTime = {1, 3, 0, 5, 8, 5};
 //        int[] finishTime = {2, 4, 6, 7, 9, 9};
@@ -7644,7 +7901,7 @@ public class DSA450Questions {
 //        obj.postfixExpressionEvaluation_MultipleDigit("100 200 * 10 /");
 //        obj.postfixExpressionEvaluation_MultipleDigit("100 200 + 10 / 1000 +");
         //......................................................................
-//        Row: 71
+//        Row: 71, 301
 //        System.out.println("Balanced parenthesis evaluation");
 //        System.out.println(obj.balancedParenthesisEvaluation("()"));
 //        System.out.println(obj.balancedParenthesisEvaluation("({[]})"));
@@ -7796,10 +8053,61 @@ public class DSA450Questions {
 //                +obj.choclateDistribution_Greedy(new int[]{7, 3, 2, 4, 9, 12, 56}, 3));
         //......................................................................
 //        Row: 123
-        System.out.println("Kth element in 2 sorted array 2 approaches");
-        //https://www.geeksforgeeks.org/k-th-element-two-sorted-arrays/
-        obj.kThElementInTwoSortedArrays_1(new int[]{2, 3, 6, 7, 9 }, new int[]{1, 4, 8, 10}, 5);
-        obj.kThElementInTwoSortedArrays_2(new int[]{2, 3, 6, 7, 9 }, new int[]{1, 4, 8, 10}, 5); //OPTIMISED
+//        System.out.println("Kth element in 2 sorted array 2 approaches");
+//        //https://www.geeksforgeeks.org/k-th-element-two-sorted-arrays/
+//        obj.kThElementInTwoSortedArrays_1(new int[]{2, 3, 6, 7, 9 }, new int[]{1, 4, 8, 10}, 5);
+//        obj.kThElementInTwoSortedArrays_2(new int[]{2, 3, 6, 7, 9 }, new int[]{1, 4, 8, 10}, 5); //OPTIMISED
+        //......................................................................
+//        Row: 72
+//        System.out.println("Word break");
+//        Set<String> set = new HashSet<>();
+//        set.addAll(Arrays.asList("mobile","samsung","sam","sung","man","mango","icecream","and",  
+//                            "go","i","like","ice","cream"));
+//        System.out.println("Word break possible: "+obj.wordBreak("ilikesamsung", set)); 
+//        System.out.println("Word break possible: "+obj.wordBreak("ilike", set));
+//        System.out.println("Word break possible: "+obj.wordBreak("ilikedhokhla", set));
+        //......................................................................
+//        Row: 245
+//        System.out.println("Minimum platform needed");
+//        //https://www.geeksforgeeks.org/minimum-number-platforms-required-railwaybus-station/
+//        obj.minimumPlatformNeeded_BruteForce(new int[]{900, 940, 950, 1100, 1500, 1800}, 
+//                new int[]{910, 1200, 1120, 1130, 1900, 2000});
+//        obj.minimumPlatformNeeded_Greedy(new int[]{900, 940, 950, 1100, 1500, 1800}, 
+//                new int[]{910, 1200, 1120, 1130, 1900, 2000});
+        //......................................................................
+//        Row: 242
+//        System.out.println("Fractional knapsack");
+//        //https://www.geeksforgeeks.org/fractional-knapsack-problem/
+//        obj.fractionalKnapsack(new int[]{10,20,30}, new int[]{60, 100, 120}, 50);
+//        obj.fractionalKnapsack(new int[]{10,20}, new int[]{60, 100}, 50);
+//        obj.fractionalKnapsack(new int[]{60,70}, new int[]{60, 100}, 50);
+        //......................................................................
+//        Row: 326
+        System.out.println("Rotten oranges");
+        //Hash BASED: this approach rot all those oranges that are adjacent to a rotten orange in 1 unit of time
+        System.out.println("Rottening all the fresh oranges are possile in time: "
+                + obj.rottenOranges_HashBased(new int[][]{
+                    {2, 1, 1}, {1, 1, 0}, {0, 1, 1}
+                }));
+        System.out.println("Rottening all the fresh oranges are possile in time: "
+                + obj.rottenOranges_HashBased(new int[][]{
+                    {2,1,1},{0,1,1},{1,0,1}
+                }));
+        System.out.println("Rottening all the fresh oranges are possile in time: "
+                + obj.rottenOranges_HashBased(new int[][]{
+                    {0,2}
+                }));
+        //DFS BASED: this approach rot all the oranges that are connected to a rotten orange
+        //this follows flood fill way
+        obj.rottenOranges_DFS(new int[][]{
+                    {2, 1, 1}, {1, 1, 0}, {0, 1, 1}
+                });
+        obj.rottenOranges_DFS(new int[][]{
+                    {2,1,1},{0,1,1},{1,0,1}
+                });
+        obj.rottenOranges_DFS(new int[][]{
+                    {0,2}
+                });
     }
 
 }
