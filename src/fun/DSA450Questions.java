@@ -1792,20 +1792,134 @@ public class DSA450Questions {
 
     }
 
-    public boolean wordBreak(String str, Set<String> set) {
+    public boolean wordBreak_Recursive(String str, Set<String> set) {
 
         //https://www.geeksforgeeks.org/word-break-problem-dp-32/
         int n = str.length();
         if (n == 0) {
             return true;
         }
+        
+        if(set.contains(str)){
+            return true;
+        }
 
         for (int i = 1; i <= n; i++) {
-            if (set.contains(str.substring(0, i)) && wordBreak(str.substring(i, n), set)) {
+            if (set.contains(str.substring(0, i)) && wordBreak_Recursive(str.substring(i, n), set)) {
                 return true;
             }
         }
         return false;
+    }
+    
+    public boolean wordBreak_DP_Problem(String str, Set<String> set) {
+
+        //https://leetcode.com/problems/word-break/discuss/1068441/Detailed-Explanation-of-Top-Down-and-Bottom-Up-DP
+        boolean[] memo = new boolean[str.length() + 1];
+        //base cond
+        memo[0] = true; // str with no length is also true
+        
+        for(int i=1; i <= str.length(); i++){
+            for(int j = 0; j < i; j++){
+                if(set.contains(str.substring(j, i)) && memo[j]){
+                    memo[i] = true;
+                    break;
+                }
+            }
+        }
+        
+        return memo[str.length()];
+        
+    }
+    
+    public void longestSubstringWithoutRepeatingChar(String str){
+        
+        //SLIDING WINDOW ALGO
+        //https://leetcode.com/problems/longest-substring-without-repeating-characters/
+        int n = str.length();
+        int i = 0;
+        int j = 0;
+        int maxLen = 0;
+        int[] count = new int[256];
+        String substr = "";
+        while(j < n){
+            
+            char ch = str.charAt(j);
+            if(count[ch] < 1){
+                count[ch]++;
+                maxLen = Math.max(maxLen, j - i + 1);
+                //the new subtring len is greater than prev substring len update that substring
+                substr = str.substring(i, j+1).length() > substr.length() ? str.substring(i, j+1) : substr;
+                j++;
+            }else {
+                count[str.charAt(i)]--;
+                i++;
+            }
+            
+        }
+        
+        //output:
+        System.out.println("Longest subtring without repeating char: "+maxLen+" ("+substr+")");
+        
+    }
+    
+    public void minimumWindowSubstring(String s, String t){
+        
+        //Explanation: https://www.youtube.com/watch?v=nMaKzLWceFg&feature=youtu.be
+        //SLIDING WINDOW ALGO
+        //prepare the count map for string t 
+        //to know how many char we need to find in string s
+        Map<Character, Integer> tMap = new HashMap<>();
+        for(char ch: t.toCharArray()){
+            tMap.put(ch, tMap.getOrDefault(ch,0) + 1);
+        }
+        
+        int tCount = 0;
+        int start = 0;
+        int end = 0;
+        int minLenWindow = Integer.MAX_VALUE;
+        int substrIndex = 0;
+        int N = s.length();
+        while(end < N){
+            
+            char chEnd = s.charAt(end);
+            //each we find the char in string s that is also in string t
+            //we decreament the count of that char from map
+            //to know how much of that char (chEnd) we needed and how much we have found
+            if(tMap.containsKey(chEnd)){
+                tMap.put(chEnd, tMap.get(chEnd) - 1);
+                if(tMap.get(chEnd) >= 0){
+                    tCount++;
+                }
+            }
+            
+            while(tCount == t.length()){
+                
+                if(minLenWindow > (end - start + 1)){
+                    minLenWindow = end - start + 1;
+                    substrIndex = start;
+                }
+                
+                //adjust the start pointer now
+                char chStart = s.charAt(start);
+                if(tMap.containsKey(chStart)){
+                    tMap.put(chStart, tMap.get(chStart) + 1);
+                    if(tMap.get(chStart) > 0){
+                        tCount--;
+                    }
+                }
+                start++;
+            }
+            
+            end++;
+        }
+        
+        //output:
+        String output = minLenWindow > s.length()  ? "" : s.substring(substrIndex, substrIndex + minLenWindow);
+        System.out.println("Min window substring containg all char of string t in string s: "
+                +(minLenWindow > s.length() ? -1 : minLenWindow)+" : "
+                +output);
+        
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -1944,15 +2058,19 @@ public class DSA450Questions {
 
     public void mergeKSortedLinkedList(Node<Integer>[] nodes) {
 
+        //............................T: O(N*K*LogK)
+        //............................S: O(K)
+        //https://www.geeksforgeeks.org/merge-k-sorted-linked-lists-set-2-using-min-heap/
         //HEAP based method
         PriorityQueue<Node<Integer>> minHeap = new PriorityQueue<>(
                 (o1, o2) -> o1.getData().compareTo(o2.getData())
         );
 
-        for (Node<Integer> x : nodes) {
-            while (x != null) {
-                minHeap.add(x);
-                x = x.getNext();
+        //at this point we have added K node heads in minHeap
+        //so the minheap size after this loop will K
+        for (Node<Integer> node : nodes) {
+            if (node != null) {
+                minHeap.add(node);
             }
         }
 
@@ -1962,7 +2080,15 @@ public class DSA450Questions {
         Node<Integer> copyHead = head;
         while (!minHeap.isEmpty()) {
 
-            copyHead.setNext(minHeap.poll());
+            //we poll out one node from heap
+            Node<Integer> curr = minHeap.poll();
+            //and add in one node 
+            //if its next node is not null
+            //so the size of the min heap remains atmost K
+            if (curr.getNext() != null) {
+                minHeap.add(curr.getNext());
+            }
+            copyHead.setNext(curr);
             copyHead = copyHead.getNext();
 
         }
@@ -4095,6 +4221,65 @@ public class DSA450Questions {
         System.out.println("All nodes at K distance from target node: " + result);
 
     }
+    
+    private boolean deleteTreeNodesAndReturnForest_Helper(TreeNode<Integer> root, 
+            Set<Integer> deleteSet, List<TreeNode<Integer>> result){
+        
+        if(root == null){
+            return false;
+        }
+        
+        boolean deleteLeft = deleteTreeNodesAndReturnForest_Helper(root.getLeft(), deleteSet, result);
+        boolean deleteRight = deleteTreeNodesAndReturnForest_Helper(root.getRight(), deleteSet, result);
+        
+        if(deleteLeft){
+            root.setLeft(null);
+        }
+        
+        if(deleteRight){
+            root.setRight(null);
+        }
+        
+        if(deleteSet.contains(root.getData())){
+            
+            if(root.getLeft() != null){
+                result.add(root.getLeft());
+            }
+            
+            if(root.getRight() != null){
+                result.add(root.getRight());
+            }
+            return true;
+        }
+        
+        return deleteLeft && deleteRight && deleteSet.contains(root.getData()); 
+        
+    }
+    
+    public void deleteTreeNodesAndReturnForest(TreeNode<Integer> root, int[] toDelete){
+        
+        List<TreeNode<Integer>> result = new ArrayList<>();
+        
+        if(root == null){
+            return;
+        }
+        
+        Set<Integer> deleteSet = new HashSet<>();
+        for(int x: toDelete) deleteSet.add(x);
+        
+        boolean res = deleteTreeNodesAndReturnForest_Helper(root, deleteSet, result);
+        
+        if(res == false || (res && !deleteSet.contains(root.getData()))){
+            result.add(root);
+        }
+        
+        //output:
+        for(TreeNode<Integer> curr: result){
+            levelOrderTraversal_Iterative(curr);
+            System.out.println();
+        }
+        
+    }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
@@ -4416,7 +4601,7 @@ public class DSA450Questions {
         System.out.println("rotten time " + rottenTime);
 
     }
-    
+
     public int rottenOranges_HashBased(int[][] grid) {
 
         Set<String> fresh = new HashSet<>();
@@ -4778,6 +4963,7 @@ public class DSA450Questions {
     public void findRepeatingAndMissingInUnsortedArray_2(int[] arr) {
 
         //problem statement: https://www.geeksforgeeks.org/find-a-repeating-and-a-missing-number/
+        ////explanation: https://youtu.be/aMsSF1Il3IY
         //OPTIMISED
         //.......................T: O(N)
         //.......................S: O(1)
@@ -4911,12 +5097,14 @@ public class DSA450Questions {
                 iK++;
                 if (iK == K) {
                     kthElement = a[i];
+                    break;
                 }
                 i++;
             } else {
                 iK++;
                 if (iK == K) {
                     kthElement = b[j];
+                    break;
                 }
                 j++;
             }
@@ -6261,6 +6449,53 @@ public class DSA450Questions {
         }
 
         return true;
+    }
+
+    private void allPathFromSourceToTargetInDirectedAcyclicGraph_Helper(Map<Integer, List<Integer>> adj, int vertex,
+            int target, boolean[] vis, List<Integer> curr, List<List<Integer>> result) {
+
+        vis[vertex] = true;
+        curr.add(vertex);
+
+        if (vertex == target) {
+            result.add(curr);
+        }
+
+        List<Integer> childrens = adj.getOrDefault(vertex, new ArrayList<>());
+        for (int childVertex : childrens) {
+            if (vis[childVertex] != true) {
+                allPathFromSourceToTargetInDirectedAcyclicGraph_Helper(adj, childVertex, target, vis, new ArrayList<>(curr), result);
+            }
+        }
+        vis[vertex] = false;
+    }
+
+    public void allPathFromSourceToTargetInDirectedAcyclicGraph(int[][] graph) {
+        
+        //https://leetcode.com/problems/all-paths-from-source-to-target/
+        List<List<Integer>> result = new ArrayList<>();
+
+        if (graph[0].length == 0 && graph[1].length == 0) {
+            return;
+        }
+
+        //prepare data
+        Map<Integer, List<Integer>> adj = new HashMap<>();
+        for (int u = 0; u < graph.length; u++) {
+            adj.putIfAbsent(u, new ArrayList<>());
+            for (int nodes : graph[u]) {
+                adj.get(u).add(nodes);
+            }
+        }
+
+        int source = 0;
+        int target = adj.size() - 1; //target = V - 1
+        boolean[] vis = new boolean[graph.length];
+
+        allPathFromSourceToTargetInDirectedAcyclicGraph_Helper(adj, source, target, vis, new ArrayList<>(), result);
+
+        //output:
+        System.out.println("All paths: " + result);
 
     }
 
@@ -6305,6 +6540,93 @@ public class DSA450Questions {
 
         //output
         System.out.println("Min cost: " + memo[actualSize][W]);
+
+    }
+
+    //MY AMAZON ONLINE ASSESSMENT
+    public boolean robotRodeo(String command) {
+
+        //initial state of robot
+        int x = 0;
+        int y = 0;
+        int dir = 0; //0 = North, 1 = East, 2 = South, 3 = West (in clockwise direction of actual N-E-S-W dir)
+        for (char move : command.toCharArray()) {
+
+            if (move == 'R') {
+                //for a given curr dir, R would be on +1 side in clockwise way
+                //where %4 will bound our dir upto 4 actual dir(N-E-S-W dir)
+                dir = (dir + 1) % 4;
+            } else if (move == 'L') {
+                //for a given curr dir, L would be on +3 side in clockwise way
+                //where %4 will bound our dir upto 4 actual dir(N-E-S-W dir)
+                dir = (dir + 3) % 4;
+            } else {
+                //now move = G
+                if (dir == 0) {
+                    //North and G, move robot to vertical up(or to north) from given (x,y)
+                    y++;
+                } else if (dir == 1) {
+                    //East and G, move robot to horizontal right(or to east side) from given (x,y)
+                    x++;
+                } else if (dir == 2) {
+                    //South and G, move robot to vertical down(or to south side) from given (x,y)
+                    y--;
+                } else { //dir == 3
+                    //West and G, move robot to horizontal left(or to west side) from given (x,y)
+                    x--;
+                }
+
+            }
+        }
+
+        //if the robot returned to same inital (x,y) = (0,0) after all moves in given command
+        //that means there exists a cycle
+        return dir != 0 || (x == 0 && y == 0);
+    }
+
+    public int swapsRequiredToSortArray(int[] arr) {
+
+        class Pair {
+
+            int element;
+            int index;
+
+            public Pair(int element, int index) {
+                this.element = element;
+                this.index = index;
+            }
+        }
+        int N = arr.length;
+        List<Pair> list = new ArrayList<>();
+        for (int i = 0; i < N; i++) {
+            list.add(new Pair(arr[i], i));
+        }
+
+        Collections.sort(list, (a, b) -> a.element - b.element);
+
+        int result = 0;
+
+        for (int i = 0; i < N; i++) {
+
+            if (list.get(i).index == i) {
+                continue;
+            } else {
+
+                int index = list.get(i).index;
+                Pair p = list.get(index);
+                list.set(index, list.get(i));
+                list.set(i, p);
+            }
+
+            if (i != list.get(i).index) {
+                i--;
+            }
+
+            result++;
+
+        }
+
+        return result;
 
     }
 
@@ -6584,7 +6906,7 @@ public class DSA450Questions {
 //        obj.romanStringToDecimal("IV");
         //......................................................................
 //        Row: 86
-//        System.out.println("Longest commn subsequence");
+//        System.out.println("Longest common subsequence");
 //        obj.longestCommonSubsequence("ababcba", "ababcba");
 //        obj.longestCommonSubsequence("abxayzbcpqba", "kgxyhgtzpnlerq");
 //        obj.longestCommonSubsequence("abcd", "pqrs");
@@ -8059,13 +8381,18 @@ public class DSA450Questions {
 //        obj.kThElementInTwoSortedArrays_2(new int[]{2, 3, 6, 7, 9 }, new int[]{1, 4, 8, 10}, 5); //OPTIMISED
         //......................................................................
 //        Row: 72
-//        System.out.println("Word break");
+        System.out.println("Word break");
 //        Set<String> set = new HashSet<>();
 //        set.addAll(Arrays.asList("mobile","samsung","sam","sung","man","mango","icecream","and",  
 //                            "go","i","like","ice","cream"));
-//        System.out.println("Word break possible: "+obj.wordBreak("ilikesamsung", set)); 
-//        System.out.println("Word break possible: "+obj.wordBreak("ilike", set));
-//        System.out.println("Word break possible: "+obj.wordBreak("ilikedhokhla", set));
+//        System.out.println("Word break possible recursive: "+obj.wordBreak_Recursive("ilikesamsung", set)); 
+//        System.out.println("Word break possible recursive: "+obj.wordBreak_Recursive("ilike", set));
+//        System.out.println("Word break possible recursive: "+obj.wordBreak_Recursive("ilikedhokhla", set));
+//        System.out.println("Word break possible recursive: "+obj.wordBreak_Recursive("andicecreamhill", set));
+//        System.out.println("Word break possible dp: "+obj.wordBreak_DP_Problem("ilikesamsung", set)); 
+//        System.out.println("Word break possible dp: "+obj.wordBreak_DP_Problem("ilike", set));
+//        System.out.println("Word break possible dp: "+obj.wordBreak_DP_Problem("ilikedhokhla", set));
+//        System.out.println("Word break possible dp: "+obj.wordBreak_DP_Problem("andicecreamhill", set));
         //......................................................................
 //        Row: 245
 //        System.out.println("Minimum platform needed");
@@ -8083,31 +8410,92 @@ public class DSA450Questions {
 //        obj.fractionalKnapsack(new int[]{60,70}, new int[]{60, 100}, 50);
         //......................................................................
 //        Row: 326
-        System.out.println("Rotten oranges");
-        //Hash BASED: this approach rot all those oranges that are adjacent to a rotten orange in 1 unit of time
-        System.out.println("Rottening all the fresh oranges are possile in time: "
-                + obj.rottenOranges_HashBased(new int[][]{
-                    {2, 1, 1}, {1, 1, 0}, {0, 1, 1}
-                }));
-        System.out.println("Rottening all the fresh oranges are possile in time: "
-                + obj.rottenOranges_HashBased(new int[][]{
-                    {2,1,1},{0,1,1},{1,0,1}
-                }));
-        System.out.println("Rottening all the fresh oranges are possile in time: "
-                + obj.rottenOranges_HashBased(new int[][]{
-                    {0,2}
-                }));
-        //DFS BASED: this approach rot all the oranges that are connected to a rotten orange
-        //this follows flood fill way
-        obj.rottenOranges_DFS(new int[][]{
-                    {2, 1, 1}, {1, 1, 0}, {0, 1, 1}
-                });
-        obj.rottenOranges_DFS(new int[][]{
-                    {2,1,1},{0,1,1},{1,0,1}
-                });
-        obj.rottenOranges_DFS(new int[][]{
-                    {0,2}
-                });
+//        System.out.println("Rotten oranges");
+//        //Hash BASED: this approach rot all those oranges that are adjacent to a rotten orange in 1 unit of time
+//        System.out.println("Rottening all the fresh oranges are possile in time: "
+//                + obj.rottenOranges_HashBased(new int[][]{
+//                    {2, 1, 1}, {1, 1, 0}, {0, 1, 1}
+//                }));
+//        System.out.println("Rottening all the fresh oranges are possile in time: "
+//                + obj.rottenOranges_HashBased(new int[][]{
+//                    {2,1,1},{0,1,1},{1,0,1}
+//                }));
+//        System.out.println("Rottening all the fresh oranges are possile in time: "
+//                + obj.rottenOranges_HashBased(new int[][]{
+//                    {0,2}
+//                }));
+//        //DFS BASED: this approach rot all the oranges that are connected to a rotten orange
+//        //this follows flood fill way
+//        obj.rottenOranges_DFS(new int[][]{
+//                    {2, 1, 1}, {1, 1, 0}, {0, 1, 1}
+//                });
+//        obj.rottenOranges_DFS(new int[][]{
+//                    {2,1,1},{0,1,1},{1,0,1}
+//                });
+//        obj.rottenOranges_DFS(new int[][]{
+//                    {0,2}
+//                });
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT : MY AMAZON ONLINE ASSESSMENT
+//        System.out.println("Robot rodeo/ Robot bounded in the circle");
+//        //https://leetcode.com/problems/robot-bounded-in-circle/
+//        System.out.println("Is robot moving in circle: " + obj.robotRodeo("GGLLGG"));
+//        System.out.println("Is robot moving in circle: " + obj.robotRodeo("GG"));
+//        System.out.println("Is robot moving in circle: " + obj.robotRodeo("GL"));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT : MY AMAZON ONLINE ASSESSMENT
+//        System.out.println("Swaps required to sort the array");
+//        //https://www.geeksforgeeks.org/minimum-number-of-swaps-required-to-sort-an-array-set-2/
+//        System.out.println("Min swaps: "+obj.swapsRequiredToSortArray(new int[]{1, 5, 4, 3, 2 }));
+//        System.out.println("Min swaps: "+obj.swapsRequiredToSortArray(new int[]{7,1,2 }));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("All path from source to target in directed acyclic graph");
+//        obj.allPathFromSourceToTargetInDirectedAcyclicGraph(new int[][]{
+//            {1, 2}, {3}, {3}, {}
+//        });
+//        obj.allPathFromSourceToTargetInDirectedAcyclicGraph(new int[][]{
+//            {4, 3, 1}, {3, 2, 4}, {3}, {4}, {}
+//        });
+//        obj.allPathFromSourceToTargetInDirectedAcyclicGraph(new int[][]{
+//            {2}, {}, {1}
+//        });
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Longest substring without repeating characters");
+//        //https://leetcode.com/problems/longest-substring-without-repeating-characters/
+//        obj.longestSubstringWithoutRepeatingChar("abcabcbb");
+//        obj.longestSubstringWithoutRepeatingChar("bbbbb");
+//        obj.longestSubstringWithoutRepeatingChar("pwwkew");
+//        obj.longestSubstringWithoutRepeatingChar("");
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Minimum window substring containing all the character to string t in string s");
+//        //https://leetcode.com/problems/minimum-window-substring/
+//        obj.minimumWindowSubstring("", "");
+//        obj.minimumWindowSubstring("ADOBECODEBANC", "ABC");
+//        obj.minimumWindowSubstring("a", "a");
+//        obj.minimumWindowSubstring("aa", "aa");
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Delete tree nodes and return forest");
+        //https://leetcode.com/problems/delete-nodes-and-return-forest/
+        TreeNode<Integer> root1 = new TreeNode<>(1);
+        root1.setLeft(new TreeNode<>(3));
+        root1.setRight(new TreeNode<>(2));
+        root1.getRight().setLeft(new TreeNode<>(5));
+        root1.getRight().getLeft().setLeft(new TreeNode<>(6));
+        root1.getRight().getLeft().getLeft().setLeft(new TreeNode<>(7));
+        root1.getRight().getLeft().setRight(new TreeNode<>(8));
+        root1.getRight().setRight(new TreeNode<>(4));
+        obj.deleteTreeNodesAndReturnForest(root1, new int[]{8,1,6});
+        root1 = new TreeNode<>(1);
+        root1.setLeft(new TreeNode<>(3));
+        root1.setRight(new TreeNode<>(2));
+        obj.deleteTreeNodesAndReturnForest(root1, new int[]{3,2});
+        
+        
+        
     }
 
 }
