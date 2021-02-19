@@ -887,6 +887,86 @@ public class DSA450Questions {
 
     }
 
+    public void productOfArrayExcludingElementItself_BruteForce(int[] arr) {
+
+        //.....................T: O(N^2)
+        //SOLUTION CAN GIVE TLE
+        int n = arr.length;
+        int[] result = new int[n];
+
+        for (int i = 0; i < n; i++) {
+            int prod = 1;
+            for (int j = 0; j < n; j++) {
+                if (i != j) {
+                    prod *= arr[j];
+                }
+            }
+            result[i] = prod;
+        }
+
+        //output:
+        for (int x : result) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+    }
+
+    public void productOfArrayExcludingElementItself_Optimised1(int[] arr) {
+
+        //.....................T: O(N)
+        //.....................S: O(N)
+        int n = arr.length;
+        int[] result = new int[n];
+        int[] leftProd = new int[n];
+        int[] rightProd = new int[n];
+
+        leftProd[0] = 1;
+        rightProd[n - 1] = 1;
+
+        for (int i = 1; i < n; i++) {
+            leftProd[i] = leftProd[i - 1] * arr[i - 1];
+        }
+
+        for (int i = n - 2; i >= 0; i--) {
+            rightProd[i] = rightProd[i + 1] * arr[i + 1];
+        }
+
+        for (int i = 0; i < n; i++) {
+            result[i] = leftProd[i] * rightProd[i];
+        }
+
+        //output:
+        for (int x : result) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+    }
+
+    public void productOfArrayExcludingElementItself_Optimised2(int[] arr) {
+
+        //.....................T: O(N)
+        //.....................S: O(1) //result[] is needed to save output 
+        int n = arr.length;
+        int[] result = new int[n];
+
+        result[0] = 1;
+        for (int i = 1; i < n; i++) {
+            result[i] = result[i - 1] * arr[i - 1];
+        }
+
+        int right = 1;
+        for (int i = n - 1; i >= 0; i--) {
+            result[i] = result[i] * right;
+            right *= arr[i];
+        }
+
+        //output:
+        for (int x : result) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+    }
+
     public void rotateMatrixClockWise90Deg(int[][] mat) {
 
         int row = mat.length;
@@ -1799,8 +1879,8 @@ public class DSA450Questions {
         if (n == 0) {
             return true;
         }
-        
-        if(set.contains(str)){
+
+        if (set.contains(str)) {
             return true;
         }
 
@@ -1811,29 +1891,29 @@ public class DSA450Questions {
         }
         return false;
     }
-    
+
     public boolean wordBreak_DP_Problem(String str, Set<String> set) {
 
         //https://leetcode.com/problems/word-break/discuss/1068441/Detailed-Explanation-of-Top-Down-and-Bottom-Up-DP
         boolean[] memo = new boolean[str.length() + 1];
         //base cond
         memo[0] = true; // str with no length is also true
-        
-        for(int i=1; i <= str.length(); i++){
-            for(int j = 0; j < i; j++){
-                if(set.contains(str.substring(j, i)) && memo[j]){
+
+        for (int i = 1; i <= str.length(); i++) {
+            for (int j = 0; j < i; j++) {
+                if (set.contains(str.substring(j, i)) && memo[j]) {
                     memo[i] = true;
                     break;
                 }
             }
         }
-        
+
         return memo[str.length()];
-        
+
     }
-    
-    public void longestSubstringWithoutRepeatingChar(String str){
-        
+
+    public void longestSubstringWithoutRepeatingChar(String str) {
+
         //SLIDING WINDOW ALGO
         //https://leetcode.com/problems/longest-substring-without-repeating-characters/
         int n = str.length();
@@ -1842,84 +1922,84 @@ public class DSA450Questions {
         int maxLen = 0;
         int[] count = new int[256];
         String substr = "";
-        while(j < n){
-            
+        while (j < n) {
+
             char ch = str.charAt(j);
-            if(count[ch] < 1){
+            if (count[ch] < 1) {
                 count[ch]++;
                 maxLen = Math.max(maxLen, j - i + 1);
                 //the new subtring len is greater than prev substring len update that substring
-                substr = str.substring(i, j+1).length() > substr.length() ? str.substring(i, j+1) : substr;
+                substr = str.substring(i, j + 1).length() > substr.length() ? str.substring(i, j + 1) : substr;
                 j++;
-            }else {
+            } else {
                 count[str.charAt(i)]--;
                 i++;
             }
-            
+
         }
-        
+
         //output:
-        System.out.println("Longest subtring without repeating char: "+maxLen+" ("+substr+")");
-        
+        System.out.println("Longest subtring without repeating char: " + maxLen + " (" + substr + ")");
+
     }
-    
-    public void minimumWindowSubstring(String s, String t){
-        
+
+    public void minimumWindowSubstring(String s, String t) {
+
         //Explanation: https://www.youtube.com/watch?v=nMaKzLWceFg&feature=youtu.be
         //SLIDING WINDOW ALGO
         //prepare the count map for string t 
         //to know how many char we need to find in string s
         Map<Character, Integer> tMap = new HashMap<>();
-        for(char ch: t.toCharArray()){
-            tMap.put(ch, tMap.getOrDefault(ch,0) + 1);
+        for (char ch : t.toCharArray()) {
+            tMap.put(ch, tMap.getOrDefault(ch, 0) + 1);
         }
-        
+
         int tCount = 0;
         int start = 0;
         int end = 0;
         int minLenWindow = Integer.MAX_VALUE;
         int substrIndex = 0;
         int N = s.length();
-        while(end < N){
-            
+        while (end < N) {
+
             char chEnd = s.charAt(end);
             //each we find the char in string s that is also in string t
             //we decreament the count of that char from map
             //to know how much of that char (chEnd) we needed and how much we have found
-            if(tMap.containsKey(chEnd)){
+            if (tMap.containsKey(chEnd)) {
                 tMap.put(chEnd, tMap.get(chEnd) - 1);
-                if(tMap.get(chEnd) >= 0){
+                if (tMap.get(chEnd) >= 0) {
                     tCount++;
                 }
             }
-            
-            while(tCount == t.length()){
-                
-                if(minLenWindow > (end - start + 1)){
+
+            while (tCount == t.length()) {
+
+                if (minLenWindow > (end - start + 1)) {
                     minLenWindow = end - start + 1;
                     substrIndex = start;
                 }
-                
+
                 //adjust the start pointer now
                 char chStart = s.charAt(start);
-                if(tMap.containsKey(chStart)){
+                if (tMap.containsKey(chStart)) {
                     tMap.put(chStart, tMap.get(chStart) + 1);
-                    if(tMap.get(chStart) > 0){
+                    if (tMap.get(chStart) > 0) {
                         tCount--;
                     }
                 }
                 start++;
             }
-            
+
             end++;
         }
-        
+
         //output:
-        String output = minLenWindow > s.length()  ? "" : s.substring(substrIndex, substrIndex + minLenWindow);
+        String output = minLenWindow > s.length() ? "" : s.substring(substrIndex, substrIndex + minLenWindow);
         System.out.println("Min window substring containg all char of string t in string s: "
-                +(minLenWindow > s.length() ? -1 : minLenWindow)+" : "
-                +output);
-        
+                + (minLenWindow > s.length() ? -1 : minLenWindow) + " : "
+                + output);
+
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -4221,64 +4301,103 @@ public class DSA450Questions {
         System.out.println("All nodes at K distance from target node: " + result);
 
     }
-    
-    private boolean deleteTreeNodesAndReturnForest_Helper(TreeNode<Integer> root, 
-            Set<Integer> deleteSet, List<TreeNode<Integer>> result){
-        
-        if(root == null){
+
+    private boolean deleteTreeNodesAndReturnForest_Helper(TreeNode<Integer> root,
+            Set<Integer> deleteSet, List<TreeNode<Integer>> result) {
+
+        if (root == null) {
             return false;
         }
-        
+
         boolean deleteLeft = deleteTreeNodesAndReturnForest_Helper(root.getLeft(), deleteSet, result);
         boolean deleteRight = deleteTreeNodesAndReturnForest_Helper(root.getRight(), deleteSet, result);
-        
-        if(deleteLeft){
+
+        if (deleteLeft) {
             root.setLeft(null);
         }
-        
-        if(deleteRight){
+
+        if (deleteRight) {
             root.setRight(null);
         }
-        
-        if(deleteSet.contains(root.getData())){
-            
-            if(root.getLeft() != null){
+
+        if (deleteSet.contains(root.getData())) {
+
+            if (root.getLeft() != null) {
                 result.add(root.getLeft());
             }
-            
-            if(root.getRight() != null){
+
+            if (root.getRight() != null) {
                 result.add(root.getRight());
             }
             return true;
         }
-        
-        return deleteLeft && deleteRight && deleteSet.contains(root.getData()); 
-        
+
+        return deleteLeft && deleteRight && deleteSet.contains(root.getData());
+
     }
-    
-    public void deleteTreeNodesAndReturnForest(TreeNode<Integer> root, int[] toDelete){
-        
+
+    public void deleteTreeNodesAndReturnForest(TreeNode<Integer> root, int[] toDelete) {
+
         List<TreeNode<Integer>> result = new ArrayList<>();
-        
-        if(root == null){
+
+        if (root == null) {
             return;
         }
-        
+
         Set<Integer> deleteSet = new HashSet<>();
-        for(int x: toDelete) deleteSet.add(x);
-        
+        for (int x : toDelete) {
+            deleteSet.add(x);
+        }
+
         boolean res = deleteTreeNodesAndReturnForest_Helper(root, deleteSet, result);
-        
-        if(res == false || (res && !deleteSet.contains(root.getData()))){
+
+        if (res == false || (res && !deleteSet.contains(root.getData()))) {
             result.add(root);
         }
-        
+
         //output:
-        for(TreeNode<Integer> curr: result){
+        for (TreeNode<Integer> curr : result) {
             levelOrderTraversal_Iterative(curr);
             System.out.println();
         }
-        
+
+    }
+
+    private TreeNode<Integer> constructBinaryTreeFromInorderPreorderArray_Helper(int preIndex, int inStart, int inEnd,
+            int[] inorder, int[] preorder) {
+
+        if (preIndex >= preorder.length || inStart > inEnd) {
+            return null;
+        }
+
+        TreeNode<Integer> root = new TreeNode<>(preorder[preIndex]);
+
+        int index = inStart;
+        for (; index <= inEnd; index++) {
+            if (preorder[preIndex] == inorder[index]) {
+                break;
+            }
+        }
+
+        root.setLeft(constructBinaryTreeFromInorderPreorderArray_Helper(preIndex + 1, inStart, index - 1, inorder, preorder));
+        root.setRight(constructBinaryTreeFromInorderPreorderArray_Helper(preIndex + 1 + index - inStart, index + 1, inEnd, inorder, preorder));
+
+        return root;
+    }
+
+    public void constructBinaryTreeFromInorderPreorderArray(int[] inorder, int[] preorder) {
+
+        if (inorder.length != preorder.length) {
+            return;
+        }
+
+        int n = inorder.length;
+        TreeNode<Integer> root = constructBinaryTreeFromInorderPreorderArray_Helper(0, 0, n - 1, inorder, preorder);
+
+        //output
+        new BinaryTree<>(root).treeBFS();
+        System.out.println();
+
     }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
@@ -6471,7 +6590,7 @@ public class DSA450Questions {
     }
 
     public void allPathFromSourceToTargetInDirectedAcyclicGraph(int[][] graph) {
-        
+
         //https://leetcode.com/problems/all-paths-from-source-to-target/
         List<List<Integer>> result = new ArrayList<>();
 
@@ -6540,6 +6659,32 @@ public class DSA450Questions {
 
         //output
         System.out.println("Min cost: " + memo[actualSize][W]);
+
+    }
+
+    public void LRUCacheDesignImpl(List<String> operations, List<List<Integer>> inputs) {
+
+        LRUCacheDesign lruObj = null;
+        for (int i = 0; i < operations.size(); i++) {
+            String operation = operations.get(i);
+            switch (operation) {
+                case "LRUCache":
+                    int capacity = inputs.get(i).get(0);
+                    lruObj = new LRUCacheDesign(capacity);
+                    System.out.println("Object created:" + operation);
+                    break;
+                case "put":
+                    int key = inputs.get(i).get(0);
+                    int value = inputs.get(i).get(1);
+                    lruObj.put(key, value);
+                    System.out.println("Put: " + key + " " + value);
+                    break;
+                case "get":
+                    key = inputs.get(i).get(0);
+                    System.out.println("Get: " + lruObj.get(key));
+                    break;
+            }
+        }
 
     }
 
@@ -8381,7 +8526,7 @@ public class DSA450Questions {
 //        obj.kThElementInTwoSortedArrays_2(new int[]{2, 3, 6, 7, 9 }, new int[]{1, 4, 8, 10}, 5); //OPTIMISED
         //......................................................................
 //        Row: 72
-        System.out.println("Word break");
+//        System.out.println("Word break");
 //        Set<String> set = new HashSet<>();
 //        set.addAll(Arrays.asList("mobile","samsung","sam","sung","man","mango","icecream","and",  
 //                            "go","i","like","ice","cream"));
@@ -8478,24 +8623,50 @@ public class DSA450Questions {
 //        obj.minimumWindowSubstring("aa", "aa");
         //......................................................................
 //        Row: SEPARATE QUESTION IMPORTANT
-        System.out.println("Delete tree nodes and return forest");
-        //https://leetcode.com/problems/delete-nodes-and-return-forest/
-        TreeNode<Integer> root1 = new TreeNode<>(1);
-        root1.setLeft(new TreeNode<>(3));
-        root1.setRight(new TreeNode<>(2));
-        root1.getRight().setLeft(new TreeNode<>(5));
-        root1.getRight().getLeft().setLeft(new TreeNode<>(6));
-        root1.getRight().getLeft().getLeft().setLeft(new TreeNode<>(7));
-        root1.getRight().getLeft().setRight(new TreeNode<>(8));
-        root1.getRight().setRight(new TreeNode<>(4));
-        obj.deleteTreeNodesAndReturnForest(root1, new int[]{8,1,6});
-        root1 = new TreeNode<>(1);
-        root1.setLeft(new TreeNode<>(3));
-        root1.setRight(new TreeNode<>(2));
-        obj.deleteTreeNodesAndReturnForest(root1, new int[]{3,2});
-        
-        
-        
+//        System.out.println("Delete tree nodes and return forest");
+//        //https://leetcode.com/problems/delete-nodes-and-return-forest/
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(3));
+//        root1.setRight(new TreeNode<>(2));
+//        root1.getRight().setLeft(new TreeNode<>(5));
+//        root1.getRight().getLeft().setLeft(new TreeNode<>(6));
+//        root1.getRight().getLeft().getLeft().setLeft(new TreeNode<>(7));
+//        root1.getRight().getLeft().setRight(new TreeNode<>(8));
+//        root1.getRight().setRight(new TreeNode<>(4));
+//        obj.deleteTreeNodesAndReturnForest(root1, new int[]{8, 1, 6});
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(3));
+//        root1.setRight(new TreeNode<>(2));
+//        obj.deleteTreeNodesAndReturnForest(root1, new int[]{3, 2});
+        //......................................................................
+//        Row: 321
+//        System.out.println("LRU cache design");
+//        List<String> operations = Arrays.asList("LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get");
+//        List<List<Integer>> inputs = Arrays.asList(
+//                Arrays.asList(2),
+//                Arrays.asList(1, 1),
+//                Arrays.asList(2, 2),
+//                Arrays.asList(1),
+//                Arrays.asList(3, 3),
+//                Arrays.asList(2),
+//                Arrays.asList(4, 4),
+//                Arrays.asList(1),
+//                Arrays.asList(3),
+//                Arrays.asList(4)
+//        );
+//        
+//        obj.LRUCacheDesignImpl(operations, inputs);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Product of array excluding element itself");
+//        obj.productOfArrayExcludingElementItself_BruteForce(new int[]{1, 2, 3, 4});
+//        obj.productOfArrayExcludingElementItself_Optimised1(new int[]{1, 2, 3, 4});
+//        obj.productOfArrayExcludingElementItself_Optimised2(new int[]{1, 2, 3, 4}); //TIME & SPACE OPTIMISED
+        //......................................................................
+//        Row: 196
+        System.out.println("Construct binary tree from inorder and preorder");
+        //https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/
+        obj.constructBinaryTreeFromInorderPreorderArray(new int[]{9, 3, 15, 20, 7}, new int[]{3, 9, 20, 15, 7});
     }
 
 }

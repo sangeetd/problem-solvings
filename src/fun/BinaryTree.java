@@ -397,58 +397,37 @@ public class BinaryTree<T> {
         return treeHeightWithNode(getRoot());
 
     }
-
-    private int inorderRootElementIndex(T[] inorder, T data, int l, int r) {
-        int i;
-        for (i = l; i <= r; i++) {
-
-            if (data == inorder[i]) {
-                return i;
-            }
-
-        }
-
-        return i;
-    }
-
-    //required for recursive stability
-    static int preIndex = 0;
-
-    private TreeNode<T> buildTree(T[] inorder, T[] preorder, int l, int r) {
-
-        if (l > r) {
+    
+    private TreeNode<T> buildTreeFromInorderPreorder_Helper(int preIndex, int inStart, int inEnd, T[] inorder, T[] preorder){
+        
+        if(preIndex >= preorder.length || inStart > inEnd){
             return null;
         }
-
-        TreeNode<T> node = new TreeNode<T>(preorder[preIndex++]);
-
-        if (l == r) {
-            return node;
+        
+        TreeNode<T> root = new TreeNode<>(preorder[preIndex]);
+        
+        int index = inStart;
+        for(; index<=inEnd; index++){
+            if(preorder[preIndex] == inorder[index]){
+                break;
+            }
         }
-
-        int inorderRootIndex = inorderRootElementIndex(inorder, node.getData(), l, r);
-        node.setLeft(buildTree(inorder, preorder, l, inorderRootIndex - 1));
-        node.setRight(buildTree(inorder, preorder, inorderRootIndex + 1, r));
-
-        return node;
-
+        
+        root.setLeft(buildTreeFromInorderPreorder_Helper(preIndex+1, inStart, index - 1, inorder, preorder));
+        root.setRight(buildTreeFromInorderPreorder_Helper(preIndex+1+index-inStart, index + 1, inEnd, inorder, preorder));
+        
+        return root;
     }
-
+    
     public BinaryTree<T> buildTreeFromInorderPreorder(T[] inorder, T[] preorder) {
 
         if (inorder.length != preorder.length) {
             throw new RuntimeException("Tree nodes are not equal");
         }
-
-        int n = inorder.length;
-        TreeNode<T> root = buildTree(inorder, preorder, 0, n - 1);
-
-        //just reseting the static variable after the work is done
-        preIndex = 0;
-
+        TreeNode<T> root = buildTreeFromInorderPreorder_Helper(0, 0, inorder.length-1, preorder, inorder);
         return new BinaryTree<T>(root);
-
     }
+    
 
     public void treeTopView() {
         //inner class scope limited to this method only
