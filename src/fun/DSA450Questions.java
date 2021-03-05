@@ -1150,66 +1150,186 @@ public class DSA450Questions {
         System.out.println("Max length: " + maxLen);
 
     }
-    
-    public void maxSumPathInTwoSortedArrays(int[] arr1, int[] arr2){
-        
+
+    public void maxSumPathInTwoSortedArrays(int[] arr1, int[] arr2) {
+
         //https://www.geeksforgeeks.org/maximum-sum-path-across-two-arrays/
         int m = arr1.length;
         int n = arr2.length;
-        
+
         int result = 0;
         int arrSum1 = 0;
         int arrSum2 = 0;
-        
+
         int i = 0; // for arr1
         int j = 0; // for arr2
-    
-        while(i < m && j < n){
-            
-            if(arr1[i] < arr2[j]){
+
+        while (i < m && j < n) {
+
+            if (arr1[i] < arr2[j]) {
                 arrSum1 += arr1[i++];
-            }else if(arr1[i] > arr2[j]){
+            } else if (arr1[i] > arr2[j]) {
                 arrSum2 += arr2[j++];
-            }else {
+            } else {
                 //common point
                 result += Math.max(arrSum1, arrSum2);
-                
+
                 arrSum1 = 0;
                 arrSum2 = 0;
-                
+
                 int temp = i;
-                while(i < m && arr1[i] == arr2[j]){
+                while (i < m && arr1[i] == arr2[j]) {
                     arrSum1 += arr1[i++];
                 }
-                
-                while(j < n && arr1[temp] == arr2[j]){
+
+                while (j < n && arr1[temp] == arr2[j]) {
                     arrSum2 += arr2[j++];
                 }
-                
+
                 result += Math.max(arrSum1, arrSum2);
-                
+
                 arrSum1 = 0;
                 arrSum2 = 0;
-                
+
             }
-            
+
         }
-        
-        while(i < m){
+
+        while (i < m) {
             arrSum1 += arr1[i++];
         }
-        
-        while(j < n){
+
+        while (j < n) {
             arrSum2 += arr2[j++];
         }
-        
+
         result += Math.max(arrSum1, arrSum2);
-        
+
         //output:
-        System.out.println("Max path sum: "+result);
-        
+        System.out.println("Max path sum: " + result);
+
     }
-    
+
+    public void asteroidCollision(int[] asteroid) {
+
+        //https://leetcode.com/problems/asteroid-collision/
+        //explanation: https://youtu.be/6GGTBM7mwfs
+
+        /*
+         cond when two collide
+         peek = -ve, incoming = -ve = left, left dir no collision //1 if cond in while()
+         peek = -ve, incoming = +ve = left, right dir no collision //1 if cond in for()
+         peek = +ve, incoming = +ve = right, right dir no collision //1 if cond in for()
+         peek = +ve, incoming = -ve = right, left dir will collision
+         if(abs(incoming) > peek) all peek will be destroyed and incoming will remain in sack //last else cond   
+         if(abs(incoming) < peek) incoming will be destroyed and stack remain same //3 else if cond
+         if(abs(incoming) == peek) both will be destroyed and stack need to pop out peek value //2 else if cond
+        
+         */
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 0; i < asteroid.length; i++) {
+
+            if (stack.isEmpty() || asteroid[i] > 0) {
+                stack.push(asteroid[i]);
+            } else {
+
+                while (true) {
+
+                    int peek = stack.peek();
+                    if (peek < 0) {
+                        //peek is less that 0 means -ve(move to left)
+                        //incoming aseroids[i] is either +ve or -ve
+                        //they will never collide
+                        //ex: stack[-4], incoming = -10 both move to left, left dir(no collision)
+                        //ex: stack[-4], incoming = 10 both move to left, right dir(no collision)
+                        stack.push(asteroid[i]);
+                        break;
+                    } else if (peek == -asteroid[i]) {
+                        // If both are the same size, both will explode
+                        stack.pop();
+                        break;
+                    } else if (peek > -asteroid[i]) {
+                        //peek is greater means +ve(move to right dir)
+                        //aseroids[i] is lesser -ve(move to left dir)
+                        //If two asteroids meet, the smaller one will explode
+                        break;
+                    } else {
+                        //case of stack[3,2,1], incoming is -10
+                        // -10 will collide with all the asteroids and blow them up until the stack is 
+                        //empty and when sack is empty put the -10 as the only asteroids
+                        stack.pop();
+                        if (stack.isEmpty()) {
+                            stack.push(asteroid[i]);
+                            break;
+                        }
+                    }
+                }
+
+            }
+        }
+
+        //output:
+        int[] output = new int[stack.size()];
+        int index = stack.size() - 1;
+        while (!stack.isEmpty()) {
+            output[index--] = stack.pop();
+        }
+
+        for (int x : output) {
+            System.out.print(x + " ");
+        }
+
+        System.out.println();
+
+    }
+
+    public void jumpGame(int[] nums) {
+
+        //https://leetcode.com/problems/jump-game/
+        //Explanantion: https://youtu.be/Zb4eRjuPHbM
+        //approach is to use reverse way assume that we can actually end of nums[]
+        //now traverse backwards to check if we can reach 0 index (reachablePoint == 0)
+        int reachablePoint = nums[nums.length - 1];
+        for (int i = nums.length - 1; i >= 0; i--) {
+            if (i + nums[i] >= reachablePoint) {
+                reachablePoint = i;
+            }
+        }
+
+        System.out.println("can we reach the end of nums array from 0th index: " + (reachablePoint == 0));
+    }
+
+    public void nextGreaterElement2_CyclicArray(int[] arr) {
+
+        //explanation: https://leetcode.com/problems/next-greater-element-ii/solution/
+        //array to be considered as cyclic
+        int n = arr.length;
+        int[] output = new int[n];
+        Stack<Integer> stack = new Stack<>();
+        for (int i = 2 * n - 1; i >= 0; i--) {
+
+            while (!stack.isEmpty() && arr[stack.peek()] <= arr[i % n]) {
+                stack.pop();
+            }
+
+            if (stack.isEmpty()) {
+                output[i % n] = -1;
+            } else {
+                output[i % n] = arr[stack.peek()];
+            }
+
+            stack.push(i % n);
+        }
+
+        //output:
+        for (int x : output) {
+            System.out.print(x + " ");
+        }
+
+        System.out.println();
+
+    }
+
     public void rotateMatrixClockWise90Deg(int[][] mat) {
 
         int row = mat.length;
@@ -2408,6 +2528,54 @@ public class DSA450Questions {
         //output
         LinkedListUtil<Integer> output = new LinkedListUtil<>(node);
         output.print();
+
+    }
+
+    private int longestPallindromicSubstring_ExpandFromMiddle(String str, int left, int right) {
+
+        if (str == null || left > right) {
+            return 0;
+        }
+
+        while (left >= 0 && right < str.length() && str.charAt(left) == str.charAt(right)) {
+            left--;
+            right++;
+        }
+
+        return right - left - 1;
+
+    }
+
+    public void longestPallindromicSubstring(String str) {
+
+        //.....................T: O(N^2)
+        //https://leetcode.com/problems/longest-palindromic-substring/
+        //explanation: https://youtu.be/y2BD4MJqV20
+        int start = 0;
+        int end = 0;
+
+        for (int i = 0; i < str.length(); i++) {
+
+            //case to handle odd length string 
+            //there will be exactly middle char in that
+            //ex: "racecar" middle char is 'e' 
+            int len1 = longestPallindromicSubstring_ExpandFromMiddle(str, i, i);
+            //case to handle even length string
+            //the middle will in b/w the two char of (str.length / 2)  and ((str.length /2) + 1)
+            //ex: "aabbaa" middle char will be in b/w b|b
+            int len2 = longestPallindromicSubstring_ExpandFromMiddle(str, i, i + 1);
+
+            int len = Math.max(len1, len2);
+
+            if (len > end - start) {
+                start = i - (len - 1) / 2;
+                end = i + (len) / 2;
+            }
+
+        }
+
+        //output:
+        System.out.println("Longest pallindromic substring: " + str.substring(start, end + 1));
 
     }
 
@@ -4813,6 +4981,34 @@ public class DSA450Questions {
 
     }
 
+    private TreeNode<Integer> deleteTreeNodesAndReturnForest_Helper2(TreeNode<Integer> root,
+            Set<Integer> deleteSet, List<TreeNode<Integer>> result) {
+
+        //Easier explanation
+        if (root == null) {
+            return null;
+        }
+
+        root.setLeft(deleteTreeNodesAndReturnForest_Helper2(root.getLeft(), deleteSet, result));
+        root.setRight(deleteTreeNodesAndReturnForest_Helper2(root.getRight(), deleteSet, result));
+
+        if (deleteSet.contains(root.getData())) {
+
+            if (root.getLeft() != null) {
+                result.add(root.getLeft());
+            }
+
+            if (root.getRight() != null) {
+                result.add(root.getRight());
+            }
+
+            return null;
+        }
+
+        return root;
+
+    }
+
     public void deleteTreeNodesAndReturnForest(TreeNode<Integer> root, int[] toDelete) {
 
         List<TreeNode<Integer>> result = new ArrayList<>();
@@ -4826,9 +5022,14 @@ public class DSA450Questions {
             deleteSet.add(x);
         }
 
-        boolean res = deleteTreeNodesAndReturnForest_Helper(root, deleteSet, result);
-
-        if (res == false || (res && !deleteSet.contains(root.getData()))) {
+//        boolean res = deleteTreeNodesAndReturnForest_Helper(root, deleteSet, result);
+//
+//        if (res == false || (res && !deleteSet.contains(root.getData()))) {
+//            result.add(root);
+//        }
+        //Easier explanation
+        deleteTreeNodesAndReturnForest_Helper2(root, deleteSet, result);
+        if (!deleteSet.contains(root.getData())) {
             result.add(root);
         }
 
@@ -5123,22 +5324,21 @@ public class DSA450Questions {
 
     }
 
-    private void printSumWhereRootToLeafPathIsANumber_createNumberHelper(TreeNode<Integer> root, int num, List<Integer> nums){
-        
-        if(root == null){
+    private void printSumWhereRootToLeafPathIsANumber_createNumberHelper(TreeNode<Integer> root, int num, List<Integer> nums) {
+
+        if (root == null) {
             return;
         }
-        
+
         printSumWhereRootToLeafPathIsANumber_createNumberHelper(root.getLeft(), num * 10 + root.getData(), nums);
         printSumWhereRootToLeafPathIsANumber_createNumberHelper(root.getRight(), num * 10 + root.getData(), nums);
-        
-        if(root.getLeft() == null && root.getRight() == null){
+
+        if (root.getLeft() == null && root.getRight() == null) {
             nums.add(num * 10 + root.getData());
         }
-        
-        
+
     }
-    
+
     public void printSumWhereRootToLeafPathIsANumber(TreeNode<Integer> root) {
 
         //ex: 
@@ -5150,18 +5350,17 @@ public class DSA450Questions {
         //num2 = 13 (as 1->3 is a path)
         //each path from root to leaf is a separate num
         //print sum of all such number
-        
         List<Integer> nums = new ArrayList<>();
         printSumWhereRootToLeafPathIsANumber_createNumberHelper(root, 0, nums);
-        
+
         int sum = 0;
-        for(int num: nums){
+        for (int num : nums) {
             sum += num;
         }
-        
+
         //output:
-        System.out.println("Sum of path of tree representing as a number: "+sum);
-        
+        System.out.println("Sum of path of tree representing as a number: " + sum);
+
     }
 
     int middleElementInStack_Element = Integer.MIN_VALUE;
@@ -5537,6 +5736,32 @@ public class DSA450Questions {
         }
 
         return minTime;
+    }
+
+    public void validSudoku(String[][] grid) {
+
+        
+        //Explanantion: https://youtu.be/Pl7mMcBm2b8
+        HashSet<String> vis = new HashSet<>();
+
+        for (int x = 0; x < grid.length; x++) {
+            for (int y = 0; y < grid[x].length; y++) {
+
+                String curr = grid[x][y];
+                if (!curr.equals(".")) {
+
+                    if (!vis.add(curr + " at row: " + x)
+                            || !vis.add(curr + " at col: " + y)
+                            || !vis.add(curr + " in cell: " + (x / 3) + "-" + (y / 3))) {
+                        System.out.println("Invalid sudoku grid");
+                        return;
+                    }
+                }
+            }
+        }
+
+        System.out.println("Valid sudoku grid");
+
     }
 
     public void minCostOfRope(int[] a) {
@@ -9778,27 +10003,69 @@ public class DSA450Questions {
 //        obj.smallestStringInTreeFromLeafToRoot(root);
         //......................................................................
 //        Row: SEPARATE QUESTION IMPORTANT
-        System.out.println("Print the sum where each root-to-leaf path of tree represent a number");
-        //https://leetcode.com/problems/sum-root-to-leaf-numbers/
-        TreeNode<Integer> root = new TreeNode<>(1);
-        root.setLeft(new TreeNode<>(2));
-        root.setRight(new TreeNode<>(3));
-        obj.printSumWhereRootToLeafPathIsANumber(root);
-        root = new TreeNode<>(1);
-        root.setLeft(new TreeNode<>(2));
-        root.getLeft().setLeft(new TreeNode<>(4));
-        root.getLeft().setRight(new TreeNode<>(5));
-        root.getLeft().getLeft().setLeft(new TreeNode<>(7));
-        root.setRight(new TreeNode<>(3));
-        root.getRight().setRight(new TreeNode<>(6));
-        root.getRight().getRight().setRight(new TreeNode<>(8));
-        obj.printSumWhereRootToLeafPathIsANumber(root);
+//        System.out.println("Print the sum where each root-to-leaf path of tree represent a number");
+//        //https://leetcode.com/problems/sum-root-to-leaf-numbers/
+//        TreeNode<Integer> root = new TreeNode<>(1);
+//        root.setLeft(new TreeNode<>(2));
+//        root.setRight(new TreeNode<>(3));
+//        obj.printSumWhereRootToLeafPathIsANumber(root);
+//        root = new TreeNode<>(1);
+//        root.setLeft(new TreeNode<>(2));
+//        root.getLeft().setLeft(new TreeNode<>(4));
+//        root.getLeft().setRight(new TreeNode<>(5));
+//        root.getLeft().getLeft().setLeft(new TreeNode<>(7));
+//        root.setRight(new TreeNode<>(3));
+//        root.getRight().setRight(new TreeNode<>(6));
+//        root.getRight().getRight().setRight(new TreeNode<>(8));
+//        obj.printSumWhereRootToLeafPathIsANumber(root);
         //......................................................................
 //        Row: SEPARATE QUESTION IMPORTANT
-        System.out.println("Max sum path in two sorted arrays");
-        //https://www.geeksforgeeks.org/maximum-sum-path-across-two-arrays/
-        obj.maxSumPathInTwoSortedArrays(new int[]{2, 3, 7, 10, 12}, new int[]{1, 5, 7, 8});
-        
+//        System.out.println("Max sum path in two sorted arrays");
+//        //https://www.geeksforgeeks.org/maximum-sum-path-across-two-arrays/
+//        obj.maxSumPathInTwoSortedArrays(new int[]{2, 3, 7, 10, 12}, new int[]{1, 5, 7, 8});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Asteroid collision");
+//        //https://leetcode.com/problems/asteroid-collision/
+//        obj.asteroidCollision(new int[] {5,10,-5});
+//        obj.asteroidCollision(new int[] {8, -8});
+//        obj.asteroidCollision(new int[] {10,2,-5});
+//        obj.asteroidCollision(new int[] {3,2,1,-10});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Longest pallindromic substring");
+//        //https://leetcode.com/problems/longest-palindromic-substring/
+//        obj.longestPallindromicSubstring("racecar");
+//        obj.longestPallindromicSubstring("babccaa");
+//        obj.longestPallindromicSubstring("aabbaa");
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Jump game");
+//        //https://leetcode.com/problems/jump-game/
+//        obj.jumpGame(new int[]{2, 3, 1, 1, 4});
+//        obj.jumpGame(new int[]{3, 2, 1, 0, 4});
+//        obj.jumpGame(new int[]{1});
+//        obj.jumpGame(new int[]{0});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Next greater element 2 (consider array to cyclic)");
+//        //https://leetcode.com/problems/next-greater-element-ii/
+//        obj.nextGreaterElement2_CyclicArray(new int[]{1, 2, 1});
+//        obj.nextGreaterElement2_CyclicArray(new int[]{5, 4, 3, 2, 1});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Valid sudoku");
+        //https://leetcode.com/problems/valid-sudoku/
+        obj.validSudoku(new String[][]{
+            {"5", "3", ".", ".", "7", ".", ".", ".", "."}, 
+            {"6", ".", ".", "1", "9", "5", ".", ".", "."}, 
+            {".", "9", "8", ".", ".", ".", ".", "6", "."}, 
+            {"8", ".", ".", ".", "6", ".", ".", ".", "3"}, 
+            {"4", ".", ".", "8", ".", "3", ".", ".", "1"}, 
+            {"7", ".", ".", ".", "2", ".", ".", ".", "6"}, 
+            {".", "6", ".", ".", ".", ".", "2", "8", "."}, 
+            {".", ".", ".", "4", "1", "9", ".", ".", "5"}, 
+            {".", ".", ".", ".", "8", ".", ".", "7", "9"}});
     }
 
 }
