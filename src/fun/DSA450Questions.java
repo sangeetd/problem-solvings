@@ -1245,6 +1245,9 @@ public class DSA450Questions {
                         stack.push(asteroid[i]);
                         break;
                     } else if (peek == -asteroid[i]) {
+                        //stack[4], incoming = -4 both move to right, left fir(collision)
+                        //magnitude of both are same so both will destroy 
+                        //(incoming = -4 will not be pushed and 4 is also poped)
                         // If both are the same size, both will explode
                         stack.pop();
                         break;
@@ -1328,6 +1331,50 @@ public class DSA450Questions {
 
         System.out.println();
 
+    }
+    
+    public void findMedianInDataStream(int[] stream){
+        
+        //explanantion: https://leetcode.com/problems/find-median-from-data-stream/solution/ [HEAP BASED]
+        
+        PriorityQueue<Integer> minHeap = new PriorityQueue<>((a, b) -> a.compareTo(b));
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b.compareTo(a));
+        
+        for(int num: stream){
+            
+            maxHeap.add(num);
+            minHeap.add(maxHeap.poll());
+            
+            if(maxHeap.size() < minHeap.size()){
+                maxHeap.add(minHeap.poll());
+            }
+            
+            double median = maxHeap.size() > minHeap.size()
+                    ? maxHeap.peek()
+                    : (double) (maxHeap.peek() + minHeap.peek()) * 0.5;
+            
+            System.out.println("Median: "+median);
+            
+        }
+    }
+    
+    public void numPairsDivisibleBy60(int[] time){
+        
+        //https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/
+        int[] remainder = new int[60];
+        int count = 0;
+        for(int t: time){
+            if(t % 60 == 0){
+                count += remainder[0];
+            }else {
+                count += remainder[60 - t % 60];
+            }
+            remainder[t % 60]++;
+        }
+        
+        //output:
+        System.out.println("Total pair: "+count);
+        
     }
 
     public void rotateMatrixClockWise90Deg(int[][] mat) {
@@ -1531,6 +1578,65 @@ public class DSA450Questions {
         //output:
         System.out.println("Spiral matrix: " + result);
 
+    }
+
+    public void diagonalMatrixTraversal(int[][] mat) {
+
+        int R = mat.length;
+        int C = mat[0].length;
+        int x = 0;
+        int y = 0;
+        boolean isGoingUp = true;
+        int totalElements = R * C;
+        int element = 0;
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> diagonal = new ArrayList<>();
+        while (element < totalElements) {
+
+            if (isGoingUp) {
+
+                while (x >= 0 && y < C) {
+                    diagonal.add(mat[x][y]);
+                    x--;
+                    y++;
+                    element++;
+                }
+
+                if (x < 0 && y <= C - 1) {
+                    x = 0;
+                }
+
+                if (y == C) {
+                    x += 2;
+                    y--;
+                }
+            } else {
+
+                while (x < R && y >= 0) {
+                    diagonal.add(mat[x][y]);
+                    x++;
+                    y--;
+                    element++;
+                }
+
+                if (x <= R - 1 && y < 0) {
+                    y = 0;
+                }
+
+                if (x == R) {
+                    y += 2;
+                    x--;
+                }
+            }
+
+            isGoingUp = !isGoingUp;
+            result.add(diagonal);
+            diagonal = new ArrayList<>();
+        }
+        
+        //output:
+        System.out.println("Diagonal matrix: "+result);
+        
     }
 
     public String reverseString(String str) {
@@ -2502,6 +2608,89 @@ public class DSA450Questions {
         //output:
         System.out.println("All balanced parenthesis: " + result);
 
+    }
+    
+    public void scoreOfParenthesis(String str){
+        
+        //https://leetcode.com/problems/score-of-parentheses
+        //explanatin: https://youtu.be/jfmJusJ0qKM
+        int score = 0;
+        Stack<Integer> stack = new Stack<>();
+        for(char ch: str.toCharArray()){
+            
+            if(ch == '('){
+                stack.push(score);
+                score = 0;
+            }else {
+                score = stack.pop() + Math.max(score * 2, 1);
+            }
+        }
+        
+        //output:
+        System.out.println("Score: "+score);
+        
+    }
+    
+    public void minimumCharRemovalToMakeValidParenthesis(String str){
+        
+        //https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses
+        class CharIndex{
+            char ch;
+            int index;
+            public CharIndex(char ch, int index){
+                this.ch = ch;
+                this.index = index;
+            }
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        Stack<CharIndex> stack = new Stack<>();
+        for(int i = 0; i < str.length(); i++){
+            char c = str.charAt(i);
+            sb.append(c);
+            if(c == '(' || c == ')'){
+                
+                if(!stack.isEmpty() && stack.peek().ch == '(' && c == ')'){
+                    stack.pop();
+                    continue;
+                }
+                stack.push(new CharIndex(c, i));
+            }
+        }
+        
+        while(!stack.isEmpty()){
+            sb.deleteCharAt(stack.pop().index);
+        }
+        
+        //output:
+        System.out.println("Balanced string: "+sb.toString());
+        
+    }
+    
+    public boolean repeatedSubstringPattern(String str){
+        
+        //https://leetcode.com/problems/repeated-substring-pattern/
+        //explanantion: https://youtu.be/bClIZj66dVE
+        int len = str.length();
+        for(int i = len / 2; i >= 1; i--){
+            
+            if(len % i == 0){
+                
+                int numRepeats = len / i;
+                String sub = str.substring(0, i);
+                StringBuilder sb = new StringBuilder();
+                for(int j = 0; j < numRepeats; j++){
+                    sb.append(sub);
+                }
+                
+                if(sb.toString().equals(str)){
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+        
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -5740,7 +5929,6 @@ public class DSA450Questions {
 
     public void validSudoku(String[][] grid) {
 
-        
         //Explanantion: https://youtu.be/Pl7mMcBm2b8
         HashSet<String> vis = new HashSet<>();
 
@@ -10054,18 +10242,61 @@ public class DSA450Questions {
 //        obj.nextGreaterElement2_CyclicArray(new int[]{5, 4, 3, 2, 1});
         //......................................................................
 //        Row: SEPARATE QUESTION IMPORTANT
-        System.out.println("Valid sudoku");
-        //https://leetcode.com/problems/valid-sudoku/
-        obj.validSudoku(new String[][]{
-            {"5", "3", ".", ".", "7", ".", ".", ".", "."}, 
-            {"6", ".", ".", "1", "9", "5", ".", ".", "."}, 
-            {".", "9", "8", ".", ".", ".", ".", "6", "."}, 
-            {"8", ".", ".", ".", "6", ".", ".", ".", "3"}, 
-            {"4", ".", ".", "8", ".", "3", ".", ".", "1"}, 
-            {"7", ".", ".", ".", "2", ".", ".", ".", "6"}, 
-            {".", "6", ".", ".", ".", ".", "2", "8", "."}, 
-            {".", ".", ".", "4", "1", "9", ".", ".", "5"}, 
-            {".", ".", ".", ".", "8", ".", ".", "7", "9"}});
+//        System.out.println("Valid sudoku");
+//        //https://leetcode.com/problems/valid-sudoku/
+//        obj.validSudoku(new String[][]{
+//            {"5", "3", ".", ".", "7", ".", ".", ".", "."}, 
+//            {"6", ".", ".", "1", "9", "5", ".", ".", "."}, 
+//            {".", "9", "8", ".", ".", ".", ".", "6", "."}, 
+//            {"8", ".", ".", ".", "6", ".", ".", ".", "3"}, 
+//            {"4", ".", ".", "8", ".", "3", ".", ".", "1"}, 
+//            {"7", ".", ".", ".", "2", ".", ".", ".", "6"}, 
+//            {".", "6", ".", ".", ".", ".", "2", "8", "."}, 
+//            {".", ".", ".", "4", "1", "9", ".", ".", "5"}, 
+//            {".", ".", ".", ".", "8", ".", ".", "7", "9"}});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Diagonal matrix traversal");
+//        //https://www.geeksforgeeks.org/print-matrix-diagonal-pattern/
+//        obj.diagonalMatrixTraversal(new int[][]{
+//            {1, 2, 3},
+//            {4, 5, 6},
+//            {7, 8, 9}});
+//        obj.diagonalMatrixTraversal(new int[][]{
+//            {1, 2, 3},
+//            {4, 5, 6}});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Score of parenthesis");
+//        //https://leetcode.com/problems/score-of-parentheses
+//        obj.scoreOfParenthesis("()");
+//        obj.scoreOfParenthesis("()()");
+//        obj.scoreOfParenthesis("(())");
+//        obj.scoreOfParenthesis("(()())");
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("minimun remove of character to make valid parenthesis");
+//        //https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/
+//        obj.minimumCharRemovalToMakeValidParenthesis("lee(t(c)o)de)");
+//        obj.minimumCharRemovalToMakeValidParenthesis("a)b(c)d");
+//        obj.minimumCharRemovalToMakeValidParenthesis(")))(((");
+//        obj.minimumCharRemovalToMakeValidParenthesis("()()");
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Repeated substring pattern");
+//        //https://leetcode.com/problems/repeated-substring-pattern/
+//        System.out.println("Repeated substring pattern possible: "+obj.repeatedSubstringPattern("abab"));
+//        System.out.println("Repeated substring pattern possible: "+obj.repeatedSubstringPattern("aba"));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Find median in data stream");
+//        //https://leetcode.com/problems/find-median-from-data-stream/
+//        obj.findMedianInDataStream(new int[] {5, 15, 1, 3, 2, 8, 7, 9, 10, 6, 11, 4});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Pairs of Songs With Total Durations Divisible by 60");
+        //https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/
+        obj.numPairsDivisibleBy60(new int[]{30,20,150,100,40});
     }
 
 }
