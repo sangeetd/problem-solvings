@@ -1332,49 +1332,170 @@ public class DSA450Questions {
         System.out.println();
 
     }
-    
-    public void findMedianInDataStream(int[] stream){
-        
+
+    public void findMedianInDataStream(int[] stream) {
+
         //explanantion: https://leetcode.com/problems/find-median-from-data-stream/solution/ [HEAP BASED]
-        
         PriorityQueue<Integer> minHeap = new PriorityQueue<>((a, b) -> a.compareTo(b));
         PriorityQueue<Integer> maxHeap = new PriorityQueue<>((a, b) -> b.compareTo(a));
-        
-        for(int num: stream){
-            
+
+        for (int num : stream) {
+
             maxHeap.add(num);
             minHeap.add(maxHeap.poll());
-            
-            if(maxHeap.size() < minHeap.size()){
+
+            if (maxHeap.size() < minHeap.size()) {
                 maxHeap.add(minHeap.poll());
             }
-            
+
             double median = maxHeap.size() > minHeap.size()
                     ? maxHeap.peek()
                     : (double) (maxHeap.peek() + minHeap.peek()) * 0.5;
-            
-            System.out.println("Median: "+median);
-            
+
+            System.out.println("Median: " + median);
+
         }
     }
-    
-    public void numPairsDivisibleBy60(int[] time){
-        
+
+    public void numPairsDivisibleBy60(int[] time) {
+
         //https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/
         int[] remainder = new int[60];
         int count = 0;
-        for(int t: time){
-            if(t % 60 == 0){
+        for (int t : time) {
+            if (t % 60 == 0) {
                 count += remainder[0];
-            }else {
+            } else {
                 count += remainder[60 - t % 60];
             }
             remainder[t % 60]++;
         }
-        
+
         //output:
-        System.out.println("Total pair: "+count);
-        
+        System.out.println("Total pair: " + count);
+    }
+
+    private int mergeSort(int[] arr, int start, int mid, int end) {
+
+        int[] left = Arrays.copyOfRange(arr, start, mid + 1);
+        int[] right = Arrays.copyOfRange(arr, mid + 1, end + 1);
+
+        int i = 0;
+        int j = 0;
+        int k = start;
+        int swaps = 0;
+        while (i < left.length && j < right.length) {
+
+            if (left[i] <= right[j]) {
+                arr[k++] = left[i++];
+            } else {
+                arr[k++] = right[j++];
+                swaps += (mid + 1) - (start + i);
+            }
+        }
+
+        while (i < left.length) {
+            arr[k++] = left[i++];
+        }
+
+        while (j < right.length) {
+            arr[k++] = right[j++];
+        }
+
+        return swaps;
+    }
+
+    private int divideAndMerge(int[] arr, int start, int end) {
+        int count = 0;
+        if (end > start) {
+
+            int mid = start + (end - start) / 2;
+            count += divideAndMerge(arr, start, mid);
+            count += divideAndMerge(arr, mid + 1, end);
+            count += mergeSort(arr, start, mid, end);
+        }
+        return count;
+    }
+
+    public void countInversion(int[] arr) {
+
+        //..........................T: O(n log n)
+        //..........................S: O(N) temp(left, right arrays)
+        //https://www.geeksforgeeks.org/counting-inversions/
+        int n = arr.length;
+        int countInversion = divideAndMerge(arr, 0, n - 1);
+        System.out.println("Count inversion: " + countInversion);
+        //array is also got sorted
+//        for(int x: arr){
+//            System.out.print(x+" ");
+//        }
+    }
+
+    public void minimumWindowSubarrayForTargetSumK(int[] arr, int K) {
+
+        //SLIDING WINDOW BASIC
+        //explanation: https://youtu.be/jKF9AcyBZ6E
+        int start = 0;
+        int end = 0;
+        int sum = 0;
+        int win = Integer.MAX_VALUE;
+
+        while (end < arr.length) {
+
+            sum += arr[end];
+
+            while (sum >= K) {
+                win = Math.min(win, end - start + 1);
+                sum -= arr[start];
+                start++;
+            }
+            end++;
+        }
+
+        //output:
+        System.out.println("Minimum length of subarrays whose sum (>= K): " + (win >= Integer.MAX_VALUE ? 0 : win));
+    }
+
+    public void flipMZerosFindMaxLengthOfConsecutiveOnes(int[] arr, int M) {
+
+        int start = 0;
+        int end = 0;
+        int zeroCount = 0;
+        int bestWin = 0;
+        int bestStart = 0;
+
+        while (end < arr.length) {
+
+            if (zeroCount <= M) {
+                if (arr[end] == 0) {
+                    zeroCount++;
+                }
+                end++;
+            }
+
+            if (zeroCount > M) {
+                if (arr[start] == 0) {
+                    zeroCount--;
+                }
+                start++;
+            }
+
+            if (end - start > bestWin && zeroCount <= M) {
+                bestWin = end - start;
+                bestStart = start;
+            }
+
+        }
+
+        //output
+        System.out.println("Length of consecutive ones after flipping M zeros: " + bestWin);
+        System.out.println("Indexs of zeros to flip");
+        for (int i = 0; i < bestWin; i++) {
+            if (arr[bestStart + i] == 0) {
+                System.out.print((bestStart + i) + " ");
+            }
+        }
+        System.out.println();
     }
 
     public void rotateMatrixClockWise90Deg(int[][] mat) {
@@ -1633,10 +1754,10 @@ public class DSA450Questions {
             result.add(diagonal);
             diagonal = new ArrayList<>();
         }
-        
+
         //output:
-        System.out.println("Diagonal matrix: "+result);
-        
+        System.out.println("Diagonal matrix: " + result);
+
     }
 
     public String reverseString(String str) {
@@ -2609,88 +2730,90 @@ public class DSA450Questions {
         System.out.println("All balanced parenthesis: " + result);
 
     }
-    
-    public void scoreOfParenthesis(String str){
-        
+
+    public void scoreOfParenthesis(String str) {
+
         //https://leetcode.com/problems/score-of-parentheses
         //explanatin: https://youtu.be/jfmJusJ0qKM
         int score = 0;
         Stack<Integer> stack = new Stack<>();
-        for(char ch: str.toCharArray()){
-            
-            if(ch == '('){
+        for (char ch : str.toCharArray()) {
+
+            if (ch == '(') {
                 stack.push(score);
                 score = 0;
-            }else {
+            } else {
                 score = stack.pop() + Math.max(score * 2, 1);
             }
         }
-        
+
         //output:
-        System.out.println("Score: "+score);
-        
+        System.out.println("Score: " + score);
+
     }
-    
-    public void minimumCharRemovalToMakeValidParenthesis(String str){
-        
+
+    public void minimumCharRemovalToMakeValidParenthesis(String str) {
+
         //https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses
-        class CharIndex{
+        class CharIndex {
+
             char ch;
             int index;
-            public CharIndex(char ch, int index){
+
+            public CharIndex(char ch, int index) {
                 this.ch = ch;
                 this.index = index;
             }
         }
-        
+
         StringBuilder sb = new StringBuilder();
         Stack<CharIndex> stack = new Stack<>();
-        for(int i = 0; i < str.length(); i++){
+        for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
             sb.append(c);
-            if(c == '(' || c == ')'){
-                
-                if(!stack.isEmpty() && stack.peek().ch == '(' && c == ')'){
+            if (c == '(' || c == ')') {
+
+                if (!stack.isEmpty() && stack.peek().ch == '(' && c == ')') {
                     stack.pop();
                     continue;
                 }
                 stack.push(new CharIndex(c, i));
             }
         }
-        
-        while(!stack.isEmpty()){
+
+        while (!stack.isEmpty()) {
             sb.deleteCharAt(stack.pop().index);
         }
-        
+
         //output:
-        System.out.println("Balanced string: "+sb.toString());
-        
+        System.out.println("Balanced string: " + sb.toString());
+
     }
-    
-    public boolean repeatedSubstringPattern(String str){
-        
+
+    public boolean repeatedSubstringPattern(String str) {
+
         //https://leetcode.com/problems/repeated-substring-pattern/
         //explanantion: https://youtu.be/bClIZj66dVE
         int len = str.length();
-        for(int i = len / 2; i >= 1; i--){
-            
-            if(len % i == 0){
-                
+        for (int i = len / 2; i >= 1; i--) {
+
+            if (len % i == 0) {
+
                 int numRepeats = len / i;
                 String sub = str.substring(0, i);
                 StringBuilder sb = new StringBuilder();
-                for(int j = 0; j < numRepeats; j++){
+                for (int j = 0; j < numRepeats; j++) {
                     sb.append(sub);
                 }
-                
-                if(sb.toString().equals(str)){
+
+                if (sb.toString().equals(str)) {
                     return true;
                 }
             }
         }
-        
+
         return false;
-        
+
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -5552,6 +5675,104 @@ public class DSA450Questions {
 
     }
 
+    private void fixTwoSwappedNodesInBST_Helper_IsBST(TreeNode<Integer> root) {
+        if (root == null) {
+            return;
+        }
+
+        fixTwoSwappedNodesInBST_Helper_IsBST(root.getLeft());
+
+        if (fixTwoSwappedNodesInBST_Prev != null && fixTwoSwappedNodesInBST_Prev.getData() > root.getData()) {
+
+            if (fixTwoSwappedNodesInBST_First == null) {
+                fixTwoSwappedNodesInBST_First = fixTwoSwappedNodesInBST_Prev;
+                fixTwoSwappedNodesInBST_Middle = root;
+            } else {
+                fixTwoSwappedNodesInBST_Last = root;
+            }
+        }
+
+        fixTwoSwappedNodesInBST_Prev = root;
+
+        fixTwoSwappedNodesInBST_Helper_IsBST(root.getRight());
+    }
+
+    private void fixTwoSwappedNodesInBST_Helper(TreeNode<Integer> root) {
+
+        fixTwoSwappedNodesInBST_First = null;
+        fixTwoSwappedNodesInBST_Middle = null;
+        fixTwoSwappedNodesInBST_Last = null;
+        fixTwoSwappedNodesInBST_Prev = null;
+
+        fixTwoSwappedNodesInBST_Helper_IsBST(root);
+
+        if (fixTwoSwappedNodesInBST_First != null && fixTwoSwappedNodesInBST_Last != null) {
+            int temp = fixTwoSwappedNodesInBST_First.getData();
+            fixTwoSwappedNodesInBST_First.setData(fixTwoSwappedNodesInBST_Last.getData());
+            fixTwoSwappedNodesInBST_Last.setData(temp);
+        } else if (fixTwoSwappedNodesInBST_First != null && fixTwoSwappedNodesInBST_Middle != null) {
+            int temp = fixTwoSwappedNodesInBST_First.getData();
+            fixTwoSwappedNodesInBST_First.setData(fixTwoSwappedNodesInBST_Middle.getData());
+            fixTwoSwappedNodesInBST_Middle.setData(temp);
+        }
+
+    }
+
+    TreeNode<Integer> fixTwoSwappedNodesInBST_First;
+    TreeNode<Integer> fixTwoSwappedNodesInBST_Middle;
+    TreeNode<Integer> fixTwoSwappedNodesInBST_Last;
+    TreeNode<Integer> fixTwoSwappedNodesInBST_Prev;
+
+    public void fixTwoSwappedNodesInBST(TreeNode<Integer> root) {
+
+        //https://www.geeksforgeeks.org/fix-two-swapped-nodes-of-bst/
+        //actual
+        new BinaryTree<Integer>(root).treeInorder();
+        System.out.println();
+
+        fixTwoSwappedNodesInBST_Helper(root);
+
+        //output
+        new BinaryTree<Integer>(root).treeInorder();
+        System.out.println();
+
+    }
+
+    private TreeNode<Integer> mergeTwoBinaryTree_Heleper(TreeNode<Integer> root1, TreeNode<Integer> root2) {
+
+        if (root1 == null) {
+            return root2;
+        }
+
+        if (root2 == null) {
+            return root1;
+        }
+
+        root1.setData(root1.getData() + root2.getData());
+
+        root1.setLeft(mergeTwoBinaryTree_Heleper(root1.getLeft(), root2.getLeft()));
+        root1.setRight(mergeTwoBinaryTree_Heleper(root1.getRight(), root2.getRight()));
+
+        return root1;
+
+    }
+
+    public void mergeTwoBinaryTree(TreeNode<Integer> root1, TreeNode<Integer> root2) {
+        //actual
+        System.out.println("Actaul trees");
+        new BinaryTree<Integer>(root1).treeBFS();
+        System.out.println();
+        new BinaryTree<Integer>(root2).treeBFS();
+        System.out.println();
+
+        mergeTwoBinaryTree_Heleper(root1, root2);
+
+        //output
+        System.out.println("Merged both trees in tree1");
+        new BinaryTree<Integer>(root1).treeBFS();
+
+    }
+    
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
     private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
@@ -6026,7 +6247,8 @@ public class DSA450Questions {
 
     }
 
-    public void mergeKSortedArrays_2(int[][] arr) {
+    public
+            void mergeKSortedArrays_2(int[][] arr) {
 
         class Input {
 
@@ -6042,8 +6264,8 @@ public class DSA450Questions {
         }
 
         //OPTIMISED
-        //........................T: O(N*K*LogK)
-        //........................S: O(K)
+//........................T: O(N*K*LogK)
+//........................S: O(K)
         PriorityQueue<Input> minHeap = new PriorityQueue<>((a, b) -> arr[a.row][a.col] - arr[b.row][b.col]);
         //minHeap will hold start coordinate(row, col) for all the elements in each row not the total R*C elements directly
         for (int r = 0; r < arr.length; r++) {
@@ -6545,6 +6767,54 @@ public class DSA450Questions {
         }
 
         System.out.println("Minimum in rotated sorted array: " + (minElement == Integer.MIN_VALUE ? arr[start] : minElement));
+
+    }
+
+    public void findLocalMinima(int[] arr) {
+
+        int start = 0;
+        int end = arr.length - 1;
+        int mid = 0;
+        while (end >= start) {
+
+            mid = start + (end - start) / 2;
+
+            if ((mid == 0 || arr[mid - 1] > arr[mid])
+                    && (mid == arr.length - 1 || arr[mid + 1] > arr[mid])) {
+                break;
+            } else if (mid > 0 && arr[mid - 1] < arr[mid]) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            }
+        }
+
+        //output
+        System.out.println("Local minima at index: " + mid + " element: " + arr[mid]);
+
+    }
+
+    public void findLocalMaxima(int[] arr) {
+
+        int start = 0;
+        int end = arr.length - 1;
+        int mid = 0;
+        while (end >= start) {
+
+            mid = start + (end - start) / 2;
+
+            if ((mid == 0 || arr[mid - 1] < arr[mid])
+                    && (mid == arr.length - 1 || arr[mid + 1] < arr[mid])) {
+                break;
+            } else if (mid > 0 && arr[mid - 1] > arr[mid]) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            }
+        }
+
+        //output
+        System.out.println("Local maxima at index: " + mid + " element: " + arr[mid]);
 
     }
 
@@ -7233,6 +7503,34 @@ public class DSA450Questions {
 
         //output:
         System.out.println("Longest inc subseq of the given array is: " + maxLengthLongestIncSubseq);
+    }
+
+    public void maximumLengthOfRepeatedSubarray_DP_Problem(int[] arr1, int[] arr2) {
+
+        //Approach is similar to longest common substring
+        int m = arr1.length;
+        int n = arr2.length;
+        int[][] memo = new int[m + 1][n + 1];
+
+        //base cond:
+        //arr1 is empty no repeated values can be checked arr2
+        //similarly arr2 is empty no repeated values can be checked with arr1
+        //x == 0, y == 0 will 0
+        int maxLen = 0;
+        for (int x = 1; x < memo.length; x++) {
+            for (int y = 1; y < memo[x].length; y++) {
+                if (arr1[x - 1] == arr2[y - 1]) {
+                    memo[x][y] = memo[x - 1][y - 1] + 1;
+                    maxLen = Math.max(maxLen, memo[x][y]);
+                } else {
+                    memo[x][y] = 0;
+                }
+            }
+        }
+
+        //output
+        System.out.println("Maximum length o repeated subarray: " + maxLen);
+
     }
 
     public void nMeetingRooms_Greedy(int[] startTime, int[] finishTime) {
@@ -8044,7 +8342,8 @@ public class DSA450Questions {
         return dir != 0 || (x == 0 && y == 0);
     }
 
-    public int swapsRequiredToSortArray(int[] arr) {
+    public
+            int swapsRequiredToSortArray(int[] arr) {
 
         class Pair {
 
@@ -10294,9 +10593,69 @@ public class DSA450Questions {
 //        obj.findMedianInDataStream(new int[] {5, 15, 1, 3, 2, 8, 7, 9, 10, 6, 11, 4});
         //......................................................................
 //        Row: SEPARATE QUESTION IMPORTANT
-        System.out.println("Pairs of Songs With Total Durations Divisible by 60");
-        //https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/
-        obj.numPairsDivisibleBy60(new int[]{30,20,150,100,40});
+//        System.out.println("Pairs of Songs With Total Durations Divisible by 60");
+//        //https://leetcode.com/problems/pairs-of-songs-with-total-durations-divisible-by-60/
+//        obj.numPairsDivisibleBy60(new int[]{30,20,150,100,40});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Count inversion in the arrays (using modified merge sort)");
+//        obj.countInversion(new int[]{1, 20, 6, 4, 5});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Minimum window length where subarray is greater OR equal to target sum");
+//        //https://leetcode.com/problems/minimum-size-subarray-sum/
+//        obj.minimumWindowSubarrayForTargetSumK(new int[] {2,3,1,2,4,3}, 7);
+//        obj.minimumWindowSubarrayForTargetSumK(new int[] {1,4,4}, 4);
+//        obj.minimumWindowSubarrayForTargetSumK(new int[] {1,1,1,1,1,1,1,1}, 11);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Maximum length of repeated subarray (DP PROBLEM)");
+//        //https://leetcode.com/problems/maximum-length-of-repeated-subarray/
+//        obj.maximumLengthOfRepeatedSubarray_DP_Problem(new int[]{1,2,3,2,1}, new int[]{3,2,1,4,7});
+//        obj.maximumLengthOfRepeatedSubarray_DP_Problem(new int[]{0,1,1,1,1,1}, new int[]{0,1,0,1,0,1});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Fix two swapped nodes of the BST");
+//        //https://www.geeksforgeeks.org/fix-two-swapped-nodes-of-bst/
+//        TreeNode<Integer> root = new TreeNode<>(10);
+//        root.setLeft(new TreeNode<>(5));
+//        root.getLeft().setLeft(new TreeNode<>(2));
+//        root.getLeft().setRight(new TreeNode<>(20)); //SWAPPED
+//        root.setRight(new TreeNode<>(8)); //SWAPPED
+//        obj.fixTwoSwappedNodesInBST(root);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Merge two binary trees");
+//        //https://leetcode.com/problems/merge-two-binary-trees/
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(3));
+//        root1.getLeft().setLeft(new TreeNode<>(5));
+//        root1.setRight(new TreeNode<>(2));
+//        TreeNode<Integer> root2 = new TreeNode<>(2);
+//        root2.setLeft(new TreeNode<>(1));
+//        root2.getLeft().setRight(new TreeNode<>(4));
+//        root2.setRight(new TreeNode<>(3));
+//        root2.getRight().setRight(new TreeNode<>(7));
+//        obj.mergeTwoBinaryTree(root1, root2);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Flip M 0s in binary array and find maximum length of consecutive 1s");
+//        obj.flipMZerosFindMaxLengthOfConsecutiveOnes(new int[]{1, 0, 1}, 1);
+//        obj.flipMZerosFindMaxLengthOfConsecutiveOnes(new int[]{1, 0, 0, 1, 1, 0, 1, 0, 1, 1}, 3);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Local minima and local maxima (BINARY SEARCH)");
+        //https://www.geeksforgeeks.org/find-local-minima-array/
+        obj.findLocalMinima(new int[]{1, 2, 3});
+        obj.findLocalMinima(new int[]{23, 8, 15, 2, 3});
+        obj.findLocalMinima(new int[]{9, 6, 3, 14, 5, 7, 4});
+        obj.findLocalMinima(new int[]{3, 2, 1});
+        //MAXIMA
+        obj.findLocalMaxima(new int[]{3, 2, 1});
+        obj.findLocalMaxima(new int[]{1, 2, 3});
+        obj.findLocalMaxima(new int[]{9, 6, 3, 14, 5, 7, 4});
+        obj.findLocalMaxima(new int[]{23, 8, 15, 2, 3});
+        obj.findLocalMaxima(new int[]{23, 8});
     }
 
 }
