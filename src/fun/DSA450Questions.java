@@ -1439,13 +1439,14 @@ public class DSA450Questions {
         int end = 0;
         int sum = 0;
         int win = Integer.MAX_VALUE;
-
+        int index = 0;
         while (end < arr.length) {
 
             sum += arr[end];
 
             while (sum >= K) {
                 win = Math.min(win, end - start + 1);
+                index = start;
                 sum -= arr[start];
                 start++;
             }
@@ -1454,6 +1455,13 @@ public class DSA450Questions {
 
         //output:
         System.out.println("Minimum length of subarrays whose sum (>= K): " + (win >= Integer.MAX_VALUE ? 0 : win));
+        System.out.println("array element:");
+        if (win != Integer.MAX_VALUE) {
+            for (int i = 0; i < win; i++) {
+                System.out.print(arr[index + i] + " ");
+            }
+        }
+        System.out.println();
     }
 
     public void flipMZerosFindMaxLengthOfConsecutiveOnes(int[] arr, int M) {
@@ -1757,6 +1765,39 @@ public class DSA450Questions {
 
         //output:
         System.out.println("Diagonal matrix: " + result);
+
+    }
+
+    public void sumOfElementsInMatrixExceptGivenRowAndCol(int[][] matrix, int[][] rowAndCol) {
+
+        //OPTIMISED
+        //..........................T: O((R * C) + n) where n = rowAndCol.length
+        //..........................S: O(R + C) because rowSum and colSum array of size R & C respec
+        //https://www.geeksforgeeks.org/find-sum-of-all-elements-in-a-matrix-except-the-elements-in-given-row-andor-column-2/
+        int R = matrix.length;
+        int C = matrix[0].length;
+
+        int[] rowSum = new int[R];
+        int[] colSum = new int[C];
+
+        int sumOfElements = 0;
+
+        for (int x = 0; x < R; x++) {
+            for (int y = 0; y < C; y++) {
+                sumOfElements += matrix[x][y]; //total sum of elements of matrix
+                rowSum[x] += matrix[x][y]; //all the sum of elements in x row
+                colSum[y] += matrix[x][y]; //all the sum of elements in y col
+            }
+        }
+
+        for (int[] except : rowAndCol) {
+
+            int row = except[0];
+            int col = except[1];
+            int sumWithoutRowAndCol = sumOfElements - rowSum[row] - colSum[col] + matrix[row][col];
+            System.out.println("Sum of elements except row: " + row + " & col: " + col + " sum: " + sumWithoutRowAndCol);
+
+        }
 
     }
 
@@ -2749,7 +2790,6 @@ public class DSA450Questions {
 
         //output:
         System.out.println("Score: " + score);
-
     }
 
     public void minimumCharRemovalToMakeValidParenthesis(String str) {
@@ -2813,7 +2853,6 @@ public class DSA450Questions {
         }
 
         return false;
-
     }
 
     public void reverseLinkedList_Iterative(Node<Integer> node) {
@@ -3813,7 +3852,7 @@ public class DSA450Questions {
             curr = next;
         }
         //after reversing slow ptr
-        //LL new Head(prev) = 1->2-N
+        //LL new Head(prev) = 1-.>2-N
 
         //now prev is the new head for the reversed-slow ptr
         curr = node; //actual head
@@ -3833,6 +3872,104 @@ public class DSA450Questions {
 
         //if while loop doesn't prove false
         return true;
+
+    }
+
+    public void reorderLinkedList(Node<Integer> head) {
+
+        //First 2 approaches are in SomePracticeQuestion reorderList_1/reorderList_2
+        //actual
+        new LinkedListUtil<Integer>(head).print();
+
+        //explanantion: https://youtu.be/xRYPjDMSUFw
+        //ex: 1-> 2-> 3-> 4-> 5-> NULL
+        //break it into 2 list (2 half)
+        //l1 = 1-> 2-> 3-> NULL
+        //l2 = 4-> 5-> NULL
+        //reverse(l2) = 5-> 4-> NULL
+        //reorderMerger(l1, l2) = 1-> 5-> 2-> 4-> 3-> NULL
+        Node<Integer> slowPrev = null;
+        Node<Integer> slow = head;
+        Node<Integer> fast = head;
+        while (fast != null && fast.getNext() != null) {
+            slowPrev = slow;
+            slow = slow.getNext();
+            fast = fast.getNext().getNext();
+        }
+
+        //list 1 head-> slowPrev-> NULL
+        Node<Integer> list1 = head;
+        slowPrev.setNext(null);
+
+        //reverse slow ptr
+        Node<Integer> curr = slow;
+        Node<Integer> next = null;
+        Node<Integer> prev = null;
+
+        while (curr != null) {
+            next = curr.getNext();
+            curr.setNext(prev);
+            prev = curr;
+            curr = next;
+        }
+
+        //list 2 would be slow-reversed 2nd half (prev)
+        Node<Integer> list2 = prev;
+
+        //reorder merge(list1, list2)
+        while (list1 != null) {
+
+            Node<Integer> list1_Next = list1.getNext();
+            Node<Integer> list2_Next = list2.getNext();
+
+            list1.setNext(list2);
+
+            if (list1_Next == null) {
+                break;
+            }
+
+            list2.setNext(list1_Next);
+
+            list1 = list1_Next;
+            list2 = list2_Next;
+        }
+
+        //output
+        new LinkedListUtil<Integer>(head).print();
+    }
+
+    public void rearrangeLinkedListAsOddIndexFirstAndEvenIndexAtEnd(Node<Integer> head) {
+
+        //rearrange all node in linked list in such a way that nodes at odd index comes first and nodes at even index 
+        //comes last and nodex should maintain the order of their occurence in actual list
+        //nodes data is not to be consider for even and odd but their INDEX ONLY
+        //https://leetcode.com/problems/odd-even-linked-list/
+        //explanation: https://youtu.be/C_LA6SOwVTM
+        //actual
+        Node<Integer> forPrinting = head;
+        int index = 0;
+        while (forPrinting != null) {
+            System.out.print((++index) + ") " + forPrinting.getData() + "\t");
+            forPrinting = forPrinting.getNext();
+        }
+        System.out.println();
+
+        Node<Integer> odd = head; //at index 1)
+        Node<Integer> even = head.getNext(); //at index 2)
+        Node<Integer> evenHead = even; //saving the starting ref of even pointr i.e, index 2) in evenHead
+
+        while (even != null && even.getNext() != null) {
+            odd.setNext(even.getNext()); //next odd index we will get after even index i.e, 3) after 2)
+            odd = odd.getNext(); //index 1) now pointing to the update i.e, index 3) and so on...
+            even.setNext(odd.getNext()); //similarly next even index we will get after odd index i.e, 4) after 3)
+            even = even.getNext(); //index 2) now pointing to the update i.e, index 4) and so on...
+        }
+
+        //odd last ref will be having even starting index ref (last nth odd index -> index 2)
+        odd.setNext(evenHead);
+
+        //output:
+        new LinkedListUtil<Integer>(head).print();
 
     }
 
@@ -5772,7 +5909,124 @@ public class DSA450Questions {
         new BinaryTree<Integer>(root1).treeBFS();
 
     }
-    
+
+    private long numberOfWaysToCreateBSTAndBTWithGivenN_Factorial(long N) {
+        long result = 1;
+        for (long i = 1; i <= N; i++) {
+            result *= i;
+        }
+
+        return result;
+    }
+
+    private long numberOfWaysToCreateBSTAndBTWithGivenN_BinomialCoeff(long N, long K) {
+        long result = 1;
+
+        if (K > N - K) {
+            K = N - K;
+        }
+
+        for (long i = 0; i < K; i++) {
+            result *= (N - i);
+            result /= (i + 1);
+        }
+
+        return result;
+    }
+
+    private long numberOfWaysToCreateBSTAndBTWithGivenN_CatalanNumberOfGivenNthNumber(long N) {
+
+        //Catalan number series:
+        //https://www.youtube.com/watch?v=CMaZ69P1bAc
+        //https://www.geeksforgeeks.org/program-nth-catalan-number/
+        //https://www.geeksforgeeks.org/total-number-of-possible-binary-search-trees-with-n-keys/#
+        long cat = numberOfWaysToCreateBSTAndBTWithGivenN_BinomialCoeff(2 * N, N);
+        return cat / (N + 1);
+    }
+
+    public void numberOfWaysToCreateBSTAndBTWithGivenN(long N) {
+
+        //problem: https://leetcode.com/problems/unique-binary-search-trees
+        //Explanation :
+        //https://www.geeksforgeeks.org/total-number-of-possible-binary-search-trees-with-n-keys/#
+        //ways to create BST
+        //find the catalan number of given Nth number 
+        System.out.println("Number of ways to create a binary search tree with given N nodes: "
+                + numberOfWaysToCreateBSTAndBTWithGivenN_CatalanNumberOfGivenNthNumber(N));
+
+        //ways to create BT
+        //find the catalan number of given Nth number * factorial(N)
+        System.out.println("Number of ways to create a binary tree with given N nodes: "
+                + (numberOfWaysToCreateBSTAndBTWithGivenN_CatalanNumberOfGivenNthNumber(N)
+                * numberOfWaysToCreateBSTAndBTWithGivenN_Factorial(N)));
+
+    }
+
+    public boolean checkIfBinaryTreeIsCompleteOrNot(TreeNode<Integer> root) {
+
+        //explanation: https://youtu.be/j16cwbLEf9w
+        //complete binary tree:
+        /*
+         In a complete binary tree, every level, except possibly the last, 
+         is completely filled, and all nodes in the last level are as far left 
+         as possible. It can have between 1 and 2^h nodes inclusive at the 
+         last level h.
+         */
+        //all the nodes at last level should be left-most alinged
+        //if any null is present before the very last node at the level
+        //that means tree is not complete binary tree
+        boolean isNullBeforeLastNode = false;
+
+        Queue<TreeNode<Integer>> q = new LinkedList<>();
+        q.add(root);
+
+        while (!q.isEmpty()) {
+
+            TreeNode<Integer> curr = q.poll();
+
+            if (curr == null) {
+                isNullBeforeLastNode = true;
+            } else {
+                if (isNullBeforeLastNode) {
+                    return false;
+                }
+                //put all the left and right child nodes as it is
+                //without checking for null
+                q.add(curr.getLeft());
+                q.add(curr.getRight());
+            }
+        }
+        return true;
+    }
+
+    private void maximumWidthOfBinaryTree_Helper(TreeNode<Integer> root, int level,
+            int position, Map<Integer, Integer> map) {
+        if (root == null) {
+            return;
+        }
+
+        map.putIfAbsent(level, position);
+        maximumWidthOfBinaryTree_MaxWidth = Math.max(maximumWidthOfBinaryTree_MaxWidth,
+                position - map.get(level) + 1);
+
+        maximumWidthOfBinaryTree_Helper(root.getLeft(), level + 1, 2 * position, map);
+        maximumWidthOfBinaryTree_Helper(root.getRight(), level + 1, 2 * position + 1, map);
+
+    }
+
+    int maximumWidthOfBinaryTree_MaxWidth;
+
+    public void maximumWidthOfBinaryTree(TreeNode<Integer> root) {
+
+        //explanation: https://youtu.be/sm4UdCO2868
+        maximumWidthOfBinaryTree_MaxWidth = 0;
+        Map<Integer, Integer> map = new HashMap<>();
+        maximumWidthOfBinaryTree_Helper(root, 0, 0, map);
+
+        //output
+        System.out.println("Max Width of binary tree: " + maximumWidthOfBinaryTree_MaxWidth);
+    }
+
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
     private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
@@ -6008,7 +6262,93 @@ public class DSA450Questions {
 
         //output:
         System.out.println("Evaluation multiple digit expression: " + stack.pop());
+    }
 
+    public void removeKDigitsToCreateSmallestNumber(String num, int K) {
+
+        //explanation: https://youtu.be/vbM41Zql228
+        if (K == num.length()) {
+            System.out.println("Number formed: 0");
+            return;
+        }
+
+        int index = 0;
+        StringBuilder sb = new StringBuilder();
+        Stack<Character> stack = new Stack<>();
+
+        while (index < num.length()) {
+            //Greedily take the smaller digit than stack's peek digit
+            //ex: "1432219"
+            //stack [1]
+            //stack [1, 4] as not 1 > 4
+            //stack [1, 3] as 4 > 3 
+            //becasue if number has to be formed in that case 14 > 13 smaller num req 13 and so on.
+            while (K != 0 && !stack.isEmpty() && stack.peek() > num.charAt(index)) {
+                stack.pop();
+                K--;
+            }
+
+            stack.push(num.charAt(index));
+            index++;
+        }
+
+        //case when the all the digits in the stack are same
+        //ex: 1111
+        while (K != 0) {
+            stack.pop();
+            K--;
+        }
+
+        //form the number
+        //ex: "1432219"
+        //stack would be having [1, 2, 1, 9] <- peek
+        //pop element and add then at 0th index so sb = "1219"
+        while (!stack.isEmpty()) {
+            sb.insert(0, stack.pop());
+        }
+
+        //case when there are leading zeros in num 
+        //ex: 000234 => 234
+        while (sb.length() > 1 && sb.charAt(0) == '0') {
+            sb.deleteCharAt(0);
+        }
+
+        //output
+        System.out.println("Number formed: " + sb.toString());
+    }
+
+    public void findTheMostCompetetiveSubsequenceOfSizeKFromArray(int[] arr, int K) {
+
+        //problem: https://leetcode.com/problems/find-the-most-competitive-subsequence/
+        //explanation: https://leetcode.com/problems/find-the-most-competitive-subsequence/discuss/1113429/Java-Brute-Force-Stack
+        int[] result = new int[K];
+        Stack<Integer> stack = new Stack<>();
+
+        for (int i = 0; i < arr.length; i++) {
+
+            int curr = arr[i];
+
+            if (stack.size() != K || stack.peek() > curr) {
+
+                int leftNums = arr.length - i;
+                while (K - stack.size() < leftNums && !stack.isEmpty() && stack.peek() > curr) {
+                    stack.pop();
+                }
+                stack.push(curr);
+            }
+        }
+
+        int index = result.length - 1;
+        while (!stack.isEmpty()) {
+            result[index--] = stack.pop();
+        }
+
+        //output
+        for (int x : result) {
+            System.out.print(x + " ");
+        }
+
+        System.out.println();
     }
 
     private void rotAllAdjacent(int[][] basket,
@@ -6247,8 +6587,7 @@ public class DSA450Questions {
 
     }
 
-    public
-            void mergeKSortedArrays_2(int[][] arr) {
+    public void mergeKSortedArrays_2(int[][] arr) {
 
         class Input {
 
@@ -6264,8 +6603,8 @@ public class DSA450Questions {
         }
 
         //OPTIMISED
-//........................T: O(N*K*LogK)
-//........................S: O(K)
+        //........................T: O(N*K*LogK)
+        //........................S: O(K)
         PriorityQueue<Input> minHeap = new PriorityQueue<>((a, b) -> arr[a.row][a.col] - arr[b.row][b.col]);
         //minHeap will hold start coordinate(row, col) for all the elements in each row not the total R*C elements directly
         for (int r = 0; r < arr.length; r++) {
@@ -6322,7 +6661,6 @@ public class DSA450Questions {
         }
 
         System.out.println("kth largest sum from contigous subarray: " + minHeap.peek());
-
     }
 
     public void majorityElement_1(int[] a) {
@@ -6815,6 +7153,55 @@ public class DSA450Questions {
 
         //output
         System.out.println("Local maxima at index: " + mid + " element: " + arr[mid]);
+
+    }
+
+    private int countElementsFromSecondArrayLessOrEqualToElementInFirstArray_FindLastOccurenceOfX(int[] arr,
+            int x, int start, int end) {
+
+        //MODIFIED BINARY SERACH FOR THIS QUESTION
+        //SIMILAR TO findLastOccurenecOfKInSortedArray()
+        if (end >= start) {
+
+            int mid = start + (end - start) / 2;
+
+            if ((mid == arr.length - 1 || arr[mid] < arr[mid + 1]) && arr[mid] == x) {
+                return mid;
+            } else if (x < arr[mid]) {
+                return countElementsFromSecondArrayLessOrEqualToElementInFirstArray_FindLastOccurenceOfX(
+                        arr, x, start, mid - 1);
+            } else {
+                return countElementsFromSecondArrayLessOrEqualToElementInFirstArray_FindLastOccurenceOfX(
+                        arr, x, mid + 1, end);
+            }
+        }
+        return end;
+    }
+
+    public void countElementsFromSecondArrayLessOrEqualToElementInFirstArray(int[] first, int[] second) {
+
+        /*
+         Brute force : T: O(N^2)
+         `1. Use 2 for loop: 
+         -> i for first[] 
+         ---> count = 0
+         ---> j for second[]
+         ------> if second[j] <= first[i]: count++
+         ---> print: count
+         */
+        //............................T: O((M + N) * LogN) where M = first.length, N = second.length
+        //............................S: O(1)
+        //https://www.geeksforgeeks.org/element-1st-array-count-elements-less-equal-2nd-array/
+        Arrays.sort(second);
+        List<Integer> result = new ArrayList<>();
+        for (int x : first) {
+            int index = countElementsFromSecondArrayLessOrEqualToElementInFirstArray_FindLastOccurenceOfX(
+                    second, x, 0, second.length - 1);
+            result.add(index + 1);
+        }
+
+        //output
+        System.out.println("Count: " + result);
 
     }
 
@@ -7529,7 +7916,7 @@ public class DSA450Questions {
         }
 
         //output
-        System.out.println("Maximum length o repeated subarray: " + maxLen);
+        System.out.println("Maximum length of repeated subarray: " + maxLen);
 
     }
 
@@ -7754,6 +8141,33 @@ public class DSA450Questions {
         //output:
         System.out.println("Max value can be picked up by fractional knapsack: " + maxValue);
 
+    }
+    
+    public void swapTwoDigitAtMostToFormAGreaterNumber_Greedy(int num){
+        
+        //https://leetcode.com/problems/maximum-swap/
+        char[] digit = String.valueOf(num).toCharArray();
+        int[] index = new int[10];
+        int ans = -1;
+        for(int i = 0; i < digit.length; i++){
+            index[digit[i] - '0'] = i;
+        }
+        
+        for(int  i = 0; i < digit.length; i++){
+            for(int d = 9; d > digit[i] - '0'; d--){
+                if(index[d] > i){
+                    char temp = digit[i];
+                    digit[i] = digit[index[d]];
+                    digit[index[d]] = temp;
+                    System.out.println("Greater number after 2 digit swaps atmost: "+Integer.parseInt(String.valueOf(digit)));
+                    return;
+                }
+            }
+        }
+
+        //output
+        System.out.println("Greater number after 2 digit swaps atmost: "+num);
+        
     }
 
     public void graphBFSAdjList_Graph(int V, List<List<Integer>> adjList) {
@@ -8386,6 +8800,123 @@ public class DSA450Questions {
         }
 
         return result;
+    }
+
+    public void checkBinaryNumberStreamIsDivisibleByN(int[] binaryStream, int N) {
+
+        //explanantion: https://www.geeksforgeeks.org/check-divisibility-binary-stream/
+        //see method 2
+        /*
+        
+         formula: 
+         if bit is 1 new decimal = 2 * prevDecimal + 1
+         if bit is 0 new decimal = 2 * prevDecimal
+        
+         Ex:
+         binaryStream = [1,0,1,0,1]
+         prevDecimal = 0
+         binaryFormed = ""
+         i = 0
+         bit = 1 -> binaryFormed.append(bit) = "1" == actualDecimal(binaryFormed) = 1
+         if bit == 1: prevDecimal = (2 * prevDecimal) + 1
+         ---> prevDecimal = 2 * 0 + 1 = 1
+        
+         i = 1
+         bit = 0 -> binaryFormed.append(bit) = "10" == actualDecimal(binaryFormed) = 2
+         if bit == 0: prevDecimal = (2 * prevDecimal)
+         ---> prevDecimal = 2 * 1 = 2
+        
+         i = 2
+         bit = 1 -> binaryFormed.append(bit) = "101" == actualDecimal(binaryFormed) = 5
+         if bit == 1: prevDecimal = (2 * prevDecimal) + 1
+         ---> prevDecimal = 2 * 2 + 1= 5
+        
+         so on...
+         */
+        int remainder = 0;
+        int decimal = 0;
+        StringBuilder sb = new StringBuilder(); //just for output purpose, not necessary to use
+        for (int bit : binaryStream) {
+
+            if (bit == 0) {
+                remainder = (2 * remainder) % N;
+                decimal = 2 * decimal;
+            } else if (bit == 1) {
+                remainder = (2 * remainder + 1) % N;
+                decimal = 2 * decimal + 1;
+            }
+
+            sb.append(bit);
+            if (remainder == 0) {
+                System.out.println("Binary formed: " + sb.toString() + " dec("+decimal+") is divisible by " + N);
+            } else {
+                System.out.println("Binary formed: " + sb.toString() + " dec("+decimal+") is not divisible by " + N);
+            }
+        }
+    }
+
+    private String convertNumberToWords_Helper(int n, String suff) {
+
+        // Strings at index 0 is not used, it is to make array 
+        // indexing simple 
+        String one[] = {"", "one ", "two ", "three ", "four ",
+            "five ", "six ", "seven ", "eight ",
+            "nine ", "ten ", "eleven ", "twelve ",
+            "thirteen ", "fourteen ", "fifteen ",
+            "sixteen ", "seventeen ", "eighteen ",
+            "nineteen "};
+
+        // Strings at index 0 and 1 are not used, they is to 
+        // make array indexing simple 
+        String ten[] = {"", "", "twenty ", "thirty ", "forty ",
+            "fifty ", "sixty ", "seventy ", "eighty ",
+            "ninety "};
+
+        String str = "";
+        // if n is more than 19, divide it 
+        if (n > 19) {
+            str += ten[n / 10] + one[n % 10];
+        } else {
+            str += one[n];
+        }
+
+        // if n is non-zero 
+        if (n != 0) {
+            str += suff;
+        }
+
+        return str;
+    }
+
+    public void convertNumberToWords(long n) {
+
+        //https://www.geeksforgeeks.org/program-to-convert-a-given-number-to-words-set-2/
+        StringBuilder sb = new StringBuilder();
+
+        // handles digits at ten millions and hundred 
+        // millions places (if any) 
+        sb.append(convertNumberToWords_Helper((int) (n / 1000_000_0) % 100, "crore "));
+
+        // handles digits at hundred thousands and one 
+        // millions places (if any) 
+        sb.append(convertNumberToWords_Helper((int) ((n / 100_000) % 100), "lakh "));
+
+        // handles digits at thousands and tens thousands 
+        // places (if any) 
+        sb.append(convertNumberToWords_Helper((int) ((n / 1000) % 100), "thousand "));
+
+        // handles digit at hundreds places (if any) 
+        sb.append(convertNumberToWords_Helper((int) ((n / 100) % 10), "hundred "));
+
+        if (n > 100 && n % 100 > 0) {
+            sb.append("and ");
+        }
+
+        // handles digits at ones and tens places (if any) 
+        sb.append(convertNumberToWords_Helper((int) (n % 100), ""));
+
+        //output
+        System.out.println("In words: \n" + sb.toString());
 
     }
 
@@ -8921,7 +9452,7 @@ public class DSA450Questions {
 //        obj.majorityElement_2(new int[] { 1, 3, 3, 3, 2 }); //MOORE'S VOTING ALGO
         //......................................................................
 //        Row: 195
-//        System.out.println("Convert tree to its sun tree");
+//        System.out.println("Convert tree to its sum tree");
 //        TreeNode<Integer> root1 = new TreeNode<>(6);
 //        root1.setLeft(new TreeNode(2));
 //        root1.getLeft().setLeft(new TreeNode(0));
@@ -10644,18 +11175,151 @@ public class DSA450Questions {
 //        obj.flipMZerosFindMaxLengthOfConsecutiveOnes(new int[]{1, 0, 0, 1, 1, 0, 1, 0, 1, 1}, 3);
         //......................................................................
 //        Row: SEPARATE QUESTION IMPORTANT
-        System.out.println("Local minima and local maxima (BINARY SEARCH)");
-        //https://www.geeksforgeeks.org/find-local-minima-array/
-        obj.findLocalMinima(new int[]{1, 2, 3});
-        obj.findLocalMinima(new int[]{23, 8, 15, 2, 3});
-        obj.findLocalMinima(new int[]{9, 6, 3, 14, 5, 7, 4});
-        obj.findLocalMinima(new int[]{3, 2, 1});
-        //MAXIMA
-        obj.findLocalMaxima(new int[]{3, 2, 1});
-        obj.findLocalMaxima(new int[]{1, 2, 3});
-        obj.findLocalMaxima(new int[]{9, 6, 3, 14, 5, 7, 4});
-        obj.findLocalMaxima(new int[]{23, 8, 15, 2, 3});
-        obj.findLocalMaxima(new int[]{23, 8});
+//        System.out.println("Local minima and local maxima (BINARY SEARCH)");
+//        //https://www.geeksforgeeks.org/find-local-minima-array/
+//        obj.findLocalMinima(new int[]{1, 2, 3});
+//        obj.findLocalMinima(new int[]{23, 8, 15, 2, 3});
+//        obj.findLocalMinima(new int[]{9, 6, 3, 14, 5, 7, 4});
+//        obj.findLocalMinima(new int[]{3, 2, 1});
+//        //MAXIMA
+//        obj.findLocalMaxima(new int[]{3, 2, 1});
+//        obj.findLocalMaxima(new int[]{1, 2, 3});
+//        obj.findLocalMaxima(new int[]{9, 6, 3, 14, 5, 7, 4});
+//        obj.findLocalMaxima(new int[]{23, 8, 15, 2, 3});
+//        obj.findLocalMaxima(new int[]{23, 8});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Reorder linked list");
+//        //https://leetcode.com/problems/reorder-list/
+//        Node<Integer> head = new Node<Integer>(1);
+//        head.setNext(new Node<>(2));
+//        head.getNext().setNext(new Node<>(3));
+//        head.getNext().getNext().setNext(new Node<>(4));
+//        head.getNext().getNext().getNext().setNext(new Node<>(5));
+//        obj.reorderLinkedList(head);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Remove K digits and create the smallest num");
+//        //https://leetcode.com/problems/remove-k-digits/
+//        obj.removeKDigitsToCreateSmallestNumber("1432219", 3);
+//        obj.removeKDigitsToCreateSmallestNumber("10", 2);
+//        obj.removeKDigitsToCreateSmallestNumber("10200", 1);
+//        obj.removeKDigitsToCreateSmallestNumber("4321", 2);
+//        obj.removeKDigitsToCreateSmallestNumber("1234", 2);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Find the most competetive subsequence of length K in the given array");
+//        //https://leetcode.com/problems/find-the-most-competitive-subsequence/
+//        obj.findTheMostCompetetiveSubsequenceOfSizeKFromArray(new int[]{3,5,2,6}, 2);
+//        obj.findTheMostCompetetiveSubsequenceOfSizeKFromArray(new int[]{2,4,3,3,5,4,9,6}, 4);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Odd even linked list");
+//        //https://leetcode.com/problems/odd-even-linked-list/
+//        Node<Integer> head = new Node<Integer>(1);
+//        head.setNext(new Node<>(2));
+//        head.getNext().setNext(new Node<>(3));
+//        head.getNext().getNext().setNext(new Node<>(4));
+//        head.getNext().getNext().getNext().setNext(new Node<>(5));
+//        obj.rearrangeLinkedListAsOddIndexFirstAndEvenIndexAtEnd(head);
+//        head = new Node<Integer>(1);
+//        head.setNext(new Node<>(2));
+//        head.getNext().setNext(new Node<>(3));
+//        head.getNext().getNext().setNext(new Node<>(4));
+//        head.getNext().getNext().getNext().setNext(new Node<>(5));
+//        head.getNext().getNext().getNext().getNext().setNext(new Node<>(6));
+//        obj.rearrangeLinkedListAsOddIndexFirstAndEvenIndexAtEnd(head);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Number of ways to create BST and BT with given N (req info: Catalan number series)");
+//        //https://leetcode.com/problems/unique-binary-search-trees/
+//        //https://www.geeksforgeeks.org/total-number-of-possible-binary-search-trees-with-n-keys/#
+//        obj.numberOfWaysToCreateBSTAndBTWithGivenN(3);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Check if binary tree is complete binary tree or not");
+//        //https://leetcode.com/problems/check-completeness-of-a-binary-tree/
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.getLeft().setRight(new TreeNode<>(5));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setLeft(new TreeNode<>(6)); //COMPLETE BINARY TREE
+//        System.out.println("Is tree complete binary tree: "+obj.checkIfBinaryTreeIsCompleteOrNot(root1));
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.getLeft().setLeft(new TreeNode<>(5));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setRight(new TreeNode<>(7)); //NOT-COMPLETE BINARY TREE
+//        System.out.println("Is tree complete binary tree: "+obj.checkIfBinaryTreeIsCompleteOrNot(root1));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("maximum width of binary tree");
+//        //https://leetcode.com/problems/maximum-width-of-binary-tree/
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(3));
+//        root1.getLeft().setLeft(new TreeNode<>(5));
+//        root1.getLeft().setRight(new TreeNode<>(3));
+//        root1.setRight(new TreeNode<>(2));
+//        root1.getRight().setRight(new TreeNode<>(9));
+//        obj.maximumWidthOfBinaryTree(root1);
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(3));
+//        root1.getLeft().setLeft(new TreeNode<>(5));
+//        root1.getLeft().getLeft().setLeft(new TreeNode<>(6));
+//        root1.setRight(new TreeNode<>(2));
+//        root1.getRight().setRight(new TreeNode<>(9));
+//        root1.getRight().getRight().setRight(new TreeNode<>(7));
+//        obj.maximumWidthOfBinaryTree(root1);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Sum of elements in matrix except given row and col");
+//        //https://www.geeksforgeeks.org/find-sum-of-all-elements-in-a-matrix-except-the-elements-in-given-row-andor-column-2/
+//        int[][] rowAndCol = new int[][]{
+//            {0, 0},
+//            {1, 1},
+//            {0, 1}
+//        };
+//        int[][] matrix = new int[][]{
+//            {1, 1, 2},
+//            {3, 4, 6},
+//            {5, 3, 2}
+//        };
+//        obj.sumOfElementsInMatrixExceptGivenRowAndCol(matrix, rowAndCol);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Count number elements from second array less than or equal to element in first array");
+//        //https://www.geeksforgeeks.org/element-1st-array-count-elements-less-equal-2nd-array/
+//        obj.countElementsFromSecondArrayLessOrEqualToElementInFirstArray(
+//                new int[]{1, 2, 3, 4, 7, 9},
+//                new int[]{0, 1, 2, 1, 1, 4});
+//        obj.countElementsFromSecondArrayLessOrEqualToElementInFirstArray(
+//                new int[]{5, 10, 2, 6, 1, 8, 6, 12},
+//                new int[]{6, 5, 11, 4, 2, 3, 7});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Check if input binary number stream is divisible by N");
+//        //https://www.geeksforgeeks.org/check-divisibility-binary-stream/
+//        obj.checkBinaryNumberStreamIsDivisibleByN(new int[]{1,0,1,0,1}, 3);
+//        obj.checkBinaryNumberStreamIsDivisibleByN(new int[]{1,0,1}, 5);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Convert number to words");
+//        //https://www.geeksforgeeks.org/program-to-convert-a-given-number-to-words-set-2/
+//        obj.convertNumberToWords(438237764);
+//        obj.convertNumberToWords(0);
+//        obj.convertNumberToWords(9);
+//        obj.convertNumberToWords(1000);
+//        obj.convertNumberToWords(222);
+//        obj.convertNumberToWords(1234567891);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Maximum swaps to form greater number by swaping 2 digit atmost ");
+        //https://leetcode.com/problems/maximum-swap/
+        obj.swapTwoDigitAtMostToFormAGreaterNumber_Greedy(2736);
+        obj.swapTwoDigitAtMostToFormAGreaterNumber_Greedy(9973);
+        obj.swapTwoDigitAtMostToFormAGreaterNumber_Greedy(1002);
     }
 
 }
