@@ -12,8 +12,9 @@ package fun;
 public class Node<T> {
     
     private T data;
-    private Node previous;
-    private Node next;
+    private Node<T> previous;
+    private Node<T> next;
+    private Node<T> random;
 
     public Node(T data, Node previous, Node next) {
         this.data = data;
@@ -35,22 +36,29 @@ public class Node<T> {
         this.data = data;
     }
 
-    public Node getPrevious() {
+    public Node<T> getPrevious() {
         return previous;
     }
 
-    public void setPrevious(Node previous) {
+    public void setPrevious(Node<T> previous) {
         this.previous = previous;
     }
 
-    public Node getNext() {
+    public Node<T> getNext() {
         return next;
     }
 
-    public void setNext(Node next) {
+    public void setNext(Node<T> next) {
         this.next = next;
     }
-    
+
+    public Node<T> getRandom() {
+        return random;
+    }
+
+    public void setRandom(Node<T> random) {
+        this.random = random;
+    }
     
     
 }

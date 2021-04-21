@@ -10,9 +10,10 @@ package fun;
  * @author RAVI
  */
 public class TreeNode<T> {
-    T data;
-    TreeNode left;
-    TreeNode right;
+    private T data;
+    private TreeNode<T> left;
+    private TreeNode<T> right;
+    private TreeNode<T> random;
 
     public TreeNode(T data) {
         this.data = data;
@@ -20,7 +21,7 @@ public class TreeNode<T> {
         this.right = null;
     }
     
-    public TreeNode(T data, TreeNode left, TreeNode right) {
+    public TreeNode(T data, TreeNode<T> left, TreeNode<T> right) {
         this.data = data;
         this.left = left;
         this.right = right;
@@ -34,27 +35,33 @@ public class TreeNode<T> {
         this.data = data;
     }
 
-    protected TreeNode getLeft() {
+    protected TreeNode<T> getLeft() {
         return left;
     }
 
-    protected void setLeft(TreeNode left) {
+    protected void setLeft(TreeNode<T> left) {
         this.left = left;
     }
 
-    protected TreeNode getRight() {
+    protected TreeNode<T> getRight() {
         return right;
     }
 
-    protected void setRight(TreeNode right) {
+    protected void setRight(TreeNode<T> right) {
         this.right = right;
+    }
+
+    public TreeNode<T> getRandom() {
+        return random;
+    }
+
+    public void setRandom(TreeNode<T> random) {
+        this.random = random;
     }
 
     @Override
     public String toString() {
         return data.toString();
     }
-    
-    
     
 }

@@ -208,7 +208,7 @@ public class DSA450Questions {
         //https://www.geeksforgeeks.org/sort-an-array-of-0s-1s-and-2s/
         int lo = 0;
         int hi = a.length - 1;
-        int mid = 0, temp = 0;
+        int mid = 0;
         while (mid <= hi) {
             switch (a[mid]) {
                 case 0: {
@@ -1811,36 +1811,36 @@ public class DSA450Questions {
         return true;
     }
 
-    private void combinationSum_Helper(int[] arr, int N, int target, int currSum, 
-            List<Integer> currList, List<List<Integer>> result){
-        
-        if(currSum == target){
+    private void combinationSum_Helper(int[] arr, int N, int target, int currSum,
+            List<Integer> currList, List<List<Integer>> result) {
+
+        if (currSum == target) {
             //to avoid any duplicate combinations of arr element
-            for(List<Integer> l : result){
+            for (List<Integer> l : result) {
                 //currList combination is already added in the result, we dont need extra
-                if(l.equals(currList)){
+                if (l.equals(currList)) {
                     return;
                 }
             }
             result.add(currList);
             return;
         }
-        
-        if(N >= arr.length || currSum > target || arr[N] > target){
+
+        if (N >= arr.length || currSum > target || arr[N] > target) {
             return;
         }
         //two decision to make
         //1. we can skip the curr arr element and move to next element
         combinationSum_Helper(arr, N + 1, target, currSum, new ArrayList<>(currList), result);
-        
+
         //2. we can take the curr arr element and that element needs to added 
         //in the currList & also to be added in currSum
         currList.add(arr[N]);
         combinationSum_Helper(arr, N + 1, target, currSum + arr[N], new ArrayList<>(currList), result);
     }
-    
+
     public void combinationSum(int[] arr, int target) {
-        
+
         //..............................T: O(2^N)
         //APPROACH SIMILAR TO SUBSET SUM EQUAL TO TARGET
         //NOT FULLY OPTIMISED
@@ -1848,9 +1848,293 @@ public class DSA450Questions {
         Arrays.sort(arr);
         List<List<Integer>> result = new ArrayList<>();
         combinationSum_Helper(arr, 0, target, 0, new ArrayList<>(), result);
+
+        //output
+        System.out.println("All combinations whose sum is equal to target: " + result);
+    }
+
+    public int longestConsecutiveSequence(int[] arr) {
+
+        int N = arr.length;
+
+        if (N == 1) {
+            return 1;
+        }
+
+        Arrays.sort(arr);
+
+        int end = 0;
+        int count = 0;
+        int maxLen = 0;
+        for (int i = 1; i < N; i++) {
+
+            if (arr[i] - arr[end] == 1) {
+                count++;
+                maxLen = Math.max(maxLen, count + 1);
+            } else if (arr[i] - arr[end] > 1) {
+                count = 0;
+            }
+
+            //adjust if there are duplicates
+            while (i + 1 < N && arr[i] == arr[i + 1]) {
+                i++;
+            }
+            end = i; //prev of i in end
+        }
+        return maxLen;
+    }
+
+    public void maxDifferenceOfIndexes(int[] arr) {
+
+        //........................T: O(N)
+        //........................S: O(N)
+        //OPTIMISED
+        //https://www.geeksforgeeks.org/given-an-array-arr-find-the-maximum-j-i-such-that-arrj-arri/
+        /*
+         The task is to find the maximum of j - i subjected to the constraint of A[i] <= A[j].
+         */
+        int n = arr.length;
+        int i;
+        int j;
+        int maxDiff = -1;
+        int[] leftMin = new int[n];
+        int[] rightMax = new int[n];
+
+        leftMin[0] = arr[0];
+        for (i = 1; i < n; i++) {
+            leftMin[i] = Math.min(arr[i], leftMin[i - 1]);
+        }
+
+        rightMax[n - 1] = arr[n - 1];
+        for (i = n - 2; i >= 0; i--) {
+            rightMax[i] = Math.max(arr[i], rightMax[i + 1]);
+        }
+
+        i = 0;
+        j = 0;
+
+        while (i < n && j < n) {
+            if (leftMin[i] <= rightMax[j]) {
+                maxDiff = Math.max(maxDiff, j - i);
+                j++;
+            } else {
+                i++;
+            }
+        }
+
+        //output
+        System.out.println("Mmax diff: " + maxDiff);
+    }
+
+    public void rearrangeArrayElements(int[] arr) {
+
+        //OPTIMISED
+        //.................................T: O(N)
+        //.................................S: O(1)
+        //https://www.geeksforgeeks.org/rearrange-given-array-place/
+        /*
+         Given an array arr[] of size N where every element is in the range 
+         from 0 to n-1. 
+         Rearrange the given array so that arr[i] becomes arr[arr[i]].
+         */
+        int n = arr.length;
+
+        for (int i = 0; i < n; i++) {
+            arr[i] += (arr[arr[i]] % n) * n;
+        }
+
+        for (int i = 0; i < n; i++) {
+            arr[i] /= n;
+        }
+
+        //output
+        for (int x : arr) {
+            System.out.print(x + " ");
+        }
+        System.out.println();
+    }
+
+    public void minimumRangeContainingAtleastOneElementFromKSortedList(int[][] kSortedList) {
+
+        ////............................T: O(N*K*LogK)
+        //............................S: O(K)
+        //https://www.geeksforgeeks.org/find-smallest-range-containing-elements-from-k-lists/
+        //APPROACH SIMILAR TO k sorted list/array
+        class Data {
+
+            final int row;
+            final int len;
+            int col;
+
+            public Data(int row, int col, int len) {
+                this.row = row;
+                this.len = len;
+                this.col = col;
+            }
+        }
+
+        int K = kSortedList.length;
+
+        int max = Integer.MIN_VALUE;
+        int minRange = Integer.MAX_VALUE;
+        int minElementRange = -1;
+        int maxElementRange = -1;
+
+        PriorityQueue<Data> minHeap = new PriorityQueue<>((a, b) -> {
+            return kSortedList[a.row][a.col] - kSortedList[b.row][b.col];
+        });
+
+        for (int r = 0; r < K; r++) {
+            minHeap.add(new Data(r, 0, kSortedList[r].length));
+            max = Math.max(max, kSortedList[r][0]); //max element from all the first element of K sorted list([r][0])
+        }
+
+        while (!minHeap.isEmpty()) {
+
+            Data curr = minHeap.poll(); //its minHeap, root is always min
+
+            int min = kSortedList[curr.row][curr.col];
+
+            //find range
+            if ((max - min) < minRange) {
+                minRange = max - min;
+                minElementRange = min;
+                maxElementRange = max;
+            }
+
+            if (curr.col + 1 < curr.len) {
+                curr.col++;
+                max = Math.max(max, kSortedList[curr.row][curr.col]); //max(currMax, updated element from the kSortedList)
+                minHeap.add(curr);
+            } else {
+                break;
+            }
+        }
+
+        //output
+        System.out.println("Min range of elements that is present in all K sorted list: "
+                + "[" + minElementRange + ", " + maxElementRange + "]");
+
+    }
+
+    public void tupleWithSameProduct(int[] arr) {
+
+        //https://practice.geeksforgeeks.org/problems/sum-equals-to-sum4006/1 (SAME APPROACH)
+        //https://leetcode.com/problems/tuple-with-same-product/
+        Map<Integer, Integer> map = new HashMap<>();
+        int count = 0;
+
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = i + 1; j < arr.length; j++) {
+                int mul = arr[i] * arr[j];
+                if (map.containsKey(mul)) {
+                    count += map.get(mul);
+                }
+                map.put(mul, map.getOrDefault(mul, 0) + 1);
+            }
+        }
+
+        //output
+        System.out.println("Possible tuple counts: " + (count * 8));
+    }
+
+    public void kDiffPairsInArray(int[] arr, int k) {
+
+        //https://leetcode.com/problems/k-diff-pairs-in-an-array/
+        int pair = 0;
+        Map<Integer, Long> map = IntStream.of(arr).boxed()
+                .collect(Collectors.groupingBy(
+                                Function.identity(),
+                                Collectors.counting()
+                        ));
+
+        for (int key : map.keySet()) {
+
+            long freq = map.get(key);
+            if ((k > 0 && map.containsKey(key + k)) || (k == 0 && freq > 1)) {
+                pair++;
+            }
+        }
+
+        //output
+        System.out.println("Count of pair of array element with diff equal to k: " + pair);
+    }
+
+    public void leastNumberOfUniqueIntegersLeftAfterKRemoval(int[] arr, int K) {
+
+        //https://leetcode.com/problems/least-number-of-unique-integers-after-k-removals/
+        //can't remove K elements if K is more than array's length
+        if (K > arr.length) {
+            return;
+        }
+        //get the frequency count of all the array element
+        Map<Integer, Long> map = IntStream.of(arr).boxed()
+                .collect(Collectors.groupingBy(
+                                Function.identity(),
+                                Collectors.counting()
+                        ));
+
+        //arrange all the array element at top having less frequency
+        PriorityQueue<Integer> minFreq = new PriorityQueue<>(
+                (a, b) -> (int) (map.get(a) - map.get(b))
+        );
+
+        //put all the unique integers in the minFreq queue
+        minFreq.addAll(IntStream.of(arr).boxed()
+                .collect(Collectors.toSet()));
+
+        while (K > 0 && !minFreq.isEmpty()) {
+
+            int curr = minFreq.poll();
+            //reduce the freq of all the array element who are 
+            //having less freq untill K becomes 0
+            map.put(curr, map.get(curr) - 1);
+            //if freq of curr array element is 0 remove it from map and dont add it in minFreq
+            if (map.get(curr) <= 0) {
+                map.remove(curr);
+            } else {
+                //if freq of array element is greater than 0, put it back in minFreq
+                minFreq.add(curr);
+            }
+            K--;
+        }
+
+        //output
+        System.out.println("Total unique integer after K removals: " + minFreq.size() + " K integers left: " + minFreq);
+    }
+    
+    private void printAllPermutationOfDistinctIntegerArray_Helper(int[] arr, 
+            int index, 
+            List<List<Integer>> res){
+        
+        if(index == arr.length){
+            res.add(Arrays.stream(arr).boxed().collect(Collectors.toList()));
+        }
+        
+        for(int i = index; i < arr.length; i++){
+            
+            //swap
+            int temp = arr[index];
+            arr[index] = arr[i];
+            arr[i] = temp;
+            
+            printAllPermutationOfDistinctIntegerArray_Helper(arr, index + 1, res);
+            
+            //swapping back the integers at their orignal places
+            temp = arr[index];
+            arr[index] = arr[i];
+            arr[i] = temp;
+        }
+    }
+    
+    public void printAllPermutationOfDistinctIntegerArray(int[] arr){
+        
+        //https://leetcode.com/problems/permutations/
+        List<List<Integer>> res = new ArrayList<>();
+        printAllPermutationOfDistinctIntegerArray_Helper(arr, 0, res);
         
         //output
-        System.out.println("All combinations whose sum is equal to target: "+result);
+        System.out.println("All permutations of distinct integer: "+res);
     }
 
     public void rotateMatrixClockWise90Deg(int[][] mat) {
@@ -1866,7 +2150,6 @@ public class DSA450Questions {
                 mat[y][N - 1 - x] = mat[N - 1 - x][N - 1 - y];
                 mat[N - 1 - x][N - 1 - y] = mat[N - 1 - y][x];
                 mat[N - 1 - y][x] = temp;
-
             }
         }
 
@@ -1877,7 +2160,6 @@ public class DSA450Questions {
             }
             System.out.println();
         }
-
     }
 
     private int areaPerRow(int[] hist) {
@@ -2279,12 +2561,10 @@ public class DSA450Questions {
             } else {
                 decimal += roman.get(c);
             }
-
         }
 
         //output
         System.out.println("Decimal: " + decimal);
-
     }
 
     public void longestCommonSubsequence(String a, String b) {
@@ -2360,11 +2640,9 @@ public class DSA450Questions {
 
                 counter = 1;
             }
-
         }
 
         return sb.toString();
-
     }
 
     public void countAndSay(int n) {
@@ -2375,21 +2653,19 @@ public class DSA450Questions {
 
         //https://www.geeksforgeeks.org/remove-consecutive-duplicates-string/
         char[] ch = str.toCharArray();
-        int f = 0;
-        int l = 1;
+        int start = 0;
+        int end = 1;
 
-        while (l < ch.length) {
+        while (end < ch.length) {
 
-            if (ch[f] == ch[l]) {
-                l++;
-            } else {
-                ch[f + 1] = ch[l];
-                f++;
+            if (ch[start] != ch[end]) {
+                ch[start + 1] = ch[end];
+                start++;
             }
-
+            end++;
         }
 
-        System.out.println("output: " + String.valueOf(ch, 0, f + 1));
+        System.out.println("output: " + String.valueOf(ch, 0, start + 1));
 
     }
 
@@ -2412,7 +2688,7 @@ public class DSA450Questions {
 
         // Recur for next row
         for (int i = 0; i < words.length; i++) {
-            if (words[m + 1][i] != "" && m < words.length) {
+            if (!"".equals(words[m + 1][i]) && m < words.length) {
                 printSentencesFromCollectionOfWords_Propagte_Recursion(words, m + 1, i, output);
             }
         }
@@ -2456,66 +2732,56 @@ public class DSA450Questions {
         System.out.println("Longest prefix substring: " + (j == 0 ? "" : s.substring(0, j)));
     }
 
-    class CharCount {
-
-        //reorganizeString
-        char letter;
-        int count;
-
-        public CharCount(char letter, int count) {
-            this.letter = letter;
-            this.count = count;
-        }
-    }
-
     public String reorganizeString(String S) {
 
         //https://leetcode.com/problems/reorganize-string/
         int N = S.length();
-        int[] charCount = new int[26];
-        for (char c : S.toCharArray()) {
-            charCount[c - 'a']++;
-        }
+        Map<Character, Long> map = S.chars().mapToObj(c -> (char) c)
+                .collect(Collectors.groupingBy(
+                                Function.identity(),
+                                Collectors.counting()
+                        ));
 
-        PriorityQueue<CharCount> heap = new PriorityQueue<>(
-                (o1, o2) -> o1.count == o2.count ? o1.letter - o2.letter : o2.count - o1.count
+        PriorityQueue<Character> heap = new PriorityQueue<>(
+                (e1, e2) -> map.get(e1) == map.get(e2)
+                        ? e1 - e2
+                        : (int) (map.get(e2) - map.get(e1))
         );
 
-        for (int i = 0; i < 26; i++) {
-
-            if (charCount[i] > 0) {
-                if (charCount[i] > (N + 1) / 2) {
-                    return "";
-                }
-                heap.add(new CharCount((char) (i + 'a'), charCount[i]));
+        //check all unique char in string S and put it in heap
+        //alternatively stream api : for(char ch :  S.chars().mapToObj(c -> (char)c).collect(Collectors.toSet()))
+        for (char ch : map.keySet()) {
+            if (map.get(ch) > (N + 1) / 2) {
+                return "";
             }
-
+            heap.add(ch);
         }
 
         StringBuilder sb = new StringBuilder();
         while (heap.size() >= 2) {
 
-            CharCount chC1 = heap.poll();
-            CharCount chC2 = heap.poll();
+            char chC1 = heap.poll();
+            char chC2 = heap.poll();
 
-            sb.append(chC1.letter);
-            sb.append(chC2.letter);
+            sb.append(chC1);
+            sb.append(chC2);
 
-            if (--chC1.count > 0) {
+            map.put(chC1, map.get(chC1) - 1);
+            if (map.get(chC1) > 0) {
                 heap.add(chC1);
             }
-            if (--chC2.count > 0) {
+
+            map.put(chC2, map.get(chC2) - 1);
+            if (map.get(chC2) > 0) {
                 heap.add(chC2);
             }
-
         }
 
         if (heap.size() > 0) {
-            sb.append(heap.poll().letter);
+            sb.append(heap.poll());
         }
 
         return sb.toString();
-
     }
 
     public void longestCommonPrefix(String[] strs) {
@@ -2535,18 +2801,15 @@ public class DSA450Questions {
         for (int i = 1; i < strs.length; i++) {
             String s = strs[i];
             int index = 0;
-            while (index < Math.min(s.length(), prefix.length())) {
-
-                if (prefix.charAt(index) != s.charAt(index)) {
-                    break;
-                }
+            int minLen = Math.min(s.length(), prefix.length());
+            while (index < minLen && prefix.charAt(index) == s.charAt(index)) {
                 index++;
             }
             minLenPrefix = Math.min(minLenPrefix, index);
         }
 
-        System.out.println("Longest common prefix in list of strings: " + (prefix.length() >= minLenPrefix ? prefix.substring(0, minLenPrefix) : ""));
-
+        System.out.println("Longest common prefix in list of strings: "
+                + (prefix.length() >= minLenPrefix ? prefix.substring(0, minLenPrefix) : ""));
     }
 
     public void secondMostOccuringWordInStringList(String[] list) {
@@ -3246,9 +3509,9 @@ public class DSA450Questions {
             left--;
             right++;
         }
-
+        
+        //total pallindromic char b/w left and right
         return right - left - 1;
-
     }
 
     public void longestPallindromicSubstring(String str) {
@@ -3276,7 +3539,6 @@ public class DSA450Questions {
                 start = i - (len - 1) / 2;
                 end = i + (len) / 2;
             }
-
         }
 
         //output:
@@ -3323,7 +3585,7 @@ public class DSA450Questions {
             if (i >= 0 && j >= 0 && a.charAt(i) != b.charAt(j)) {
                 return false;
             }
-            
+
             //if one string length is smaller than others and run out of characters than the
             //other string
             if ((i >= 0) != (j >= 0)) {
@@ -3465,6 +3727,7 @@ public class DSA450Questions {
         int start = 0;
         int end = 0;
         int maxLen = 0;
+        int index = 0;
         Map<Character, Integer> map = new HashMap<>();
 
         while (end < n) {
@@ -3473,7 +3736,10 @@ public class DSA450Questions {
             map.put(chEnd, map.getOrDefault(chEnd, 0) + 1);
 
             if (map.size() == K) {
-                maxLen = Math.max(maxLen, end - start + 1);
+                if (maxLen < end - start + 1) {
+                    maxLen = end - start + 1;
+                    index = start;
+                }
             }
 
             while (map.size() > K) {
@@ -3490,12 +3756,12 @@ public class DSA450Questions {
         //output:
         System.out.println("Max length substring with K unique char: " + (maxLen == 0 ? -1 : maxLen));
         if (maxLen != 0) {
-            System.out.println("Substring with K unique char: " + str.substring(start, start + maxLen));
+            System.out.println("Substring with K unique char: " + str.substring(index, index + maxLen));
         }
     }
-    
-    public void largestNumberFromSetOfNumbers(String[] nums){
-        
+
+    public void largestNumberFromSetOfNumbers(String[] nums) {
+
         //https://leetcode.com/problems/largest-number/
         //https://practice.geeksforgeeks.org/problems/largest-number-formed-from-an-array1117/1
         //https://www.geeksforgeeks.org/given-an-array-of-numbers-arrange-the-numbers-to-form-the-biggest-number/
@@ -3508,51 +3774,196 @@ public class DSA450Questions {
             String ba = b + a;
             return ab.compareTo(ba) > 0 ? -1 : 1;
         });
-        
+
         StringBuilder sb = new StringBuilder();
-        
+
         combinations.addAll(Arrays.asList(nums));
-        
-        while(!combinations.isEmpty()){
+
+        while (!combinations.isEmpty()) {
             sb.append(combinations.poll());
         }
-        
-        //remove any trailing zeroes
-        while(sb.length() > 1 && sb.charAt(0) == '0'){
+
+        //remove any starting zeroes
+        while (sb.length() > 1 && sb.charAt(0) == '0') {
             sb.deleteCharAt(0);
         }
-        
+
         //output
-        System.out.println("Largest number formed from the given set of numbers: "+sb.toString());
+        System.out.println("Largest number formed from the given set of numbers: " + sb.toString());
     }
-    
-    public void stringCompression(char[] str){
-        
+
+    public void stringCompression(char[] str) {
+
         //https://leetcode.com/problems/string-compression/
         int start = 0;
         int end = 0;
         int N = str.length;
-        
-        for(int i = 0; i < N; i++){
-            
-            if(i + 1 == N || str[i] != str[i + 1]){
-                
+
+        for (int i = 0; i < N; i++) {
+
+            if (i + 1 == N || str[i] != str[i + 1]) {
+
                 str[end++] = str[start];
-                if(i > start){
+                if (i > start) {
                     String count = String.valueOf(i - start + 1);
-                    for(char intCount: count.toCharArray()){
+                    for (char intCount : count.toCharArray()) {
                         str[end++] = intCount;
                     }
                 }
                 start = i + 1;
             }
         }
-        
+
         //output
-        for(int i = 0; i < end; i++){
+        for (int i = 0; i < end; i++) {
             System.out.print(str[i]);
         }
         System.out.println();
+    }
+
+    public int closestStringDistance(List<String> strs, String w1, String w2) {
+
+        //https://practice.geeksforgeeks.org/problems/closest-strings0611/1#
+        if (w1.equals(w2)) {
+            return 0;
+        }
+        int n = strs.size();
+        int dist = n + 1;
+        //find first index of any of the word
+        int first = 0;
+        int i = 0;
+        for (; i < n; i++) {
+            if (strs.get(i).equals(w1) || strs.get(i).equals(w2)) {
+                first = i;
+                break;
+            }
+        }
+
+        //find other index of other word which is not found
+        while (i < n) {
+
+            if (strs.get(i).equals(w1) || strs.get(i).equals(w2)) {
+                if (!strs.get(first).equals(strs.get(i)) && (i - first) < dist) {
+                    dist = i - first;
+                }
+                first = i;
+            }
+            i++;
+        }
+
+        return dist;
+    }
+
+    public boolean longPressedNames(String name, String typed) {
+
+        //https://leetcode.com/problems/long-pressed-name/
+        char[] nameCh = name.toCharArray();
+        char[] typedCh = typed.toCharArray();
+
+        int i = 0;
+        int j = 0;
+
+        while (i < name.length() && j < typed.length()) {
+
+            if (nameCh[i] == typedCh[j]) {
+                i++;
+                j++;
+            } else if (j > 0 && typedCh[j] == typedCh[j - 1]) {
+                j++;
+            } else {
+                return false;
+            }
+        }
+
+        if (i != name.length()) {
+            return false;
+        } else {
+            while (j < typed.length()) {
+                if (typedCh[j] != typedCh[j - 1]) {
+                    return false;
+                }
+                j++;
+            }
+        }
+        return true;
+    }
+
+    private void interleavingOfTwoStrings_Helper(String a, String b,
+            int m, int n,
+            StringBuilder sb, List<String> res) {
+
+        if (m == a.length() && n == b.length()) {
+            res.add(sb.toString());
+            return;
+        }
+
+        if (m < a.length()) {
+            sb.append(a.charAt(m));
+            interleavingOfTwoStrings_Helper(a, b,
+                    m + 1, n,
+                    sb, res);
+            sb.deleteCharAt(sb.length() - 1);
+        }
+
+        if (n < b.length()) {
+            sb.append(b.charAt(n));
+            interleavingOfTwoStrings_Helper(a, b,
+                    m, n + 1,
+                    sb, res);
+            sb.deleteCharAt(sb.length() - 1);
+        }
+    }
+
+    public void interleavingOfTwoStrings(String a, String b) {
+
+        //.............................T: O(M + N) M = a.length(), N = b.length()
+        //https://www.geeksforgeeks.org/print-all-interleavings-of-given-two-strings/
+        StringBuilder sb = new StringBuilder();
+        List<String> res = new ArrayList<>();
+        interleavingOfTwoStrings_Helper(a, b, 0, 0, sb, res);
+
+        //output
+        System.out.println("Interleaving of two strings: " + res);
+    }
+
+    private void printAllPermutationOfString_Helper(char[] chArr, int index, List<String> res) {
+
+        if (index == chArr.length) {
+            res.add(String.valueOf(chArr));
+        }
+
+        for (int i = index; i < chArr.length; i++) {
+
+            //swap
+            char temp = chArr[index];
+            chArr[index] = chArr[i];
+            chArr[i] = temp;
+
+            //recursive call
+            printAllPermutationOfString_Helper(chArr, index + 1, res);
+
+            //swap back the char to its original place
+            //to keep chaArr original before swaping and for next recursive call
+            temp = chArr[index];
+            chArr[index] = chArr[i];
+            chArr[i] = temp;
+        }
+    }
+
+    public void printAllPermutationOfDistinctCharInString(String str) {
+
+        //.............................T: O(N!) factorial(N), N = str.length()
+        //https://leetcode.com/problems/permutations/
+        //explanantion: https://www.youtube.com/watch?v=GuTPwotSdYw
+        //we are fixing char at index location perform operations on rest of 
+        //remaining chArr so ech time N * N-1 * N-2 ....0 = N!
+        char[] chArr = str.toCharArray();
+        List<String> res = new ArrayList<>();
+
+        printAllPermutationOfString_Helper(chArr, 0, res);
+
+        //output
+        System.out.println("All permutation of given string: " + res);
     }
 
     public Node<Integer> reverseLinkedList_Iterative(Node<Integer> node) {
@@ -3673,8 +4084,7 @@ public class DSA450Questions {
         Node<Integer> n1Rev = reverseLinkedList_Iterative(n1);
         Node<Integer> n2Rev = reverseLinkedList_Iterative(n2);
 
-        Node<Integer> head = new Node<>(-1);
-        Node<Integer> copy = head;
+        Node<Integer> head = null;
 
         int carry = 0;
         while (n1Rev != null || n2Rev != null) {
@@ -3691,21 +4101,21 @@ public class DSA450Questions {
                 n2Rev = n2Rev.getNext();
             }
 
-            //adding start ptr as head and copy.next -> start  
+            //adding start ptr as head
             Node<Integer> start = new Node<>(sum % 10);
-            start.setNext(copy.getNext());
-            copy.setNext(start);
+            start.setNext(head);
+            head = start;
             carry = sum / 10;
         }
 
         if (carry > 0) {
             Node<Integer> start = new Node<>(carry);
-            start.setNext(copy.getNext());
-            copy.setNext(start);
+            start.setNext(head);
+            head = start;
         }
 
         //output
-        new LinkedListUtil<Integer>(head.getNext()).print();
+        new LinkedListUtil<Integer>(head).print();
     }
 
     public void removeDuplicateFromSortedLinkedList(Node<Integer> node) {
@@ -3854,6 +4264,15 @@ public class DSA450Questions {
 
         while (K-- != 0) {
             ref = ref.getNext();
+            if (ref == null) {
+                ref = node;
+            }
+        }
+
+        if (ref == main) {
+            //output
+            System.out.println("Kth node from end is: " + main.getData());
+            return;
         }
 
         //now ref is K dist ahead of main pointer
@@ -4747,56 +5166,56 @@ public class DSA450Questions {
         new LinkedListUtil<Integer>(beforeHead.getNext()).print();
         System.out.println();
     }
-    
-    public void rotateLinkedListKTimes(Node<Integer> head, int K){
-        
+
+    public void rotateLinkedListKTimes(Node<Integer> head, int K) {
+
         //https://leetcode.com/problems/rotate-list/
         Node<Integer> dummy = new Node<>(Integer.MIN_VALUE);
         dummy.setNext(head);
         Node<Integer> fast = dummy;
         Node<Integer> slow = dummy;
-        
+
         int len = 0;
-        
-        while(fast.getNext() != null){
+
+        while (fast.getNext() != null) {
             len++;
             fast = fast.getNext();
         }
-        
-        for(int j = len - K % len; j > 0; j--){
+
+        for (int j = len - K % len; j > 0; j--) {
             slow = slow.getNext();
         }
-        
+
         fast.setNext(dummy.getNext());
         dummy.setNext(slow.getNext());
         slow.setNext(null);
-        
+
         //output
         new LinkedListUtil<>(dummy.getNext()).print();
     }
-    
-    public void sortLinkedListInRelativeOrderOfArr(Node<Integer> head, int[] arr){
-        
+
+    public void sortLinkedListInRelativeOrderOfArr(Node<Integer> head, int[] arr) {
+
         //https://www.geeksforgeeks.org/sort-linked-list-order-elements-appearing-array/
         //get the freq of all the elements in linkedlist
         Map<Integer, Integer> map = new HashMap<>();
         Node<Integer> curr = head;
-        
-        while(curr != null){
+
+        while (curr != null) {
             map.put(curr.getData(), map.getOrDefault(curr.getData(), 0) + 1);
             curr = curr.getNext();
         }
-        
+
         //regenerate linked list as relative order of arr
         curr = head;
-        for(int a: arr){
+        for (int a : arr) {
             int count = map.get(a);
-            while(count-- != 0){
+            while (count-- != 0) {
                 curr.setData(a);
                 curr = curr.getNext();
             }
         }
-        
+
         //output
         new LinkedListUtil<>(head).print();
     }
@@ -5569,7 +5988,6 @@ public class DSA450Questions {
             root.setData(lSum + rSum);
             return lSum + rSum + data;
         }
-
     }
 
     public void convertTreeToSumTree_Recursion(TreeNode<Integer> root) {
@@ -6995,6 +7413,490 @@ public class DSA450Questions {
         System.out.println("Longest edge between the nodes having same values: " + longestEdgeLengthBetweenTreeNodesWithSameValue_LongestEdge);
     }
 
+    private int countNodesInCompleteBinaryTree_LeftTreeHeight(TreeNode<Integer> root) {
+        int height = 0;
+        while (root != null) {
+            height++;
+            root = root.getLeft();
+        }
+        return height;
+    }
+
+    private int countNodesInCompleteBinaryTree_RightTreeHeight(TreeNode<Integer> root) {
+        int height = 0;
+        while (root != null) {
+            height++;
+            root = root.getRight();
+        }
+        return height;
+    }
+
+    public int countNodesInCompleteBinaryTree(TreeNode<Integer> root) {
+
+        //brute force do levelorder and count++ for all the nodes T: O(N)
+        //OPTIMISED
+        //https://leetcode.com/problems/count-complete-tree-nodes/
+        if (root == null) {
+            return 0;
+        }
+
+        int leftSubtreeHeight = countNodesInCompleteBinaryTree_LeftTreeHeight(root);
+        int rightSubtreeHeight = countNodesInCompleteBinaryTree_RightTreeHeight(root);
+
+        if (leftSubtreeHeight == rightSubtreeHeight) {
+            //number of node in complete binary tree = (2^H) - 1
+            return (int) Math.pow(2, leftSubtreeHeight) - 1;
+        }
+
+        return countNodesInCompleteBinaryTree(root.getLeft())
+                + countNodesInCompleteBinaryTree(root.getRight()) + 1;
+    }
+
+    public int countGoodNodesInBinaryTree(TreeNode<Integer> root, int max) {
+
+        //https://leetcode.com/problems/count-good-nodes-in-binary-tree/
+        /*
+         Given a binary tree root, a node X in the tree is named good if in the 
+         path from root to X there are no nodes with a value greater than X.
+         */
+        if (root == null) {
+            return 0;
+        }
+
+        int left = countGoodNodesInBinaryTree(root.getLeft(), Math.max(max, root.getData()));
+        int right = countGoodNodesInBinaryTree(root.getRight(), Math.max(max, root.getData()));
+
+        if (root.getData() < max) {
+            //curr node is not a goodNode but it can have 
+            //max (curr goodNode(i.e 0), left sub tree gootNodes + right sub tree gooNodes)
+            return Math.max(0, left + right);
+        }
+
+        //left sub tree gootNodes + right sub tree gooNodes + curr root goodNode(i.e 1) 
+        return left + right + 1;
+    }
+
+    private int minDistanceBetweenGivenTwoNodesInBinaryTree_FindLevelFromLCA(TreeNode<Integer> root, int N, int level) {
+
+        if (root == null) {
+            return -1;
+        }
+
+        Queue<TreeNode<Integer>> q = new LinkedList<>();
+        q.add(root);
+
+        while (!q.isEmpty()) {
+
+            int size = q.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode<Integer> curr = q.poll();
+
+                if (curr.getData() == N) {
+                    return level;
+                }
+
+                if (curr.getLeft() != null) {
+                    q.add(curr.getLeft());
+                }
+
+                if (curr.getRight() != null) {
+                    q.add(curr.getRight());
+                }
+            }
+            level++;
+        }
+        return -1;
+    }
+
+    public void minDistanceBetweenGivenTwoNodesInBinaryTree(TreeNode<Integer> root, int N1, int N2) {
+
+        //https://www.geeksforgeeks.org/find-distance-between-two-nodes-of-a-binary-tree/
+        TreeNode<Integer> lca = lowestCommonAncestorOfTree_Helper(root, N1, N2);
+
+        int levelN1 = minDistanceBetweenGivenTwoNodesInBinaryTree_FindLevelFromLCA(lca, N1, 0);
+        int levelN2 = minDistanceBetweenGivenTwoNodesInBinaryTree_FindLevelFromLCA(lca, N2, 0);
+
+        System.out.println("Min dstance between two given nodes: " + (levelN1 + levelN2));
+    }
+
+    private void maxProductIfBinaryTreeIsSplitIntoTwo_FindTreeSum(TreeNode<Integer> root) {
+        if (root == null) {
+            return;
+        }
+
+        maxProductIfBinaryTreeIsSplitIntoTwo_TotalTreeSum += root.getData();
+
+        maxProductIfBinaryTreeIsSplitIntoTwo_FindTreeSum(root.getLeft());
+        maxProductIfBinaryTreeIsSplitIntoTwo_FindTreeSum(root.getRight());
+    }
+
+    private int maxProductIfBinaryTreeIsSplitIntoTwo_FindMaxProduct(TreeNode<Integer> root) {
+
+        if (root == null) {
+            return 0;
+        }
+
+        int leftSubTreeSum = maxProductIfBinaryTreeIsSplitIntoTwo_FindMaxProduct(root.getLeft());
+        int rightSubTreeSum = maxProductIfBinaryTreeIsSplitIntoTwo_FindMaxProduct(root.getRight());
+
+        int leftSplit = (maxProductIfBinaryTreeIsSplitIntoTwo_TotalTreeSum - leftSubTreeSum) * leftSubTreeSum;
+        int rightSplit = (maxProductIfBinaryTreeIsSplitIntoTwo_TotalTreeSum - rightSubTreeSum) * rightSubTreeSum;
+
+        maxProductIfBinaryTreeIsSplitIntoTwo_Product = Math.max(maxProductIfBinaryTreeIsSplitIntoTwo_Product,
+                Math.max(leftSplit, rightSplit));
+
+        return leftSubTreeSum + rightSubTreeSum + root.getData(); //sub-tree sum from bottom
+    }
+
+    int maxProductIfBinaryTreeIsSplitIntoTwo_TotalTreeSum = 0;
+    int maxProductIfBinaryTreeIsSplitIntoTwo_Product = 0;
+
+    public void maxProductIfBinaryTreeIsSplitIntoTwo(TreeNode<Integer> root) {
+
+        //https://leetcode.com/problems/maximum-product-of-splitted-binary-tree/
+        /*
+        
+         treeBFS = [1,2,3,4,5,6,NULL]
+         split tree as t1 = [2,4,5], t2 = [1,3,6] link-break-between 1.left = 2 break this
+         product = sum{t1} * sum(t2) should be maximum
+         trace all such break-point where, product of two subtrees max (prod1, prod2)
+         */
+        maxProductIfBinaryTreeIsSplitIntoTwo_TotalTreeSum = 0;
+        maxProductIfBinaryTreeIsSplitIntoTwo_Product = 0;
+
+        //find the total sum of all tree nodes
+        maxProductIfBinaryTreeIsSplitIntoTwo_FindTreeSum(root);
+
+        //find max product by imitating splits
+        maxProductIfBinaryTreeIsSplitIntoTwo_FindMaxProduct(root);
+
+        //output
+        System.out.println("Max product of sum of trees by splitting into two: "
+                + maxProductIfBinaryTreeIsSplitIntoTwo_Product);
+
+    }
+
+    private int maximumDifferenceBetweenNodeAndItsAncestor_Helper(TreeNode<Integer> root) {
+
+        if (root == null) {
+            return Integer.MAX_VALUE;
+        }
+
+        int left = maximumDifferenceBetweenNodeAndItsAncestor_Helper(root.getLeft());
+        int right = maximumDifferenceBetweenNodeAndItsAncestor_Helper(root.getRight());
+
+        int minVal = Math.min(left, right);
+
+        maximumDifferenceBetweenNodeAndItsAncestor_MaxDiff = Math.max(maximumDifferenceBetweenNodeAndItsAncestor_MaxDiff,
+                root.getData() - minVal);
+
+        return Math.min(minVal, root.getData());
+    }
+
+    int maximumDifferenceBetweenNodeAndItsAncestor_MaxDiff;
+
+    public void maximumDifferenceBetweenNodeAndItsAncestor(TreeNode<Integer> root) {
+        maximumDifferenceBetweenNodeAndItsAncestor_MaxDiff = Integer.MIN_VALUE;
+        maximumDifferenceBetweenNodeAndItsAncestor_Helper(root);
+        //output
+        System.out.println("Max difference between a node and its ancestor: "
+                + maximumDifferenceBetweenNodeAndItsAncestor_MaxDiff);
+    }
+
+    private List<TreeNode<Integer>> deleteTreeNodeFromBinarySearchTree_FindInorderSuccessor(
+            TreeNode<Integer> root) {
+
+        if (root == null) {
+            return Collections.emptyList();
+        }
+
+        TreeNode<Integer> succ = null;
+        TreeNode<Integer> succPrev = null;
+        if (root.getRight() != null) {
+            succPrev = root;
+            succ = root.getRight(); //succ is left most node in the right sub tree
+            while (succ.getLeft() != null) {
+                succPrev = succ;
+                succ = succ.getLeft();
+            }
+        }
+        return Arrays.asList(succPrev, succ);
+    }
+
+    private TreeNode<Integer> deleteTreeNodeFromBinarySearchTree_Delete(TreeNode<Integer> rootToDelete) {
+
+        //https://www.geeksforgeeks.org/binary-search-tree-set-2-delete/
+        if (rootToDelete == null) {
+            return null;
+        }
+
+        if (rootToDelete.getLeft() == null && rootToDelete.getRight() == null) { // node is leaf
+            return null;
+        } else if (rootToDelete.getLeft() == null) { //node has one child
+            return rootToDelete.getRight();
+        } else if (rootToDelete.getRight() == null) { //node has one child
+            return rootToDelete.getLeft();
+        } else { //node has two child
+            List<TreeNode<Integer>> succList = deleteTreeNodeFromBinarySearchTree_FindInorderSuccessor(rootToDelete);
+
+            if (!succList.isEmpty()) {
+                TreeNode<Integer> succPrev = succList.get(0);
+                TreeNode<Integer> succ = succList.get(1);
+                //replace root's data with inorder successor (succ)
+                rootToDelete.setData(succ.getData());
+                //delete the inorder successor node from its actual place
+                if (succPrev != rootToDelete) {
+                    succPrev.setLeft(deleteTreeNodeFromBinarySearchTree_Delete(succ));
+                } else {
+                    succPrev.setRight(deleteTreeNodeFromBinarySearchTree_Delete(succ));
+                }
+            }
+
+            return rootToDelete;
+        }
+    }
+
+    public TreeNode<Integer> deleteTreeNodeFromBinarySearchTree(TreeNode<Integer> root, int findToDelete) {
+
+        //https://www.geeksforgeeks.org/binary-search-tree-set-2-delete/
+        if (root == null) {
+            return null;
+        }
+
+        if (root.getData() == findToDelete) {
+            return deleteTreeNodeFromBinarySearchTree_Delete(root);
+        } else if (findToDelete < root.getData()) {
+            root.setLeft(deleteTreeNodeFromBinarySearchTree(root.getLeft(), findToDelete));
+        } else {
+            root.setRight(deleteTreeNodeFromBinarySearchTree(root.getRight(), findToDelete));
+        }
+        return root;
+    }
+
+    private TreeNode<Integer> deleteTreeNodeFromBinarySearchTreeNotInRange_Helper(TreeNode<Integer> root,
+            int low, int high) {
+
+        if (root == null) {
+            return null;
+        }
+
+        root.setLeft(deleteTreeNodeFromBinarySearchTreeNotInRange_Helper(root.getLeft(),
+                low, high));
+        root.setRight(deleteTreeNodeFromBinarySearchTreeNotInRange_Helper(root.getRight(),
+                low, high));
+
+        //not in range
+        if (!(root.getData() >= low && root.getData() <= high)) {
+            return deleteTreeNodeFromBinarySearchTree_Delete(root);
+        }
+
+        return root;
+    }
+
+    public void deleteTreeNodeFromBinarySearchTreeNotInRange(TreeNode<Integer> root,
+            int low, int high) {
+        TreeNode<Integer> node = deleteTreeNodeFromBinarySearchTreeNotInRange_Helper(root, low, high);
+        //output
+        new BinaryTree<Integer>(root).treeBFS();
+        System.out.println();
+    }
+
+    public void checkIfTwoTreeNodesAreCousin(TreeNode<Integer> root, int x, int y) {
+
+        //https://leetcode.com/problems/cousins-in-binary-tree/
+        /*
+         Two nodes are cousins when they both lie on same level (levelX == levelY) but also 
+         their parent should not be same (parentX != parentY)
+         */
+        int levelX = -1;
+        int levelY = -1;
+
+        TreeNode<Integer> parentX = null;
+        TreeNode<Integer> parentY = null;
+
+        int level = 0;
+        Queue<TreeNode<Integer>> q = new LinkedList<>();
+        q.add(root);
+
+        while (!q.isEmpty()) {
+
+            int size = q.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode<Integer> curr = q.poll();
+
+                if (curr.getLeft() != null) {
+                    q.add(curr.getLeft());
+
+                    //x or y can be in left sub tree
+                    if ((int) curr.getLeft().getData() == x) {
+                        levelX = level;
+                        parentX = curr;
+                    }
+
+                    if ((int) curr.getLeft().getData() == y) {
+                        levelY = level;
+                        parentY = curr;
+                    }
+                }
+
+                if (curr.getRight() != null) {
+                    q.add(curr.getRight());
+
+                    //x or y can be in right sub tree
+                    if ((int) curr.getRight().getData() == x) {
+                        levelX = level;
+                        parentX = curr;
+                    }
+
+                    if ((int) curr.getRight().getData() == y) {
+                        levelY = level;
+                        parentY = curr;
+                    }
+                }
+            }
+            level++;
+        }
+
+        if (levelX == levelY && parentX != parentY) {
+            System.out.println("Cousins");
+        } else {
+            System.out.println("Not cousins");
+        }
+    }
+
+    private void printConnectedNodesAtSameLevelByRandomPointer(TreeNode<Integer> root) {
+
+        int level = 0;
+        Queue<TreeNode<Integer>> q = new LinkedList<>();
+        q.add(root);
+
+        while (!q.isEmpty()) {
+
+            int size = q.size();
+            for (int i = 0; i < size; i++) {
+
+                TreeNode<Integer> curr = q.poll();
+                TreeNode<Integer> ptrRandom = curr;
+                System.out.print(level + ": ");
+                while (ptrRandom != null) {
+                    //print the nodes connected by random pointers
+                    System.out.print(ptrRandom.getData() + " ");
+                    ptrRandom = ptrRandom.getRandom();
+                }
+
+                if (curr.getLeft() != null) {
+                    q.add(curr.getLeft());
+                }
+
+                if (curr.getRight() != null) {
+                    q.add(curr.getRight());
+                }
+
+                System.out.println();
+            }
+            level++;
+        }
+    }
+
+    private void connectTreeNodesAtSameLevel_Recursive_Helper(TreeNode<Integer> root,
+            int level, Map<Integer, TreeNode<Integer>> map) {
+
+        if (root == null) {
+            return;
+        }
+
+        if (map.containsKey(level)) {
+            //this will have a previous node to current root
+            map.get(level).setRandom(root);
+        }
+
+        //update previous node with current root in that level
+        map.put(level, root);
+        root.setRandom(null); //default random value if there is no next node in that level
+
+        connectTreeNodesAtSameLevel_Recursive_Helper(root.getLeft(), level + 1, map);
+        connectTreeNodesAtSameLevel_Recursive_Helper(root.getRight(), level + 1, map);
+    }
+
+    public void connectTreeNodesAtSameLevel_Recursive(TreeNode<Integer> root) {
+
+        //https://practice.geeksforgeeks.org/problems/connect-nodes-at-same-level/1#
+        Map<Integer, TreeNode<Integer>> map = new HashMap<>();
+        connectTreeNodesAtSameLevel_Recursive_Helper(root, 0, map);
+
+        //output
+        printConnectedNodesAtSameLevelByRandomPointer(root);
+    }
+
+    public void connectTreeNodesAtSameLevel_Iterative(TreeNode<Integer> root) {
+
+        //https://practice.geeksforgeeks.org/problems/connect-nodes-at-same-level/1#
+        TreeNode<Integer> curr = null;
+        Queue<TreeNode<Integer>> q = new LinkedList<>();
+        q.add(root);
+
+        while (!q.isEmpty()) {
+
+            int size = q.size();
+            for (int i = 0; i < size; i++) {
+
+                TreeNode<Integer> prev = curr;
+                curr = q.poll();
+
+                if (i > 0) {
+                    prev.setRandom(curr);
+                }
+
+                if (curr.getLeft() != null) {
+                    q.add(curr.getLeft());
+                }
+
+                if (curr.getRight() != null) {
+                    q.add(curr.getRight());
+                }
+            }
+            curr.setRandom(null); //default random node if there is no next ndoe in that level
+        }
+
+        //output
+        printConnectedNodesAtSameLevelByRandomPointer(root);
+    }
+
+    private void binarySearchTreeToGreaterSumTree_Helper(TreeNode<Integer> root) {
+
+        if (root == null) {
+            return;
+        }
+
+        //go to right most leaf node in right sub tree
+        //output starts from there only (otherwise you could choose as per the output demands)
+        binarySearchTreeToGreaterSumTree_Helper(root.getRight());
+
+        binarySearchTreeToGreaterSumTree_Sum += root.getData();
+
+        root.setData(binarySearchTreeToGreaterSumTree_Sum);
+
+        //now go to left sub tree as per output
+        binarySearchTreeToGreaterSumTree_Helper(root.getLeft());
+    }
+
+    int binarySearchTreeToGreaterSumTree_Sum;
+
+    public void binarySearchTreeToGreaterSumTree(TreeNode<Integer> root) {
+
+        //https://leetcode.com/problems/convert-bst-to-greater-tree/
+        //actual
+        new BinarySearchTree<Integer>(root).treeBFS();
+        System.out.println();
+
+        binarySearchTreeToGreaterSumTree_Sum = 0;
+        binarySearchTreeToGreaterSumTree_Helper(root);
+
+        //output
+        new BinarySearchTree<Integer>(root).treeBFS();
+        System.out.println();
+    }
+
     int middleElementInStack_Element = Integer.MIN_VALUE;
 
     private void middleElementInStack_Helper(Stack<Integer> s, int n, int index) {
@@ -7680,7 +8582,6 @@ public class DSA450Questions {
         }
 
         System.out.println("Majority element: -1");
-
     }
 
     public void majorityElement_2(int[] a) {
@@ -7690,20 +8591,21 @@ public class DSA450Questions {
         //..........T: O(N)
         //..........S: O(1)
         //finding candidate
-        int maj_index = 0, count = 1;
+        int majorIndex = 0;
+        int count = 1;
         int i;
         for (i = 1; i < a.length; i++) {
-            if (a[maj_index] == a[i]) {
+            if (a[majorIndex] == a[i]) {
                 count++;
             } else {
                 count--;
             }
             if (count == 0) {
-                maj_index = i;
+                majorIndex = i;
                 count = 1;
             }
         }
-        int cand = a[maj_index];
+        int cand = a[majorIndex];
 
         //validating the cand 
         count = 0;
@@ -9683,6 +10585,50 @@ public class DSA450Questions {
         return true;
     }
 
+    private void vertexWithWeightAllSourceToDestinationPath_Helper(List<List<VertexWithWeight>> adj,
+            int mainSource, int source, int target,
+            int currWeight, boolean[] vis, Map<String, Integer> result) {
+
+        if (source == target) {
+            if (!result.containsKey(target + "-" + mainSource)) {
+                result.put(mainSource + "-" + target, currWeight);
+            }
+        }
+
+        vis[source] = true;
+        List<VertexWithWeight> childs = adj.get(source);
+        for (VertexWithWeight cv : childs) {
+
+            if (vis[cv.vertex] != true) {
+                vertexWithWeightAllSourceToDestinationPath_Helper(adj, mainSource, cv.vertex, target, currWeight + cv.weight, vis, result);
+            }
+        }
+        vis[source] = false;
+    }
+
+    public void vertexWithWeightAllSourceToDestinationPath(List<List<VertexWithWeight>> adj) {
+
+        int V = adj.size();
+        Map<String, Integer> result = new HashMap<>();
+        boolean[] vis = new boolean[V];
+        for (int u = 0; u < V; u++) {
+
+            for (int v = 0; v < V; v++) {
+//                Arrays.fill(vis, false);
+                if (u != v) {
+                    vertexWithWeightAllSourceToDestinationPath_Helper(adj, u, u, v, 0, vis, result);
+                }
+            }
+        }
+
+        //output:
+        result.entrySet()
+                .stream()
+                .sorted((a, b) -> a.getKey().compareTo(b.getKey()))
+                .forEach(e -> System.out.println(e.getKey() + " = " + e.getValue()));
+
+    }
+
     public void minimumCostToFillGivenBag_DP_Memoization(int[] cost, int W) {
 
         //0-1Knapsack problem
@@ -9726,6 +10672,83 @@ public class DSA450Questions {
         //output
         System.out.println("Min cost: " + memo[actualSize][W]);
 
+    }
+
+    public void minCoinsRequiredToMakeChangeInUnlimitedSupplyOfCoins_DP_Problem(int[] coins, int change) {
+
+        //Explanation ; SomePracticeQuestion.minNoOfCoinsUsedForChange()
+        int N = coins.length;
+        int[][] memo = new int[N + 1][change + 1];
+
+        //base cond
+        for (int x = 0; x < N + 1; x++) {
+            for (int y = 0; y < change + 1; y++) {
+
+                //if no coisn are available, we might need infinite-coins to make that change
+                if (x == 0) {
+                    memo[x][y] = Integer.MAX_VALUE - 1;
+                }
+
+                //if coins are available, but change we need to make is 0, wee need 0 coins
+                if (y == 0) {
+                    memo[x][y] = 0;
+                }
+
+                if (x == 1 && y >= 1) {
+                    if (y % coins[x - 1] == 0) {
+                        memo[x][y] = 1;
+                    } else {
+                        memo[x][y] = Integer.MAX_VALUE - 1;
+                    }
+                }
+            }
+        }
+
+        for (int x = 1; x < N + 1; x++) {
+            for (int y = 1; y < change + 1; y++) {
+                //if the amount of coins is greater than the change(y) we are making
+                //then just leave that coin, and move from that without making any change in y
+                if (coins[x - 1] > y) {
+                    memo[x][y] = memo[x - 1][y];
+                } else {
+                    //two choices 
+                    //1. take that coin and adjust the change y with the amount of that coin
+                    //and add 1 as picking up 1 coins in min
+                    //2. don't take that coins and move to next coin, without making any adjustment in change y
+                    memo[x][y] = Math.min(memo[x][y - coins[x - 1]] + 1,
+                            memo[x - 1][y]);
+                }
+            }
+        }
+
+        //output
+        System.out.println("Minimum coins required to make change: " + memo[N][change]);
+    }
+    
+    public boolean checkIfStringCIsInterleavingOfStringAAndB_DP_Problem(String a, String b, String c) {
+
+        //.............................T: O(M * N) M = a.length(), N = b.length()
+        //https://leetcode.com/problems/interleaving-string/
+        if(c.length() != a.length() + b.length()){
+            return false;
+        }
+        
+        boolean dp[] = new boolean[b.length() + 1];
+        for (int i = 0; i <= a.length(); i++) {
+            for (int j = 0; j <= b.length(); j++) {
+                if (i == 0 && j == 0) {
+                    dp[j] = true;
+                } else if (i == 0) {
+                    dp[j] = dp[j - 1] && b.charAt(j - 1) == c.charAt(i + j - 1);
+                } else if (j == 0) {
+                    dp[j] = dp[j] && a.charAt(i - 1) == c.charAt(i + j - 1);
+                } else {
+                    dp[j] = (dp[j] && a.charAt(i - 1) == c.charAt(i + j - 1)) 
+                            || (dp[j - 1] && b.charAt(j - 1) == c.charAt(i + j - 1));
+                }
+            }
+        }
+        return dp[b.length()];
     }
 
     public void LRUCacheDesignImpl(List<String> operations, List<List<Integer>> inputs) {
@@ -9957,57 +10980,101 @@ public class DSA450Questions {
         System.out.println("In words: \n" + sb.toString());
 
     }
-    
-    public void printPascalTriangle_SimpleAddition(int rows){
-        
+
+    public void printPascalTriangle_SimpleAddition(int rows) {
+
         //https://leetcode.com/problems/pascals-triangle/
         List<List<Integer>> result = new ArrayList<>();
-        
-        if(rows == 0){
+
+        if (rows == 0) {
             return;
         }
-        
+
         result.add(new ArrayList<>());
         result.get(0).add(1); //base 
-        
-        for(int r = 1; r < rows; r++){
+
+        for (int r = 1; r < rows; r++) {
             List<Integer> currRow = new ArrayList<>();
             List<Integer> prevRow = result.get(r - 1);
-            
+
             currRow.add(1); //first 1 of the row
-            for(int c = 1; c < r; c++){
-                
+            for (int c = 1; c < r; c++) {
+
                 currRow.add(prevRow.get(c - 1) + prevRow.get(c));
             }
             currRow.add(1); //last 1 of the row
             result.add(currRow);
         }
-        
+
         //output
-        System.out.println("Pascal tiangle: "+result);
+        System.out.println("Pascal tiangle: " + result);
     }
-    
-    public void printPascalTriangle_BinomialCoeff(int rows){
-        
+
+    public void printPascalTriangle_BinomialCoeff(int rows) {
+
         //https://leetcode.com/problems/pascals-triangle/
         //https://www.geeksforgeeks.org/pascal-triangle/
         List<List<Integer>> result = new ArrayList<>();
-        
-        if(rows == 0){
+
+        if (rows == 0) {
             return;
         }
-        
-        for(int r = 1; r <= rows; r++){
+
+        for (int r = 1; r <= rows; r++) {
             int X = 1;
             result.add(new ArrayList<>());
-            for(int c = 1; c <= r; c++){
+            for (int c = 1; c <= r; c++) {
                 result.get(r - 1).add(X);
                 X = X * (r - c) / c;
             }
         }
-        
+
         //output
-        System.out.println("Pascal tiangle: "+result);
+        System.out.println("Pascal tiangle: " + result);
+    }
+
+    private boolean findCelebrityInNPepole_knows(int a, int b) {
+        //if i knows j then its 1 else 0
+        //for N * N people matrix
+        int[][] whoKnowsWhom = {
+            {0, 0, 1, 0},
+            {0, 0, 1, 0},
+            {0, 0, 0, 0},
+            {0, 0, 1, 0}}; //SHOULD BE GLOBAL
+        return whoKnowsWhom[a][b] == 1;
+    }
+
+    public int findCelebrityInNPepole(int N) {
+
+        //......................T: O(N)
+        //......................S: O(1)
+        //https://www.geeksforgeeks.org/the-celebrity-problem/
+        //TWO POINTER APPROACH
+        int potentialCelebrityStart = 0;
+        int potentialCelebrityEnd = N - 1;
+
+        //until endPerson and startPerson becomes equal
+        while (potentialCelebrityEnd > potentialCelebrityStart) {
+
+            if (findCelebrityInNPepole_knows(potentialCelebrityStart, potentialCelebrityEnd)) {
+                potentialCelebrityStart++;
+            } else {
+                potentialCelebrityEnd--;
+            }
+        }
+
+        //startPerson == endPerson consider to be a potential celebrity
+        for (int ordinaryPerson = 0; ordinaryPerson < N; ordinaryPerson++) {
+            // If any person doesn't
+            // know 'startPerson' or 'startPerson' doesn't
+            // know any person, return -1
+            if (ordinaryPerson != potentialCelebrityStart
+                    && (findCelebrityInNPepole_knows(potentialCelebrityStart, ordinaryPerson) /*if celebrity know any person then he can't be celebrity*/
+                    || !findCelebrityInNPepole_knows(ordinaryPerson, potentialCelebrityStart) /*if any person doesn't know celebrity then he can't be celebrity*/)) {
+                return -1;
+            }
+        }
+        return potentialCelebrityStart;
     }
 
     public static void main(String[] args) {
@@ -10454,6 +11521,8 @@ public class DSA450Questions {
 //        obj.kThNodeFromEndOfLinkedList_1(n1, 3);
 //        obj.kThNodeFromEndOfLinkedList_2(n1, 3);
 //        obj.kThNodeFromEndOfLinkedList_3(n1, 3); //OPTIMISED O(N)
+//        obj.kThNodeFromEndOfLinkedList_3(n1, 6); //OPTIMISED O(N)
+//        obj.kThNodeFromEndOfLinkedList_3(n1, 8); //OPTIMISED O(N)
         //......................................................................
 //        Row: 190
 //        System.out.println("Check if a tree is height balanced or not");
@@ -12345,7 +13414,7 @@ public class DSA450Questions {
 //        root1 = new TreeNode<>(1);
 //        root1.setLeft(new TreeNode<>(2));
 //        root1.getLeft().setLeft(new TreeNode<>(4));
-//        root1.getLeft().setLeft(new TreeNode<>(5));
+//        root1.getLeft().setRight(new TreeNode<>(5));
 //        root1.setRight(new TreeNode<>(3));
 //        root1.getRight().setRight(new TreeNode<>(7)); //NOT-COMPLETE BINARY TREE
 //        System.out.println("Is tree complete binary tree: "+obj.checkIfBinaryTreeIsCompleteOrNot(root1));
@@ -12552,6 +13621,7 @@ public class DSA450Questions {
 //        Row: SEPARATE QUESTION IMPORTANT
 //        System.out.println("Longest substring with K unique characters (SLIDING WINDOW)");
 //        obj.longestSubstringWithKUniqueCharacter("aabacbebebe", 3);
+//        obj.longestSubstringWithKUniqueCharacter("aabcaccbeb", 3);
 //        obj.longestSubstringWithKUniqueCharacter("aaaa", 2);
 //        obj.longestSubstringWithKUniqueCharacter("hq", 2);
         //......................................................................
@@ -12561,6 +13631,7 @@ public class DSA450Questions {
 //        System.out.println("Smallest missing positive number: " + obj.smallestMissingPositiveNumber(new int[]{1, 2, 3, 4, 5}));
 //        System.out.println("Smallest missing positive number: " + obj.smallestMissingPositiveNumber(new int[]{0, -10, 1, 3, -20}));
 //        System.out.println("Smallest missing positive number: " + obj.smallestMissingPositiveNumber(new int[]{}));
+//        System.out.println("Smallest missing positive number: " + obj.smallestMissingPositiveNumber(new int[]{-2,2,7,1}));
         //......................................................................
 //        Row: SEPARATE QUESTION IMPORTANT
 //        System.out.println("Sort the matrix diaonally");
@@ -12581,7 +13652,7 @@ public class DSA450Questions {
 //        obj.subarrayProductLessThanK(new int[]{10, 5, 2, 6}, 100);
         //......................................................................
 //        Row: SEPARATE QUESTION IMPORTANT
-//        System.out.println("Lnked list component");
+//        System.out.println("Linked list component");
 //        //https://leetcode.com/problems/linked-list-components/
 //        Node<Integer> head = new Node<>(0);
 //        head.setNext(new Node<>(1));
@@ -12680,16 +13751,293 @@ public class DSA450Questions {
 //        obj.rotateLinkedListKTimes(head, 2);
         //......................................................................
 //        Row: SEPARATE QUESTION IMPORTANT
-        System.out.println("Sort the linked list in relative order of the given arr");
-        //https://www.geeksforgeeks.org/sort-linked-list-order-elements-appearing-array/
-        Node<Integer> head = new Node<>(3);
-        head.setNext(new Node<>(2));
-        head.getNext().setNext(new Node<>(5));
-        head.getNext().getNext().setNext(new Node<>(8));
-        head.getNext().getNext().getNext().setNext(new Node<>(5));
-        head.getNext().getNext().getNext().getNext().setNext(new Node<>(2));
-        head.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(1));
-        obj.sortLinkedListInRelativeOrderOfArr(head, new int[]{5, 1, 3, 2, 8});
+//        System.out.println("Sort the linked list in relative order of the given arr");
+//        //https://www.geeksforgeeks.org/sort-linked-list-order-elements-appearing-array/
+//        Node<Integer> head = new Node<>(3);
+//        head.setNext(new Node<>(2));
+//        head.getNext().setNext(new Node<>(5));
+//        head.getNext().getNext().setNext(new Node<>(8));
+//        head.getNext().getNext().getNext().setNext(new Node<>(5));
+//        head.getNext().getNext().getNext().getNext().setNext(new Node<>(2));
+//        head.getNext().getNext().getNext().getNext().getNext().setNext(new Node<>(1));
+//        obj.sortLinkedListInRelativeOrderOfArr(head, new int[]{5, 1, 3, 2, 8});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Count nodes in complete binary tree");
+//        //https://leetcode.com/problems/count-complete-tree-nodes/
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.getLeft().setRight(new TreeNode<>(5));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setLeft(new TreeNode<>(6));
+//        root1.getRight().setRight(new TreeNode<>(7));
+//        System.out.println("Nnumber of nodes in complete binary tree: " + obj.countNodesInCompleteBinaryTree(root1));
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.getLeft().setRight(new TreeNode<>(5));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setLeft(new TreeNode<>(6));
+//        System.out.println("Nnumber of nodes in complete binary tree: " + obj.countNodesInCompleteBinaryTree(root1));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("All source to destination path with weight sum in N-Ary tree ");
+//        //https://www.geeksforgeeks.org/amazon-interview-experience-set-424-sde-2/
+//        List<List<VertexWithWeight>> adjList = Arrays.asList(
+//                /*0*/Arrays.asList(new VertexWithWeight(1, 10),
+//                        new VertexWithWeight(2, 50),
+//                        new VertexWithWeight(3, 20)),
+//                /*1*/ Arrays.asList(new VertexWithWeight(0, 10),
+//                        new VertexWithWeight(4, 30),
+//                        new VertexWithWeight(5, 40)),
+//                /*2*/ Arrays.asList(new VertexWithWeight(0, 50)),
+//                /*3*/ Arrays.asList(new VertexWithWeight(0, 20)),
+//                /*4*/ Arrays.asList(new VertexWithWeight(1, 30)),
+//                /*5*/ Arrays.asList(new VertexWithWeight(1, 40))
+//        );
+//        obj.vertexWithWeightAllSourceToDestinationPath(adjList);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Count good nodes in binary tree");
+//        //https://leetcode.com/problems/count-good-nodes-in-binary-tree/
+//        TreeNode<Integer> root1 = new TreeNode<>(3);
+//        root1.setLeft(new TreeNode<>(1));
+//        root1.getLeft().setLeft(new TreeNode<>(3));
+//        root1.setRight(new TreeNode<>(4));
+//        root1.getRight().setLeft(new TreeNode<>(1));
+//        root1.getRight().setRight(new TreeNode<>(5));
+//        System.out.println("Good nodes in the binary tree count: "+obj.countGoodNodesInBinaryTree(root1, Integer.MIN_VALUE));
+//        root1 = new TreeNode<>(3);
+//        root1.setLeft(new TreeNode<>(3));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.getLeft().setRight(new TreeNode<>(2));
+//        System.out.println("Good nodes in the binary tree count: "+obj.countGoodNodesInBinaryTree(root1, Integer.MIN_VALUE));
+//        root1 = new TreeNode<>(1);
+//        System.out.println("Good nodes in the binary tree count: "+obj.countGoodNodesInBinaryTree(root1, Integer.MIN_VALUE));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Min distance between 2 nodes in given binary tree");
+//        //https://www.geeksforgeeks.org/find-distance-between-two-nodes-of-a-binary-tree/
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.setRight(new TreeNode<>(3));
+//        obj.minDistanceBetweenGivenTwoNodesInBinaryTree(root1, 2, 3);
+//        obj.minDistanceBetweenGivenTwoNodesInBinaryTree(root1, 3, 3);
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.getLeft().setRight(new TreeNode<>(5));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setLeft(new TreeNode<>(6));
+//        root1.getRight().getLeft().setRight(new TreeNode<>(8));
+//        root1.getRight().setRight(new TreeNode<>(7));
+//        obj.minDistanceBetweenGivenTwoNodesInBinaryTree(root1, 4, 5);
+//        obj.minDistanceBetweenGivenTwoNodesInBinaryTree(root1, 4, 6);
+//        obj.minDistanceBetweenGivenTwoNodesInBinaryTree(root1, 3, 4);
+//        obj.minDistanceBetweenGivenTwoNodesInBinaryTree(root1, 2, 4);
+//        obj.minDistanceBetweenGivenTwoNodesInBinaryTree(root1, 8, 5);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Celebrity problem (TWO POINTER)");
+//        //https://www.geeksforgeeks.org/the-celebrity-problem/
+//        System.out.println("Id of celebrity person: " + obj.findCelebrityInNPepole(4));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Max product in splitted binary tree");
+//        //https://leetcode.com/problems/maximum-product-of-splitted-binary-tree/
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.getLeft().setRight(new TreeNode<>(5));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setLeft(new TreeNode<>(6));
+//        obj.maxProductIfBinaryTreeIsSplitIntoTwo(root1);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Longest consecutive sequenec");
+//        //https://practice.geeksforgeeks.org/problems/longest-consecutive-subsequence2449/1
+//        System.out.println("Longest consecutive seq: "+obj.longestConsecutiveSequence(new int[]{2,6,1,9,4,5,3}));
+//        System.out.println("Longest consecutive seq: "+obj.longestConsecutiveSequence(new int[]{2,2,4,5,1,1,1,3,4,5,6,7,8,9,9}));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Max difference of indexes");
+//        //https://www.geeksforgeeks.org/given-an-array-arr-find-the-maximum-j-i-such-that-arrj-arri/
+//        obj.maxDifferenceOfIndexes(new int[]{34, 8, 10, 3, 2, 80, 30, 33, 1});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Maximum difference between node and its ancestor");
+//        //https://www.geeksforgeeks.org/maximum-difference-between-node-and-its-ancestor-in-binary-tree/
+//        TreeNode<Integer> root1 = new TreeNode<>(7);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setRight(new TreeNode<>(1)); //Node = 1 and ancestor = 7 max diff becomes 6
+//        obj.maximumDifferenceBetweenNodeAndItsAncestor(root1);
+//        root1 = new TreeNode<>(1);
+//        root1.setRight(new TreeNode<>(34));
+//        obj.maximumDifferenceBetweenNodeAndItsAncestor(root1);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Delete nodes from binary search tree");
+//        //https://leetcode.com/problems/delete-node-in-a-bst/
+//        TreeNode<Integer> root1 = new TreeNode<>(3);
+//        root1.setLeft(new TreeNode<>(0));
+//        root1.getLeft().setRight(new TreeNode<>(2));
+//        root1.getLeft().getRight().setLeft(new TreeNode<>(1));
+//        root1.setRight(new TreeNode<>(4));
+//        new BinaryTree<Integer>(obj.deleteTreeNodeFromBinarySearchTree(root1, 3)).treeBFS(); //DELETE ROOT OF TREE
+//        new BinaryTree<Integer>(obj.deleteTreeNodeFromBinarySearchTree(root1, 1)).treeBFS(); //DELETE LEAF
+//        new BinaryTree<Integer>(obj.deleteTreeNodeFromBinarySearchTree(root1, 0)).treeBFS(); //DELETE ROOT HAS ONE CHILD (RIGHT)
+//        new BinaryTree<Integer>(obj.deleteTreeNodeFromBinarySearchTree(root1, 2)).treeBFS(); //DELETE ROOT HAS ONE CHILD (LEFT)
+//        System.out.println();
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Delete nodes from binary search tree that are not in range");
+//        //https://leetcode.com/problems/trim-a-binary-search-tree/
+//        TreeNode<Integer> root1 = new TreeNode<>(3);
+//        root1.setLeft(new TreeNode<>(0));
+//        root1.getLeft().setRight(new TreeNode<>(2));
+//        root1.getLeft().getRight().setLeft(new TreeNode<>(1));
+//        root1.setRight(new TreeNode<>(4));
+//        obj.deleteTreeNodeFromBinarySearchTreeNotInRange(root1, 1, 3);
+//        root1 = new TreeNode<>(3);
+//        root1.setLeft(new TreeNode<>(1));
+//        root1.getLeft().setLeft(new TreeNode<>(0));
+//        root1.getLeft().setRight(new TreeNode<>(2));
+//        root1.setRight(new TreeNode<>(4));
+//        obj.deleteTreeNodeFromBinarySearchTreeNotInRange(root1, 2, 3);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Rearrange array elements");
+//        //https://www.geeksforgeeks.org/rearrange-given-array-place/
+//        obj.rearrangeArrayElements(new int[]{4, 0, 2, 1, 3});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Minimum range that contains atleast one element from K sorted List");
+//        //https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/
+//        //https://www.geeksforgeeks.org/find-smallest-range-containing-elements-from-k-lists/
+//        obj.minimumRangeContainingAtleastOneElementFromKSortedList(new int[][]{
+//            {1, 3, 5, 7, 9},
+//            {0, 2, 4, 6, 8},
+//            {2, 3, 5, 7, 11}
+//        });
+//        obj.minimumRangeContainingAtleastOneElementFromKSortedList(new int[][]{
+//            {1, 2, 3, 4},
+//            {5, 6, 7, 8},
+//            {9, 10, 11, 12}
+//        });
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Tuples with same product");
+//        //https://leetcode.com/problems/tuple-with-same-product/
+//        obj.tupleWithSameProduct(new int[]{2, 3, 4, 6});
+//        obj.tupleWithSameProduct(new int[]{2, 3, 5, 7});
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Check if two nodes are cousin of each other");
+//        //https://leetcode.com/problems/cousins-in-binary-tree/
+//        TreeNode<Integer> root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.setRight(new TreeNode<>(3));
+//        obj.checkIfTwoTreeNodesAreCousin(root1, 4, 3);
+//        obj.checkIfTwoTreeNodesAreCousin(root1, 2, 3);
+//        root1 = new TreeNode<>(1);
+//        root1.setLeft(new TreeNode<>(2));
+//        root1.getLeft().setRight(new TreeNode<>(4));
+//        root1.setRight(new TreeNode<>(3));
+//        root1.getRight().setRight(new TreeNode<>(5));
+//        obj.checkIfTwoTreeNodesAreCousin(root1, 4, 5);
+//        obj.checkIfTwoTreeNodesAreCousin(root1, 2, 5);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Closest Strings distance");
+//        //https://practice.geeksforgeeks.org/problems/closest-strings0611/1#
+//        System.out.println("Closest string distance: " + obj.closestStringDistance(
+//                Arrays.asList("geeks", "for", "geeks", "contribute", "practice"), "geeks", "practice"));
+//        System.out.println("Closest string distance: " + obj.closestStringDistance(
+//                Arrays.asList("geeks", "for", "geeks", "contribute", "practice"), "geeks", "geeks"));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Connect all nodes at same level in a tree by the random pointer (Recursive/ Iterative)");
+//        //https://practice.geeksforgeeks.org/problems/connect-nodes-at-same-level/1#
+//        TreeNode<Integer> root1 = new TreeNode<>(10);
+//        root1.setLeft(new TreeNode<>(3));
+//        root1.getLeft().setLeft(new TreeNode<>(4));
+//        root1.getLeft().setRight(new TreeNode<>(1));
+//        root1.setRight(new TreeNode<>(5));
+//        root1.getRight().setRight(new TreeNode<>(2));
+//        obj.connectTreeNodesAtSameLevel_Recursive(root1);
+//        obj.connectTreeNodesAtSameLevel_Iterative(root1);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("K - diff pairs in array");
+//        //https://leetcode.com/problems/k-diff-pairs-in-an-array/
+//        obj.kDiffPairsInArray(new int[]{3, 1, 4, 1, 5}, 2);
+//        obj.kDiffPairsInArray(new int[]{-1, -2, -3}, 1);
+//        obj.kDiffPairsInArray(new int[]{1, 3, 1, 5, 4}, 0);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+//        System.out.println("Least number of unique integers left after K removals");
+//        //https://leetcode.com/problems/least-number-of-unique-integers-after-k-removals/
+//        obj.leastNumberOfUniqueIntegersLeftAfterKRemoval(new int[]{5, 5, 4}, 1);
+//        obj.leastNumberOfUniqueIntegersLeftAfterKRemoval(new int[]{4, 3, 1, 1, 3, 3, 2}, 3);
+//        obj.leastNumberOfUniqueIntegersLeftAfterKRemoval(new int[]{4, 3, 1, 1, 3, 3, 2}, 7);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Min number of coines required to make change in unlimited supply of coins(DP_PROBLEM)");
+        //https://practice.geeksforgeeks.org/problems/number-of-coins1824/1
+        obj.minCoinsRequiredToMakeChangeInUnlimitedSupplyOfCoins_DP_Problem(new int[]{25, 10, 5}, 30);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Long pressed names");
+        //https://leetcode.com/problems/long-pressed-name/
+        System.out.println("Both actual name and typed name supposed to equal: " + obj.longPressedNames("alex", "aaleex"));
+        System.out.println("Both actual name and typed name supposed to equal: " + obj.longPressedNames("laex", "aaleex"));
+        System.out.println("Both actual name and typed name supposed to equal: " + obj.longPressedNames("saeed", "ssaaedd"));
+        System.out.println("Both actual name and typed name supposed to equal: " + obj.longPressedNames("leelee", "lgeelege"));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Binary search tree to greater sum tree");
+        //https://leetcode.com/problems/convert-bst-to-greater-tree/
+        TreeNode<Integer> root1 = new TreeNode<>(4);
+        root1.setLeft(new TreeNode<>(1));
+        root1.getLeft().setLeft(new TreeNode<>(0));
+        root1.getLeft().setRight(new TreeNode<>(2));
+        root1.getLeft().getRight().setRight(new TreeNode<>(3));
+        root1.setRight(new TreeNode<>(6));
+        root1.getRight().setLeft(new TreeNode<>(5));
+        root1.getRight().setRight(new TreeNode<>(7));
+        root1.getRight().getRight().setRight(new TreeNode<>(8));
+        obj.binarySearchTreeToGreaterSumTree(root1);
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Print all interleavings of given two strings");
+        //https://www.geeksforgeeks.org/print-all-interleavings-of-given-two-strings/
+        obj.interleavingOfTwoStrings("AB", "CD");
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Check if String C is interleaving of String A & B");
+        ////https://leetcode.com/problems/interleaving-string/
+        System.out.println("Third string is interleaving of other two: "
+                + obj.checkIfStringCIsInterleavingOfStringAAndB_DP_Problem("AB", "CD", "ACBG"));
+        System.out.println("Third string is interleaving of other two: "
+                + obj.checkIfStringCIsInterleavingOfStringAAndB_DP_Problem("AB", "CD", "ACDB"));
+        System.out.println("Third string is interleaving of other two: "
+                + obj.checkIfStringCIsInterleavingOfStringAAndB_DP_Problem("AB", "CD", "AC"));
+        System.out.println("Third string is interleaving of other two: "
+                + obj.checkIfStringCIsInterleavingOfStringAAndB_DP_Problem("aabcc", "dbbca", "aadbbcbcac"));
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Print all permutation of distinct char in string");
+        //https://leetcode.com/problems/permutations/
+        obj.printAllPermutationOfDistinctCharInString("ABC");
+        obj.printAllPermutationOfDistinctCharInString("ABCD");
+        //......................................................................
+//        Row: SEPARATE QUESTION IMPORTANT
+        System.out.println("Print all permutation of a distinct integer");
+        //https://leetcode.com/problems/permutations/
+        obj.printAllPermutationOfDistinctIntegerArray(new int[]{1,2,3});
     }
 
 }

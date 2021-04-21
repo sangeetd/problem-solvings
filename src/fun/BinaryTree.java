@@ -484,7 +484,7 @@ public class BinaryTree<T> {
         }
 
         if (!result.containsKey(level)) {
-            result.put(level, root.data);
+            result.put(level, root.getData());
         }
 
         leftViewHelper(root.getLeft(), level + 1, result);
@@ -517,7 +517,7 @@ public class BinaryTree<T> {
         }
 
         if (!result.containsKey(level)) {
-            result.put(level, root.data);
+            result.put(level, root.getData());
         }
 
         rightViewHelper(root.getRight(), level + 1, result);

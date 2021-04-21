@@ -94,11 +94,21 @@ public class Fun {
         // TODO code application logic here
         
         List<String> getCombination = stringPermutation("MISSISSIPPI");
-        System.out.println(getCombination.size());
-        for(String s: getCombination){
-            System.out.println(s);
-        }
+//        System.out.println(getCombination.size());
+//        for(String s: getCombination){
+//            System.out.println(s);
+//        }
         
+        BinaryHeap<Integer> minHeap = new BinaryHeap<>((a, b) -> a.compareTo(b));
+        minHeap.add(2);
+        minHeap.add(10);
+        minHeap.add(1);
+        minHeap.print();
+        minHeap.add(13);
+        minHeap.add(0);
+        minHeap.add(7);
+        minHeap.add(100);
+        minHeap.print();
     }
 
 }

@@ -3095,12 +3095,12 @@ public class SomePracticeQuestion {
                 m.put(vLevel, firstList);
             }
 
-            if (n.left != null) {
-                q.add(new Pair<>(n.left, vLevel - 1));
+            if (n.getLeft() != null) {
+                q.add(new Pair<>(n.getLeft(), vLevel - 1));
             }
 
-            if (n.right != null) {
-                q.add(new Pair<>(n.right, vLevel + 1));
+            if (n.getRight() != null) {
+                q.add(new Pair<>(n.getRight(), vLevel + 1));
             }
 
         }
@@ -3383,12 +3383,12 @@ public class SomePracticeQuestion {
             return false;
         }
 
-        boolean presenceOfOneInLeft = deepPruning(node.left);
+        boolean presenceOfOneInLeft = deepPruning(node.getLeft());
         if (!presenceOfOneInLeft) {
             node.setLeft(null);
         }
 
-        boolean presenceOfOneInRight = deepPruning(node.right);
+        boolean presenceOfOneInRight = deepPruning(node.getRight());
         if (!presenceOfOneInRight) {
             node.setRight(null);
         }
@@ -3420,8 +3420,8 @@ public class SomePracticeQuestion {
             return root;
         }
 
-        TreeNode leftLca = lcaSolver(root.left, p, q);
-        TreeNode rightLca = lcaSolver(root.right, p, q);
+        TreeNode leftLca = lcaSolver(root.getLeft(), p, q);
+        TreeNode rightLca = lcaSolver(root.getRight(), p, q);
 
         if (leftLca != null && rightLca != null) {
             return root;
@@ -3618,7 +3618,7 @@ public class SomePracticeQuestion {
         if (node == null) {
             return 0;
         }
-        if (node.left == null && node.right == null) {
+        if (node.getLeft() == null && node.getRight() == null) {
             res.result = Math.max(res.result, (Integer) node.getData());
             return (Integer) node.getData();
         }
@@ -3630,7 +3630,7 @@ public class SomePracticeQuestion {
         int rs = maxPathSumOfTreeLeafNodeToLeafNode(node.getRight(), res);
 
         // If both left and right children exist 
-        if (node.left != null && node.right != null) {
+        if (node.getLeft() != null && node.getRight() != null) {
 
             // Update result if needed 
             res.result = Math.max(res.result, ls + rs + (Integer) node.getData());
@@ -4392,17 +4392,17 @@ public class SomePracticeQuestion {
         while (!q.isEmpty()) {
             TreeNode curr = q.removeFirst(); //pop first from the queue
 
-            if (curr.right != null) {
-                q.addFirst(curr.right); //push at first in queue
+            if (curr.getRight() != null) {
+                q.addFirst(curr.getRight()); //push at first in queue
             }
-            if (curr.left != null) {
-                q.addFirst(curr.left); //push at first in queue
+            if (curr.getLeft() != null) {
+                q.addFirst(curr.getLeft()); //push at first in queue
             }
 //            System.out.println(q);
             if (!q.isEmpty()) {
 //                System.out.println(q.peek()+"--");
-                curr.right = q.peek();
-                curr.left = null;
+                curr.setRight(q.peek());
+                curr.setLeft(null);
             }
         }
 
@@ -5627,7 +5627,7 @@ public class SomePracticeQuestion {
             sumOfOnlyLeftChildOfNodeInTree += root.getData();
         }
 
-        sumOfLeftLeafNodesOfTree_Helper(root.right, root);
+        sumOfLeftLeafNodesOfTree_Helper(root.getRight(), root);
 
     }
 
@@ -9904,6 +9904,7 @@ public class SomePracticeQuestion {
 //        int n = coins.length; 
 //        int K = 5;
 //        System.out.println( minNoOfCoinsUsedForChange(coins, n, K)); //2
+//        System.out.println( minNoOfCoinsUsedForChange(new int[]{25, 10, 5}, 3, 30)); //2
 //        //2+3, 1+1+1+2, 1+1+3, 1+1+1+1+1, 1+2+2
 //        //max ways to make change for K=5 is above 5 ways
 //        //out of that we used just 2 coins in 2,3 that are min no of coins used in above 5 ways. 
